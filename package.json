@@ -1,0 +1,25 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "electron": "wait-on tcp:3000 && electron .",
+    "electron:serve": "concurrently -k \"npm run dev\" \"npm run electron\""
+  },
+  "dependencies": {
+    "ant-design-vue": "^3.2.12",
+    "vue": "^3.2.37",
+    "axios": "^0.25.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.1.0",
+    "concurrently": "^7.4.0",
+    "electron": "^20.1.4",
+    "vite": "^3.1.0",
+    "wait-on": "^6.0.1"
+  }
+}
