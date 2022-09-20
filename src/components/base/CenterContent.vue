@@ -8,7 +8,7 @@
         <a-breadcrumb-item>Bill</a-breadcrumb-item>
       </a-breadcrumb>
       <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
-        Bill is a cat.
+        Bill is a cat.{{ menuKey }}
       </div>
     </a-layout-content>
   </a-layout>
@@ -16,6 +16,18 @@
 
 <script setup>
 
+import {ref} from "vue";
+
+const menuKeyValue = ref(null)
+
+const prop = defineProps({
+  menuKey: {
+    type: String,
+    default: ""
+  }
+})
+
+menuKeyValue.value = prop.menuKey
 
 </script>
 

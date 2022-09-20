@@ -3,7 +3,11 @@
   <a-layout-sider v-model:collapsed="collapsed" collapsible width="150" id="components-layout-demo-side">
     <div class="logo">
       <p>easy pass</p></div>
-    <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
+    <a-menu
+        v-model:selectedKeys="selectedKeys"
+        theme="dark"
+        mode="inline"
+        @click="menuClick">
       <a-menu-item key="100">
         <lock-outlined/>
         <span>密码管理</span>
@@ -12,27 +16,6 @@
         <desktop-outlined/>
         <span>常用密码</span>
       </a-menu-item>
-      <!--        <a-sub-menu key="sub1">
-                <template #title>
-                  <span>
-                    <user-outlined/>
-                    <span>User</span>
-                  </span>
-                </template>
-                <a-menu-item key="3">Tom</a-menu-item>
-                <a-menu-item key="4">Bill</a-menu-item>
-                <a-menu-item key="5">Alex</a-menu-item>
-              </a-sub-menu>-->
-      <!--        <a-sub-menu key="sub2">
-                <template #title>
-                  <span>
-                    <team-outlined/>
-                    <span>Team</span>
-                  </span>
-                </template>
-                <a-menu-item key="6">Team 1</a-menu-item>
-                <a-menu-item key="8">Team 2</a-menu-item>
-              </a-sub-menu>-->
       <a-menu-item key="300">
         <upload-outlined/>
         <span>导入密码</span>
@@ -60,7 +43,15 @@ import {
 import {ref} from 'vue';
 
 const collapsed = ref(false)
-const selectedKeys = ref(['1'])
+const selectedKeys = ref(['100'])
+
+// 使用defineEmits注册一个自定义事件
+const emit = defineEmits(["getKey"])
+
+//菜单点击事件，每次点击，通过getKey事件发送selectedKeys的值
+const menuClick = (item) => {
+  emit("getKey", item.key)
+}
 
 </script>
 

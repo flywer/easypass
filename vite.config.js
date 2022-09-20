@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  //base: path.resolve(__dirname, './dist/'),	// 新增
-  base: "./",	// 新增
+  //base: path.resolve(__dirname, './dist/'),
+  base: "./",
   plugins: [vue()]
 })
