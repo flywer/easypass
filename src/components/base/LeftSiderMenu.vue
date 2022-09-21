@@ -2,7 +2,7 @@
 <template>
   <a-layout-sider v-model:collapsed="collapsed" collapsible width="150" id="components-layout-demo-side">
     <div class="logo">
-      <p>easy pass</p></div>
+<!--      <p>easy pass</p>--></div>
     <a-menu
         v-model:selectedKeys="selectedKeys"
         theme="dark"

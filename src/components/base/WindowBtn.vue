@@ -2,6 +2,9 @@
 <template>
   <a-layout id="topBar">
     <a-layout-content>
+      <div class="appName">
+        {{ appName }}
+      </div>
       <section style="float: right" id="btnGroup">
         <a-button type="text" @click="minWindowBtn">
           <minus-outlined/>
@@ -19,6 +22,9 @@
 
 <script setup>
 import {CloseOutlined, MinusOutlined, BorderOutlined} from '@ant-design/icons-vue';
+import {ref} from "vue";
+
+const appName = ref("easyPass")
 
 function maxWindowBtn() {
   window.electronAPI.setWindow("window-max");
@@ -36,6 +42,21 @@ function closeWindowBtn() {
 <style scoped lang="less">
 #topBar {
   -webkit-app-region: drag;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+
+  .appName {
+    float: left;
+    text-align: center;
+    line-height: 32px;
+    height: 32px;
+    margin-left: 12px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  }
 
   #btnGroup {
     -webkit-app-region: no-drag;

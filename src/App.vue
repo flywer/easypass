@@ -1,6 +1,6 @@
 <template>
   <WindowBtn/>
-  <a-layout style="min-height: 100vh">
+  <a-layout style="min-height: 100vh;margin-top: 32px">
     <!-- 左菜单-->
     <LeftSiderMenu  @getKey="getMenuKey"/>
     <!--中心内容组件载体-->
@@ -19,7 +19,6 @@ const manuKey = ref("")
 //接收子组件传过来的值，此为响应函数
 const getMenuKey = (value) => {
   manuKey.value = value
-  console.log(manuKey.value)
 }
 
 </script>

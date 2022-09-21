@@ -12,7 +12,7 @@ const router = createRouter({
     routes, // `routes: routes` 的缩写
 })
 
-createApp(App)//创建应用
+const  app = createApp(App)//创建应用
     .use(Antd)
     .use(router)//整个应用支持路由
     .mount('#app');//挂载根实例

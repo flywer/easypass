@@ -1,5 +1,5 @@
 {
-  "name": "vite-project",
+  "name": "easy-pass",
   "private": true,
   "version": "0.0.0",
   "main": "electron/main.js",
