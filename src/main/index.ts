@@ -5,6 +5,9 @@ import {createWindow} from './main.window'
 import {sequelize} from "@main/mysql";
 import {User} from "@main/model/user";
 import {PwdGroup} from "@main/model/pwdGroup";
+import {logger} from "sequelize/types/utils/logger";
+import {datableInit} from "@main/mapper/defaultSql";
+import {PwdMgtController} from "@main/controller/pwdMgt.controller";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -35,7 +38,7 @@ async function bootstrap() {
 
         await createEinf({
             window: createWindow,
-            controllers: [AppController],
+            controllers: [AppController,PwdMgtController],
             injects: [{
                 name: 'IS_DEV',
                 inject: !app.isPackaged,
@@ -45,17 +48,10 @@ async function bootstrap() {
 
         //验证是否连接成功
         sequelize.authenticate().then(async () => {
-            console.log('数据库连接成功!');
-            //将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配
-            //await sequelize.sync({force: true});
-            //await PwdGroup.sync()
-
-            const group = await PwdGroup.create({name:"默认"})
-            
-            //const user = await User.findAll()
-            //console.log(user)
+            console.log('Database connection succeeded :)');
+            //await datableInit()
         }).catch(err => {
-            console.error('数据库连接失败:', err);
+            console.error('Database connection failed :(', err);
         });
 
     } catch (error) {

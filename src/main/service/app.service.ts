@@ -1,13 +1,14 @@
-import { Injectable } from 'einf'
-import User from "@main/model/user";
+import {Injectable} from 'einf'
 
 @Injectable()
 export class AppService {
-  public getDelayTime(): number {
-    return 2
-  }
+    constructor() {
+    }
+    public getDelayTime(): number {
+        return 2
+    }
 
-  public getUserInfo(){
+    public getUserInfo() {
 
-  }
+    }
 }

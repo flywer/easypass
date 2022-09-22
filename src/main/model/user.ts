@@ -2,9 +2,9 @@ const {Sequelize, Model, DataTypes} = require('sequelize');
 import {sequelize} from "@main/mysql";
 
 /**
- * 用户信息类
+ * 用户信息model
  */
-export const User = sequelize.define('User', {
+export const User = sequelize.define('user', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -23,6 +23,7 @@ export const User = sequelize.define('User', {
     }
 }, {
     tableName: 'sys_user',
+    comment:'用户信息表'
 });
 
 
