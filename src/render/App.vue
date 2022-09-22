@@ -10,6 +10,7 @@ const manuKey = ref('')
 const getMenuKey = (value) => {
   manuKey.value = value
 }
+
 </script>
 
 <template>

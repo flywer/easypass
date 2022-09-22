@@ -1,6 +1,6 @@
 import { Controller, IpcHandle, IpcSend } from 'einf'
 import { BrowserWindow } from 'electron'
-import { AppService } from './app.service'
+import { AppService } from '../service/app.service'
 
 @Controller()
 export class AppController {
