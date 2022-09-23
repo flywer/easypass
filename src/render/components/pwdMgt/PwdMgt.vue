@@ -4,7 +4,7 @@ import {onMounted, reactive, ref, toRaw, watch} from 'vue'
 import {MoreOutlined, PlusOutlined, ReloadOutlined} from '@ant-design/icons-vue'
 import {getPwdGroupListByUserInfo} from "@render/api/pwdMgt/pwdMgt.api";
 import {getIpcResponseData} from '@common/types'
-import AddGroupModal from '@render/components/pwdMgt/addGroupModal.vue'
+import AddGroupModal from '@render/components/pwdMgt/AddGroupModal.vue'
 
 const route = useRoute()
 

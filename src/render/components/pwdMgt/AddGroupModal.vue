@@ -10,14 +10,6 @@ const props = defineProps({
   visible: Boolean,
 })
 
-onMounted(() => {
-  setInterval(() => {
-    console.log('props.visible:' + props.visible)
-  }, 10000)
-
-})
-
-
 // 定义事件
 const emit = defineEmits(['getVisible', 'createGroup'])
 
@@ -53,7 +45,6 @@ const handleOk = (e) => {
   validate().then(async () => {
     // 关闭弹窗
     emit('getVisible', false)
-
     if ((await savePwdGroup(modelRef)).data != null) {
       // 刷新界面
       emit('createGroup', true)

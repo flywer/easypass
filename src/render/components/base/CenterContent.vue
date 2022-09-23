@@ -16,11 +16,19 @@ const menuKeyValue = ref('')
 
 watch(() => props.menuKey, () => {
   menuKeyValue.value = props.menuKey
-  router.push(
-    {
-      name: 'pwdMgt',
-      params: { key: props.menuKey },
-    })
+  if(props.menuKey==='100'){
+    router.push(
+        {
+          name: 'pwdMgt',
+          params: { key: props.menuKey },
+        })
+  }
+  else if(props.menuKey==='500'){
+    router.push(
+        {
+          name: 'settings',
+        })
+  }
 })
 </script>
 
