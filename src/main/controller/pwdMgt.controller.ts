@@ -1,9 +1,6 @@
-import {Controller, IpcHandle, IpcSend, Window} from "einf";
-import {AppService} from "@main/service/app.service";
-import {BrowserWindow} from "electron";
-import {toRaw} from "vue";
+import {Controller, IpcHandle} from "einf";
 import {PwdMgtService} from "@main/service/pdwMgt.service";
-import {Model} from "sequelize";
+import {PwdGroup} from "@main/model/pwdGroup";
 
 @Controller()
 export class PwdMgtController {
@@ -12,23 +9,17 @@ export class PwdMgtController {
     ) {
     }
 
-
     /**
      * 通过用户信息获取密码分组信息
      * @param user
      */
     @IpcHandle('pwdMgt/getPwdGroupListByUserInfo')
-    public async handleGetPwdGroupListByUserInfo(user: {}) {
-        let resultArr = []
-        resultArr =  await this.pwdMgtService.getPwdGroupListByUserInfo(user).then(res => {
-            return res
-        })
-        return resultArr
+    public handleGetPwdGroupListByUserInfo(user: {}): Promise<PwdGroup[]> {
+        return this.pwdMgtService.getPwdGroupListByUserInfo(user)
     }
 
-/*    @IpcSend('send:pwdMgt/getPwdGroupListByUserInfo')
-    public  sendPwdGroupListByUserInfo(pwdGroupListByUserInfo) {
-        return pwdGroupListByUserInfo;
-    }*/
-
+    @IpcHandle('pwdMgt/savePwdGroup')
+    public async handleSavePwdGroup(pwdGroup: PwdGroup): Promise<PwdGroup> {
+        return await this.pwdMgtService.savePwdGroup(pwdGroup);
+    }
 }

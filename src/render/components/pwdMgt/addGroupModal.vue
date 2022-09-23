@@ -1,27 +1,37 @@
 <!-- 添加分组弹窗 -->
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { Form } from 'ant-design-vue'
+import {onMounted, reactive} from 'vue'
+import {Form} from 'ant-design-vue'
+import {savePwdGroup} from "@render/api/pwdMgt/pwdMgt.api";
+import {PwdGroup, pwdGroupVo} from "@main/model/pwdGroup";
 
 // 父组件传过来的值，是否显示
-defineProps({
+const props = defineProps({
   visible: Boolean,
 })
 
+onMounted(() => {
+  setInterval(() => {
+    console.log('props.visible:' + props.visible)
+  }, 10000)
+
+})
+
+
 // 定义事件
-const emit = defineEmits(['getVisible', 'getGroupName'])
+const emit = defineEmits(['getVisible', 'createGroup'])
 
 const useForm = Form.useForm
 
 // region 校验表单、提交表单
 // 表单属性
 const modelRef = reactive({
-  groupName: '',
+  name: '',
 })
 
 // 校验规则
 const rulesRef = reactive({
-  groupName: [
+  name: [
     {
       required: true,
       message: '请输入分组名',
@@ -35,16 +45,20 @@ const rulesRef = reactive({
 })
 
 // 提取检验方法
-const { resetFields, validate, validateInfos } = useForm(modelRef, rulesRef)
+const {resetFields, validate, validateInfos} = useForm(modelRef, rulesRef)
 
 // 点击确定
 const handleOk = (e) => {
   // 校验表单
-  validate().then(() => {
+  validate().then(async () => {
     // 关闭弹窗
     emit('getVisible', false)
-    // 传递新分组名
-    emit('getGroupName', modelRef.groupName)
+
+    if ((await savePwdGroup(modelRef)).data != null) {
+      // 刷新界面
+      emit('createGroup', true)
+    } else
+      console.log('新增失败!')
     resetFields()
   }).catch((err) => {
     console.log('error', err)
@@ -56,30 +70,31 @@ const handleOk = (e) => {
 const handleCancel = () => {
   emit('getVisible', false)
 }
+
 </script>
 
 <template>
+
   <a-modal
-    v-model:visible="visible"
-    title="添加分组"
-    width="50%"
-    get-container="#toolHeader"
-    body-style="padding:10px"
-    ok-text="确定"
-    cancel-text="取消"
-    @ok="handleOk"
-    @cancel="handleCancel"
+      v-model:visible='visible'
+      title="添加分组"
+      width="50%"
+      body-style="padding:10px"
+      ok-text="确定"
+      cancel-text="取消"
+      @ok="handleOk"
+      @cancel="handleCancel"
   >
     <a-form autocomplete="off">
       <a-form-item
-        label="分组名"
-        name="groupName"
-        style="margin-bottom: 0"
-        v-bind="validateInfos.groupName"
+          label="分组名"
+          name="name"
+          style="margin-bottom: 0"
+          v-bind="validateInfos.name"
       >
         <a-input
-          v-model:value="modelRef.groupName"
-          placeholder="分组名称最多10个字"
+            v-model:value="modelRef.name"
+            placeholder="分组名称最多10个字"
         />
       </a-form-item>
     </a-form>

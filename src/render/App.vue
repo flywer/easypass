@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import WindowBtn from './components/base/WindowBtn.vue'
-import LeftSiderMenu from './components/base/LeftSiderMenu.vue'
-import CenterContent from './components/base/CenterContent.vue'
+import {ref} from 'vue'
+import WindowBtn from '@render/components/base/WindowBtn.vue'
+import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
+import CenterContent from '@render/components/base/CenterContent.vue'
 
 const manuKey = ref('')
 
@@ -14,12 +14,12 @@ const getMenuKey = (value) => {
 </script>
 
 <template>
-  <WindowBtn />
+  <WindowBtn/>
   <a-layout style="min-height: 100vh;margin-top: 32px">
     <!-- 左菜单 -->
-    <LeftSiderMenu @getKey="getMenuKey" />
+    <LeftSiderMenu @getKey="getMenuKey"/>
     <!-- 中心内容组件载体 -->
-    <CenterContent :menu-key="manuKey" />
+    <CenterContent :menu-key="manuKey"/>
   </a-layout>
 </template>
 

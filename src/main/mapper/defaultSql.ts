@@ -1,11 +1,11 @@
 import {User} from "@main/model/user";
 import {PwdGroup} from "@main/model/pwdGroup"
-import {sequelize} from "@main/mysql";
+import {sequelize} from "@main/sequelize.init";
 
 /**
  * 数据库初始化
  */
-export const datableInit = async () => {
+export const databaseInit = async () => {
     try {
         await sequelize.transaction(async (t) => {
 
@@ -29,9 +29,13 @@ export const datableInit = async () => {
                 userId: user.get('id')
             })
 
+            //密码组与组项是一对多的关系
+            /* PwdGroup.hasMany(GroupItem)
+             GroupItem*/
+
             console.log("database init succeeded :)")
         });
     } catch (error) {
-        throw new Error("database init failed :(")
+        throw new Error("database init failed :( :"+error)
     }
 }

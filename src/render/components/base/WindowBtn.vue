@@ -1,7 +1,7 @@
 <!-- 窗口的右上角三个操作按钮 -->
 <script setup lang="ts">
 import { BorderOutlined, CloseOutlined, MinusOutlined } from '@ant-design/icons-vue'
-import { setWindow } from '@render/api'
+import { setWindow } from '@render/api/app.api'
 import { ref } from 'vue'
 
 const appName = ref('easyPass')

@@ -1,28 +1,58 @@
 const {Sequelize, Model, DataTypes} = require('sequelize');
-import {sequelize} from "@main/mysql";
+import {sequelize} from "@main/sequelize.init";
 
 /**
  * 密码组信息model
  */
-export const PwdGroup = sequelize.define('pwdGroup', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
-        comment: '主键ID',
-    },
-    name: {
-        type: DataTypes.STRING(36),
-        comment: '组名'
-    },
-    groupIndex: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        unique: true,
-        comment: '排序号'
+export class PwdGroup extends Model {
+    declare id: string
+    declare name: string
+    declare groupIndex: number
+
+    constructor(obj?: {
+        id?: string,
+        name?: string,
+        groupIndex?: number
+    }) {
+        super();
+        this.id = obj.id
+        this.name = obj.name
+        this.groupIndex = obj.groupIndex
     }
-}, {
-    tableName: 'pwd_group',
-    comment:'密码组信息表'
-});
+}
+
+export const pwdGroupVo = {
+    id: '',
+    name: '',
+    groupIndex: null
+}
+
+/**
+ * 初始化，注册为sequelize模型
+ */
+export const pwdGroupInit = () => {
+    PwdGroup.init({
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+            comment: '主键ID',
+        },
+        name: {
+            type: DataTypes.STRING(36),
+            comment: '组名'
+        },
+        groupIndex: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            unique: true,
+            comment: '排序号'
+        }
+    }, {
+        sequelize,
+        tableName: 'pwd_group',
+        comment: '密码组信息表'
+    })
+}
+
 

@@ -25,11 +25,13 @@ watch(() => props.menuKey, () => {
 </script>
 
 <template>
-  <a-layout>
+  <a-layout id="layout">
     <router-view />
   </a-layout>
 </template>
 
 <style scoped>
-
+#layout{
+  overflow-y: auto;
+}
 </style>
