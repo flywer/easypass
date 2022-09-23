@@ -71,6 +71,7 @@ const handleCancel = () => {
       title="添加分组"
       width="50%"
       body-style="padding:10px"
+      getContainer="#tool-header"
       ok-text="确定"
       cancel-text="取消"
       @ok="handleOk"

@@ -80,7 +80,7 @@ const updateGroupGrid = async (value) => {
 <style scoped lang="less">
 #tool-header {
   background: #fff;
-  margin: 8px;
+  margin: 40px 8px 8px 8px;
   -webkit-border-radius: 5px;
   height: auto;
   line-height: normal;

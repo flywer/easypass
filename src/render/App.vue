@@ -15,7 +15,7 @@ const getMenuKey = (value) => {
 
 <template>
   <WindowBtn/>
-  <a-layout style="min-height: 100vh;margin-top: 32px">
+  <a-layout has-sider style="min-height: 100vh;">
     <!-- 左菜单 -->
     <LeftSiderMenu @getKey="getMenuKey"/>
     <!-- 中心内容组件载体 -->
@@ -23,6 +23,7 @@ const getMenuKey = (value) => {
   </a-layout>
 </template>
 
-<style>
+<style scoped>
+
 
 </style>
