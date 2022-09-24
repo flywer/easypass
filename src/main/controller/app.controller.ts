@@ -1,6 +1,7 @@
 import {Controller, IpcHandle, IpcSend, Window} from 'einf'
-import {BrowserWindow} from 'electron'
+import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
+import path from "path";
 
 @Controller()
 export class AppController {
@@ -26,5 +27,51 @@ export class AppController {
         } else if (setup === 'window-close') {
             this.mainWindow.close()
         }
+    }
+
+    /**
+     * 设置开机自启
+     * @param setup
+     */
+    @IpcHandle('set-openAtLogin')
+    public async handleSetOpenAtLogin(setup: boolean) {
+        const exeName = path.basename(process.execPath);
+        //mac系统
+        if (process.platform === "darwin") {
+            app.setLoginItemSettings({
+                openAtLogin: setup,
+                openAsHidden: setup
+            });
+        } else {
+            app.setLoginItemSettings({
+                openAtLogin: setup,
+                openAsHidden: setup,
+                path: process.execPath,
+                args: [
+                    "--processStart", `"${exeName}"`,
+                    "--process-start-args", `"--hidden"`
+                ]
+            });
+        }
+    }
+
+    @IpcHandle('get-openAtLogin')
+    public handleGetOpenAtLogin() {
+        const exeName = path.basename(process.execPath);
+
+        let settings: Electron.LoginItemSettings
+
+        if (process.platform === "darwin") {
+            settings = app.getLoginItemSettings();
+        } else {
+            settings = app.getLoginItemSettings({
+                path: process.execPath,
+                args: [
+                    "--processStart", `"${exeName}"`,
+                    "--process-start-args", `"--hidden"`
+                ]
+            });
+        }
+        return settings.openAtLogin
     }
 }

@@ -1,4 +1,4 @@
-import {app} from 'electron'
+import {app,Tray,Menu,nativeImage} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
@@ -9,12 +9,17 @@ import {logger} from "sequelize/types/utils/logger";
 import {databaseInit} from "@main/mapper/defaultSql";
 import {PwdMgtController} from "@main/controller/pwdMgt.controller";
 import {GroupItem} from "@main/model/groupItem";
+import path from "path";
+import {trayInit} from "@main/app/app.tray";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 async function electronAppInit() {
     const isDev = !app.isPackaged
+
     app.on('window-all-closed', () => {
+        //Mac操作系统下的用户体验准则:
+        // 应用程序关闭所有窗口后，应用不退出，而是继续保留在Dock栏
         if (process.platform !== 'darwin')
             app.exit()
     })
@@ -30,6 +35,39 @@ async function electronAppInit() {
                 app.exit()
             })
         }
+    }
+    else{
+        //开机自启功能
+        //app.isReady() ? launchAtStartup() : app.on("ready", launchAtStartup);
+    }
+
+    ///应用启动后的操作
+    app.whenReady().then(() => {
+        trayInit()
+    })
+
+}
+
+const appFolder = path.dirname(process.execPath);
+//const updateExe = path.resolve(appFolder, "..", "Update.exe");
+
+function launchAtStartup() {
+    const exeName = path.basename(process.execPath);
+    if (process.platform === "darwin") {
+        app.setLoginItemSettings({
+            openAtLogin: true,
+            openAsHidden: true
+        });
+    } else {
+        app.setLoginItemSettings({
+            openAtLogin: true,
+            openAsHidden: true,
+            path: process.execPath,
+            args: [
+                "--processStart",`"${exeName}"`,
+                "--process-start-args",`"--hidden"`
+            ]
+        });
     }
 }
 

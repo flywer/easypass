@@ -1,8 +1,24 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import {getOpenAtLogin, setOpenAtLogin} from "@render/api/app.api";
+import {IpcResponse} from "einf";
 
-const checked1 = ref<boolean>(false);
+/*开机自启动*/
+const openAtLoginChecked = ref<boolean>(false);
+
+const setOpenAtLoginChecked = () => {
+  setOpenAtLogin(openAtLoginChecked.value)
+}
+
 const checked2 = ref<boolean>(false);
+
+
+
+
+
+onMounted(async () => {
+  openAtLoginChecked.value = (await getOpenAtLogin()).data
+})
 </script>
 
 <template>
@@ -17,14 +33,14 @@ const checked2 = ref<boolean>(false);
               开机自启动
             </div>
             <div style="float: right">
-              <a-switch v-model:checked="checked1"/>
+              <a-switch v-model:checked="openAtLoginChecked" @click="setOpenAtLoginChecked"/>
             </div>
           </a-layout-content>
         </a-card>
       </a-col>
     </a-row>
 
-    <a-row type="flex">
+<!--    <a-row type="flex">
       <a-col flex="auto">
         <a-card class="card-view" :bordered="false" size="small"
                 style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
@@ -38,7 +54,7 @@ const checked2 = ref<boolean>(false);
           </a-layout-content>
         </a-card>
       </a-col>
-    </a-row>
+    </a-row>-->
 
     <a-row type="flex">
       <a-col flex="auto">
@@ -61,97 +77,6 @@ const checked2 = ref<boolean>(false);
 
     <a-divider style="height: 2px;background-color: rgba(211,211,211,0.82);margin: 4px 0 12px 0;padding: 0 2px"/>
 
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="checked2"/>
-            </div>
-          </a-layout-content>
-        </a-card>
-
-      </a-col>
-    </a-row>
-
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="checked2"/>
-            </div>
-          </a-layout-content>
-        </a-card>
-
-      </a-col>
-    </a-row>
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="checked2"/>
-            </div>
-          </a-layout-content>
-        </a-card>
-
-      </a-col>
-    </a-row>
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="checked2"/>
-            </div>
-          </a-layout-content>
-        </a-card>
-
-      </a-col>
-    </a-row>
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="checked2"/>
-            </div>
-          </a-layout-content>
-        </a-card>
-
-      </a-col>
-    </a-row>
   </a-layout-content>
 </template>
 
