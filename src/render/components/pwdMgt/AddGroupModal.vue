@@ -3,7 +3,6 @@
 import {onMounted, reactive} from 'vue'
 import {Form} from 'ant-design-vue'
 import {savePwdGroup} from "@render/api/pwdMgt/pwdMgt.api";
-import {PwdGroup, pwdGroupVo} from "@main/model/pwdGroup";
 
 // 父组件传过来的值，是否显示
 const props = defineProps({

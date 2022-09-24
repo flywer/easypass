@@ -1,7 +1,9 @@
 import {Injectable} from "einf";
-import {PwdGroup} from "@main/model/pwdGroup";
+import {PwdGroup, PwdGroupVo} from "@main/model/pwdGroup";
 import {sequelize} from "@main/sequelize.init";
-
+import {Op} from "sequelize"
+import {sqlLikePack} from "@main/utils";
+import {GroupedCountResultItem} from "sequelize/types/model";
 
 @Injectable()
 export class pwdGroupMapper {
@@ -27,6 +29,24 @@ export class pwdGroupMapper {
             })
         } catch (error) {
             return null
+        }
+    }
+
+    public async getPwdGroupListByUserInfoByPage(vo: PwdGroupVo): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
+        try {
+            const {count, rows} = await PwdGroup.findAndCountAll({
+                where: {
+                    name: {
+                        [Op.like]: sqlLikePack(vo.name, true, true)
+                    }
+                },
+                offset: (vo.pageIndex - 1) * vo.pageSize,
+                limit: vo.pageSize,
+                order: ['groupIndex']
+            })
+            return {rows, count}
+        } catch (error) {
+            throw new Error(error)
         }
     }
 }

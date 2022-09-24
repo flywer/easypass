@@ -1,6 +1,6 @@
 import {Injectable} from "einf";
 import {pwdGroupMapper} from "@main/mapper/pwdGroup.mapper";
-import {PwdGroup} from "@main/model/pwdGroup";
+import {PwdGroup, PwdGroupVo} from "@main/model/pwdGroup";
 
 @Injectable()
 export class PwdMgtService {
@@ -11,7 +11,13 @@ export class PwdMgtService {
         return this.pwdGroupMapper.getPwdGroupListByUserInfo(user);
     }
 
+    getPwdGroupListByUserInfoByPage(vo: PwdGroupVo) {
+        return this.pwdGroupMapper.getPwdGroupListByUserInfoByPage(vo);
+    }
+
     public async savePwdGroup(pwdGroup: PwdGroup): Promise<PwdGroup> {
         return await this.pwdGroupMapper.savePwdGroup(pwdGroup)
     }
+
+
 }

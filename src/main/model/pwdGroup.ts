@@ -1,3 +1,5 @@
+import {BaseVo} from "@main/model/baseVo";
+
 const {Sequelize, Model, DataTypes} = require('sequelize');
 import {sequelize} from "@main/sequelize.init";
 
@@ -21,10 +23,11 @@ export class PwdGroup extends Model {
     }
 }
 
-export const pwdGroupVo = {
-    id: '',
-    name: '',
-    groupIndex: null
+export class PwdGroupVo extends BaseVo {
+    id: StringConstructor
+    name: StringConstructor
+    groupIndex: number
+    userId: string
 }
 
 /**
