@@ -1,12 +1,11 @@
-<!-- 添加分组弹窗 -->
 <script setup lang="ts">
-import {reactive} from 'vue'
-import {Form} from 'ant-design-vue'
-import {savePwdGroup} from "@render/api/pwdMgt/pwdMgt.api";
-
 // 父组件传过来的值，是否显示
+import {savePwdGroup} from "@render/api/pwdMgt/pwdMgt.api";
+import {Form} from "ant-design-vue";
+import {reactive,ref} from "vue";
+
 const props = defineProps({
-  visible: Boolean,
+  searchInputVisible: Boolean,
 })
 
 // 定义事件
@@ -14,12 +13,12 @@ const emit = defineEmits(['getVisible', 'createGroup'])
 
 // region 校验表单、提交表单
 // 表单属性
-const modelRef = reactive({
+const modelRef = ref({
   name: '',
 })
 
 // 校验规则
-const rulesRef = reactive({
+const rulesRef = ref({
   name: [
     {
       required: true,
@@ -60,12 +59,13 @@ const handleCancel = () => {
   emit('getVisible', false)
 }
 
+
 </script>
 
 <template>
   <a-modal
       v-model:visible='visible'
-      title="添加分组"
+      title="添加账号"
       width="50%"
       body-style="padding:10px"
       getContainer="#tool-header"

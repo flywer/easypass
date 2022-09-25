@@ -1,0 +1,216 @@
+<!--组项列表-->
+<script setup lang="ts">
+
+import {store} from "@render/store";
+import {nextTick, onMounted, ref} from "vue";
+import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, ArrowLeftOutlined} from '@ant-design/icons-vue'
+import {useRouter} from "vue-router";
+import {getPwdGroupById} from "@render/api/pwdMgt/pwdMgt.api";
+import AddItemModal from "@render/components/pwdMgt/AddItemModal.vue";
+
+const router = useRouter()
+//从后端传过来的分组数据
+let accountItemArr = ref([])
+//当前页数
+let pageIndex = ref<number>(1)
+//每页总数
+let pageSize = ref<number>(9)
+//搜索框显示
+let searchInputVisible = ref<boolean>(false)
+//搜索框是否失去焦点
+let blur = true
+//查询model
+let modelRef = ref({
+  pageIndex: pageIndex.value,
+  pageSize: pageSize.value
+});
+//组信息model
+let groupModelRef = ref({
+  name: store.currentGroupName,
+  id: store.currentGroupId
+})
+//是否显示新增弹窗
+let addItemModalVisible = ref<boolean>(false)
+
+onMounted(async () => {
+  setInterval(() => {
+    if (blur && searchInputVisible.value)
+      searchInputVisible.value = false
+  }, 600)
+})
+
+//region emit
+//emit:是否显示弹出框，一般用于弹出框关闭时回调
+const setVisible = (value) => {
+  addItemModalVisible.value = value
+}
+
+//endregion
+
+// click:显示添加账号项
+const showAddItemModal = () => {
+  addItemModalVisible.value = true
+}
+
+// click:搜索框显示
+const showSearchInput = () => {
+  if (!searchInputVisible.value) {
+    searchInputVisible.value = true
+    blur = false
+    nextTick(() => {
+      document.getElementById("search-input").focus()
+    })
+  } else {
+    blur = true
+  }
+}
+
+// blur:搜索框失去焦点时触发
+const searchInputBlur = () => {
+  blur = true
+}
+
+//router:返回密码组管理页面
+const backToPwdMgt = () => {
+  store.currentGroupId = null
+  store.currentGroupName = null
+  router.back()
+}
+
+</script>
+
+<template>
+
+  <!--  顶部按钮栏 -->
+  <a-layout-header id="tool-header">
+    <a-space>
+      <a-space>
+        <!--返回-->
+        <a-button class="tool-btn" type="text" size="large" @click="backToPwdMgt">
+          <arrow-left-outlined class="icon"/>
+        </a-button>
+        <a-typography-title :level="5" style="margin-bottom: 2px">{{ groupModelRef.name }}</a-typography-title>
+        <a-divider type="vertical" class="divider"/>
+      </a-space>
+      <!--新增弹出框 -->
+      <a-button class="tool-btn" type="text" size="large" @click="showAddItemModal">
+        <PlusOutlined class="icon"/>
+      </a-button>
+      <!--搜索-->
+      <a-button id="search-btn" class="tool-btn" type="text" size="large" @click="showSearchInput">
+        <search-outlined class="icon"/>
+      </a-button>
+      <!--搜索框动画-->
+      <transition name="search">
+        <div
+            v-if="searchInputVisible"
+            style="width: 120px;border-bottom:1px solid #cbcbcb;">
+          <a-input
+              v-model:value="modelRef.name"
+              id="search-input"
+              :bordered="false"
+              allow-clear
+              :onblur="searchInputBlur"
+              @keyup.enter="searchGroupItemByPage(false,true)"
+              placeholder="回车搜索↵"
+          />
+        </div>
+
+      </transition>
+    </a-space>
+    <!--  新增弹框-->
+    <AddItemModal :visible="addItemModalVisible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
+    <!--右侧-->
+    <a-space style="float: right">
+      <a-button class="tool-btn" type="text" size="large" @click="searchGroupItemByPage(true)">
+        <reload-outlined class="icon"/>
+      </a-button>
+      <a-button class="tool-btn" type="text" size="large">
+        <MoreOutlined class="icon"/>
+      </a-button>
+    </a-space>
+  </a-layout-header>
+  <!--账号列表-->
+    <a-layout-content id="card-view">
+      <a-row :gutter="16">
+        <a-col v-for="(item) in accountItemArr" :span="8" style="margin-bottom: 15px">
+          <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true" size="small" head-style=""
+                  @click="showGroupItem($event)">
+            <template #extra>
+              <a-button class="card-extra-btn" type="link">
+                <MoreOutlined/>
+              </a-button>
+            </template>
+            <p>card content</p>
+          </a-card>
+        </a-col>
+      </a-row>
+      <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="groupTotal"
+                    show-less-items @change="searchGroupByPage(false)"/>
+    </a-layout-content>
+</template>
+
+<style scoped lang="less">
+#tool-header {
+  background: #fff;
+  margin: 40px 8px 8px 8px;
+  -webkit-border-radius: 5px;
+  height: auto;
+  line-height: normal;
+  padding: 2px 8px 2px 8px;
+
+  .divider {
+    height: 23px;
+    width: 2px;
+    background-color: #ececec;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .icon {
+    font-size: 20px;
+    color: #545454;
+  }
+
+  .tool-btn {
+    padding: 0 2px;
+  }
+}
+
+#card-view {
+  margin: 0 8px;
+  background-color: #ececec;
+  padding: 20px 20px 10px 20px;
+  min-height: auto;
+
+  .pagination {
+    text-align: center;
+    bottom: 10px;
+  }
+}
+
+@keyframes searchWith {
+  from {
+    width: 0;
+  }
+  to {
+    width: 120px;
+  }
+}
+
+.search-enter-active {
+  animation: searchWith 0.5s;
+}
+
+.search-leave-active {
+  animation: searchWith 0.5s reverse;
+}
+
+</style>
+
+<style>
+.card-extra-btn {
+  padding-right: 0;
+}
+</style>

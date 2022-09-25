@@ -29,6 +29,15 @@ export class PwdMgtController {
     }
 
     /**
+     * 通过分组ID获取密码分组信息
+     * @param vo
+     */
+    @IpcHandle('pwdMgt/getPwdGroupById')
+    public handleGetPwdGroupById(groupId: string): Promise<PwdGroup> {
+        return this.pwdMgtService.getPwdGroupById(groupId)
+    }
+
+    /**
      * 新增保存分组信息
      * @param pwdGroup
      */

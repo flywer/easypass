@@ -11,7 +11,7 @@ export class PwdMgtService {
         return this.pwdGroupMapper.getPwdGroupListByUserInfo(user);
     }
 
-    getPwdGroupListByUserInfoByPage(vo: PwdGroupVo) {
+    public getPwdGroupListByUserInfoByPage(vo: PwdGroupVo) {
         return this.pwdGroupMapper.getPwdGroupListByUserInfoByPage(vo);
     }
 
@@ -19,5 +19,7 @@ export class PwdMgtService {
         return await this.pwdGroupMapper.savePwdGroup(pwdGroup)
     }
 
-
+    public getPwdGroupById(groupId: string) {
+        return this.pwdGroupMapper.getPwdGroupById(groupId);
+    }
 }

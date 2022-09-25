@@ -5,25 +5,21 @@ import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined} from '@ant-d
 import {getPwdGroupListByUserInfo, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt/pwdMgt.api";
 import {getIpcResponseData} from '@common/types'
 import AddGroupModal from '@render/components/pwdMgt/AddGroupModal.vue'
+import {useRouter} from "vue-router";
+import {store} from "@render/store";
 
 //路由
 const route = useRoute()
+const router = useRouter()
 // 菜单key
 const menuKey = ref<string>('100')
 watch(() => route.params.key, (newValue) => {
   menuKey.value = (newValue as string) // 断言推断，类型选择
 })
-
 //是否显示新增弹窗
 let visible = ref<boolean>(false)
-
 //当前页数
 let pageIndex = ref<number>(1)
-/*watch(() => pageIndex, (newValue, oldValue) => {
-  if (newValue != oldValue) {
-    searchGroupByPage(false)
-  }
-})*/
 //每页总数
 let pageSize = ref<number>(9)
 //分组总数
@@ -32,27 +28,29 @@ let groupTotal = ref<number>()
 let pwdGroupArr = ref([])
 //搜索框显示
 let searchInputVisible = ref<boolean>(false)
+//搜索框是否失去焦点
+let blur = true
+//搜索提交表单
+let modelRef = reactive({
+  name: '',
+  pageIndex: pageIndex.value,
+  pageSize: pageSize.value
+})
 
+//region emit
 //emit:是否显示弹出框，一般用于弹出框关闭时回调
 const setVisible = (value) => {
   visible.value = value
 }
 
-onMounted(() => {
-  searchGroupByPage(true)
-  setInterval(() => {
-    if (blur && searchInputVisible.value)
-      searchInputVisible.value = false
-  }, 600)
-})
+//endregion
+
+//region click
 
 // click:显示弹出框
 const showAddCardModal = () => {
   visible.value = true
 }
-
-//搜索框是否失去焦点
-let blur = true
 
 // click:搜索框显示
 const showSearchInput = () => {
@@ -67,17 +65,21 @@ const showSearchInput = () => {
   }
 }
 
+
+//endregion
+
+onMounted(() => {
+  searchGroupByPage(true)
+  setInterval(() => {
+    if (blur && searchInputVisible.value)
+      searchInputVisible.value = false
+  }, 600)
+})
+
 // blur:搜索框失去焦点时触发
 const searchInputBlur = () => {
   blur = true
 }
-
-
-let modelRef = reactive({
-  name: '',
-  pageIndex: pageIndex.value,
-  pageSize: pageSize.value
-})
 
 //enter:搜索
 const searchGroupByPage = async (init: boolean, search?: true) => {
@@ -104,6 +106,13 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   })
 }
 
+//router: 跳转到组项页面
+const showGroupItem = (event) => {
+  store.currentGroupId = event.currentTarget.dataset.id
+  store.currentGroupName = event.currentTarget.dataset.name
+  router.push({name: 'groupItems'})
+}
+
 </script>
 
 <template>
@@ -118,6 +127,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
       <a-button id="search-btn" class="tool-btn" type="text" size="large" @click="showSearchInput">
         <search-outlined class="icon"/>
       </a-button>
+      <!--搜索框动画-->
       <transition name="search">
         <div
             v-if="searchInputVisible"
@@ -132,29 +142,26 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
               placeholder="回车搜索↵"
           />
         </div>
-
       </transition>
+    </a-space>
+    <!--右侧-->
+    <a-space style="float: right">
+      <a-button class="tool-btn" type="text" size="large" @click="searchGroupByPage(true)">
+        <reload-outlined class="icon"/>
+      </a-button>
       <a-button class="tool-btn" type="text" size="large">
-        <search-outlined class="icon"/>
+        <MoreOutlined class="icon"/>
       </a-button>
     </a-space>
-
-    <div style="float: right">
-      <a-space>
-        <a-button class="tool-btn" type="text" size="large" @click="searchGroupByPage(true)">
-          <reload-outlined class="icon"/>
-        </a-button>
-        <a-button class="tool-btn" type="text" size="large">
-          <MoreOutlined class="icon"/>
-        </a-button>
-      </a-space>
-    </div>
   </a-layout-header>
+  <!--  新增弹框-->
   <AddGroupModal :visible="visible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
+  <!--组-->
   <a-layout-content id="card-view">
     <a-row :gutter="16">
       <a-col v-for="(item) in pwdGroupArr" :span="8" style="margin-bottom: 15px">
-        <a-card :title="item.name" :data-id="item.id" :bordered="false" :hoverable="true" size="small" head-style="">
+        <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true" size="small" head-style=""
+                @click="showGroupItem($event)">
           <template #extra>
             <a-button class="card-extra-btn" type="link">
               <MoreOutlined/>

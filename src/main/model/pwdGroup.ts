@@ -24,8 +24,8 @@ export class PwdGroup extends Model {
 }
 
 export class PwdGroupVo extends BaseVo {
-    id: StringConstructor
-    name: StringConstructor
+    declare id: string
+    name: string
     groupIndex: number
     userId: string
 }
@@ -37,7 +37,6 @@ export const pwdGroupInit = () => {
     PwdGroup.init({
         id: {
             type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
             comment: '主键ID',
         },

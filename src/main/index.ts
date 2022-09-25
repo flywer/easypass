@@ -1,4 +1,4 @@
-import {app,Tray,Menu,nativeImage} from 'electron'
+import {app, Tray, Menu, nativeImage} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
@@ -11,6 +11,7 @@ import {PwdMgtController} from "@main/controller/pwdMgt.controller";
 import {GroupItem} from "@main/model/groupItem";
 import path from "path";
 import {trayInit} from "@main/app/app.tray";
+import {User2} from "@main/model/user2";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -35,8 +36,7 @@ async function electronAppInit() {
                 app.exit()
             })
         }
-    }
-    else{
+    } else {
         //开机自启功能
         //app.isReady() ? launchAtStartup() : app.on("ready", launchAtStartup);
     }
@@ -49,6 +49,7 @@ async function electronAppInit() {
 }
 
 const appFolder = path.dirname(process.execPath);
+
 //const updateExe = path.resolve(appFolder, "..", "Update.exe");
 
 function launchAtStartup() {
@@ -64,8 +65,8 @@ function launchAtStartup() {
             openAsHidden: true,
             path: process.execPath,
             args: [
-                "--processStart",`"${exeName}"`,
-                "--process-start-args",`"--hidden"`
+                "--processStart", `"${exeName}"`,
+                "--process-start-args", `"--hidden"`
             ]
         });
     }
@@ -88,10 +89,18 @@ async function bootstrap() {
             }],
         })
 
+
         //验证是否连接成功
         sequelize.authenticate().then(async () => {
             console.log('===================Database connection succeeded :) ================');
             //await databaseInit()
+
+            /* await GroupItem.sync({force:true})
+             //密码组与组项是一对多的关系
+             PwdGroup.hasMany(GroupItem)
+             GroupItem.belongsTo(PwdGroup)
+             await GroupItem.sync({alter: true})//添加外键*/
+
         }).catch(err => {
             console.error('=================Database connection failed :( ===================', err);
         });

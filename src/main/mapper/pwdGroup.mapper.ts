@@ -1,7 +1,7 @@
 import {Injectable} from "einf";
 import {PwdGroup, PwdGroupVo} from "@main/model/pwdGroup";
 import {sequelize} from "@main/sequelize.init";
-import {Op} from "sequelize"
+import {Op, UUIDV4} from "sequelize"
 import {sqlLikePack} from "@main/utils";
 import {GroupedCountResultItem} from "sequelize/types/model";
 
@@ -22,9 +22,22 @@ export class pwdGroupMapper {
         }
     }
 
+    public getPwdGroupById(groupId: string) {
+        try {
+            return PwdGroup.findOne({
+                where: {
+                    id: groupId
+                }
+            })
+        } catch (e) {
+            return null
+        }
+    }
+
     public async savePwdGroup(pwdGroup: PwdGroup): Promise<PwdGroup> {
         try {
             return await sequelize.transaction((t) => {
+                pwdGroup.id = UUIDV4.toString()
                 return PwdGroup.create(pwdGroup)
             })
         } catch (error) {
@@ -49,4 +62,5 @@ export class pwdGroupMapper {
             throw new Error(error)
         }
     }
+
 }

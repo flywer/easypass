@@ -1,6 +1,7 @@
 import {User} from "@main/model/user";
 import {PwdGroup} from "@main/model/pwdGroup"
 import {sequelize} from "@main/sequelize.init";
+import {GroupItem} from "@main/model/groupItem";
 
 /**
  * 数据库初始化
@@ -29,13 +30,19 @@ export const databaseInit = async () => {
                 userId: user.get('id')
             })
 
+
+            await GroupItem.sync({force: true})
             //密码组与组项是一对多的关系
-            /* PwdGroup.hasMany(GroupItem)
-             GroupItem*/
+            PwdGroup.hasMany(GroupItem)
+            GroupItem.belongsTo(PwdGroup, {
+                foreignKey: 'groupId'
+            })
+            await GroupItem.sync({alter: true})//添加外键
+
 
             console.log("database init succeeded :)")
         });
     } catch (error) {
-        throw new Error("database init failed :( :"+error)
+        throw new Error("database init failed :( :" + error)
     }
 }
