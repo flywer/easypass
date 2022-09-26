@@ -1,7 +1,4 @@
 import {DataTypes, Options, Sequelize} from "sequelize";
-import {GroupItem, groupItemInit} from "@main/model/groupItem";
-import {userInit} from "@main/model/user";
-import {pwdGroupInit} from "@main/model/pwdGroup";
 
 /* 选择 'mysql' | 'mariadb' | 'postgres' | 'mssql' 其一 */
 
@@ -21,10 +18,7 @@ export const sequelizeInit = (database: string, username: string, password: stri
 
     sequelize = new Sequelize(database, username, password, options)
 
-    console.log('===================sequelizeInit====================')
-    userInit()
-    pwdGroupInit()
-    groupItemInit()
+    console.log('===================sequelizeInit-end====================')
 
     return sequelize
 }

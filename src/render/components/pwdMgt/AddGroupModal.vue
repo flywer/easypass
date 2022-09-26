@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import {reactive} from 'vue'
 import {Form} from 'ant-design-vue'
-import {savePwdGroup} from "@render/api/pwdMgt/pwdMgt.api";
+import {savePwdGroup} from "@render/api/pwdMgt.api";
 
 // 父组件传过来的值，是否显示
 const props = defineProps({

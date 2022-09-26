@@ -3,15 +3,14 @@ import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
 import {sequelizeInit, sequelize} from "@main/sequelize.init";
-import {User} from "@main/model/user";
 import {PwdGroup} from "@main/model/pwdGroup";
 import {logger} from "sequelize/types/utils/logger";
 import {databaseInit} from "@main/mapper/defaultSql";
-import {PwdMgtController} from "@main/controller/pwdMgt.controller";
+import {PwdGroupController} from "@main/controller/pwdGroup.controller";
 import {GroupItem} from "@main/model/groupItem";
 import path from "path";
 import {trayInit} from "@main/app/app.tray";
-import {User2} from "@main/model/user2";
+import {SysUser} from "@main/model/sysUser";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -82,7 +81,7 @@ async function bootstrap() {
 
         await createEinf({
             window: createWindow,
-            controllers: [AppController, PwdMgtController],
+            controllers: [AppController, PwdGroupController],
             injects: [{
                 name: 'IS_DEV',
                 inject: !app.isPackaged,
@@ -100,6 +99,11 @@ async function bootstrap() {
              PwdGroup.hasMany(GroupItem)
              GroupItem.belongsTo(PwdGroup)
              await GroupItem.sync({alter: true})//添加外键*/
+
+            /*            const user =  await SysUser.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
+                        console.log(user.id)*/
+
+
 
         }).catch(err => {
             console.error('=================Database connection failed :( ===================', err);

@@ -22,22 +22,18 @@ export class pwdGroupMapper {
         }
     }
 
-    public getPwdGroupById(groupId: string) {
+    public async getPwdGroupById(groupId: string) {
         try {
-            return PwdGroup.findOne({
-                where: {
-                    id: groupId
-                }
-            })
+            return await PwdGroup.findByPk(groupId)
         } catch (e) {
             return null
         }
     }
 
-    public async savePwdGroup(pwdGroup: PwdGroup): Promise<PwdGroup> {
+    public async savePwdGroup(pwdGroup: typeof PwdGroup): Promise<typeof PwdGroup> {
         try {
-            return await sequelize.transaction((t) => {
-                pwdGroup.id = UUIDV4.toString()
+            return await sequelize.transaction(() => {
+                console.log(pwdGroup)
                 return PwdGroup.create(pwdGroup)
             })
         } catch (error) {
@@ -45,7 +41,7 @@ export class pwdGroupMapper {
         }
     }
 
-    public async getPwdGroupListByUserInfoByPage(vo: PwdGroupVo): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
+    public async getPwdGroupListByUserInfoByPage(vo: typeof PwdGroup): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
         try {
             const {count, rows} = await PwdGroup.findAndCountAll({
                 where: {

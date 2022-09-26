@@ -1,11 +1,13 @@
 <script setup lang="ts">
 // 父组件传过来的值，是否显示
-import {savePwdGroup} from "@render/api/pwdMgt/pwdMgt.api";
-import {Form} from "ant-design-vue";
-import {reactive,ref} from "vue";
+import {savePwdGroup} from "@render/api/pwdMgt.api";
+import {Form, FormInstance} from "ant-design-vue";
+import {onMounted, reactive, ref} from "vue";
+import {MinusCircleOutlined, PlusOutlined} from '@ant-design/icons-vue';
+import {GroupItem} from "@main/model/groupItem";
 
 const props = defineProps({
-  searchInputVisible: Boolean,
+  addItemModalVisible: Boolean,
 })
 
 // 定义事件
@@ -60,13 +62,37 @@ const handleCancel = () => {
 }
 
 
+const formRef = ref<FormInstance>();
+const groupItemForm = reactive<{ groupItems: typeof GroupItem[] }>({
+  groupItems: [{name: '名称', value: '', isTitle: true},
+    {name: '账号', value: '', isAccount: true},
+    {name: '密码', value: '', isPassword: true}],
+});
+
+
+const removeUser = (item: typeof GroupItem) => {
+  let index = groupItemForm.groupItems.indexOf(item);
+  if (index !== -1) {
+    groupItemForm.groupItems.splice(index, 1);
+  }
+};
+const addUser = () => {
+  groupItemForm.groupItems.push({
+    name: '',
+    value: '',
+  });
+};
+const onFinish = values => {
+  console.log('Received values of form:', values);
+  console.log('dynamicValidateForm.users:', groupItemForm.groupItems);
+};
+
 </script>
 
 <template>
   <a-modal
-      v-model:visible='visible'
+      v-model:visible='addItemModalVisible'
       title="添加账号"
-      width="50%"
       body-style="padding:10px"
       getContainer="#tool-header"
       ok-text="确定"
@@ -74,18 +100,43 @@ const handleCancel = () => {
       @ok="handleOk"
       @cancel="handleCancel"
   >
-    <a-form autocomplete="off">
-      <a-form-item
-          label="分组名"
-          name="name"
-          style="margin-bottom: 0"
-          v-bind="validateInfos.name"
+    <a-form
+        ref="formRef"
+        name="dynamic_form_nest_item"
+        :model="groupItemForm"
+        @finish="onFinish"
+    >
+      <a-space
+          v-for="(groupItem, index) in groupItemForm.groupItems"
+          :key="groupItem.id"
+          style="display: flex; margin-bottom: 8px"
+          align="baseline"
       >
-        <a-input
-            v-model:value="modelRef.name"
-            placeholder="分组名称最多10个字"
-        />
+        <a-form-item
+            :name="['groupItems', index, 'name']"
+            :rules="{required: true,message: '名称不能为空',}"
+        >
+          <a-input v-model:value="groupItem.name" placeholder="名称"/>
+        </a-form-item>
+        <a-form-item
+            :name="['groupItems', index, 'value']"
+            :rules="{required: true,message: '内容不能为空',}"
+        >
+          <a-input v-model:value="groupItem.value" placeholder="请输入内容..."/>
+        </a-form-item>
+        <!--移除按钮-->
+        <MinusCircleOutlined v-if="!groupItem.isTitle && !groupItem.isAccount" @click="removeUser(groupItem)"/>
+      </a-space>
+      <a-form-item>
+        <a-button type="dashed" block @click="addUser">
+          <PlusOutlined/>
+          Add user
+        </a-button>
       </a-form-item>
+      <a-form-item>
+        <a-button type="primary" html-type="submit">Submit</a-button>
+      </a-form-item>
+
     </a-form>
   </a-modal>
 </template>

@@ -2,7 +2,7 @@
 import {useRoute} from 'vue-router'
 import {nextTick, onMounted, reactive, ref, toRaw, watch} from 'vue'
 import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined} from '@ant-design/icons-vue'
-import {getPwdGroupListByUserInfo, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt/pwdMgt.api";
+import {getPwdGroupListByUserInfo, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
 import {getIpcResponseData} from '@common/types'
 import AddGroupModal from '@render/components/pwdMgt/AddGroupModal.vue'
 import {useRouter} from "vue-router";
@@ -25,7 +25,7 @@ let pageSize = ref<number>(9)
 //分组总数
 let groupTotal = ref<number>()
 //从后端传过来的分组数据
-let pwdGroupArr = ref([])
+let pwdGroupList = ref([])
 //搜索框显示
 let searchInputVisible = ref<boolean>(false)
 //搜索框是否失去焦点
@@ -100,14 +100,15 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   }
   pageVo = (await getPwdGroupListByUserInfoByPage(modelRef)).data
   groupTotal.value = pageVo.count
-  pwdGroupArr.value = []
+  pwdGroupList.value = []
   pageVo.rows.forEach(item => {
-    pwdGroupArr.value.push(item.dataValues)
+    pwdGroupList.value.push(item.dataValues)
   })
 }
 
 //router: 跳转到组项页面
-const showGroupItem = (event) => {
+const showGroupItem = (event,id) => {
+  console.log(id)
   store.currentGroupId = event.currentTarget.dataset.id
   store.currentGroupName = event.currentTarget.dataset.name
   router.push({name: 'groupItems'})
@@ -159,9 +160,9 @@ const showGroupItem = (event) => {
   <!--组-->
   <a-layout-content id="card-view">
     <a-row :gutter="16">
-      <a-col v-for="(item) in pwdGroupArr" :span="8" style="margin-bottom: 15px">
+      <a-col v-for="(item) in pwdGroupList" :span="8" style="margin-bottom: 15px">
         <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true" size="small" head-style=""
-                @click="showGroupItem($event)">
+                @click="showGroupItem($event,item.id)">
           <template #extra>
             <a-button class="card-extra-btn" type="link">
               <MoreOutlined/>

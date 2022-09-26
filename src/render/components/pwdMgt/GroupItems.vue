@@ -5,22 +5,26 @@ import {store} from "@render/store";
 import {nextTick, onMounted, ref} from "vue";
 import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, ArrowLeftOutlined} from '@ant-design/icons-vue'
 import {useRouter} from "vue-router";
-import {getPwdGroupById} from "@render/api/pwdMgt/pwdMgt.api";
+import {getPwdGroupById, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
 import AddItemModal from "@render/components/pwdMgt/AddItemModal.vue";
 
 const router = useRouter()
+let modalVisible  = ref<boolean>(false)
 //从后端传过来的分组数据
-let accountItemArr = ref([])
+let accountItemList = ref([{name: '默认'}])
 //当前页数
 let pageIndex = ref<number>(1)
 //每页总数
 let pageSize = ref<number>(9)
+//分组总数
+let itemTotal = ref<number>()
 //搜索框显示
 let searchInputVisible = ref<boolean>(false)
 //搜索框是否失去焦点
 let blur = true
 //查询model
 let modelRef = ref({
+  title: '',
   pageIndex: pageIndex.value,
   pageSize: pageSize.value
 });
@@ -70,6 +74,31 @@ const searchInputBlur = () => {
   blur = true
 }
 
+const searchItemsByPage = async (init: boolean, search?: true) => {
+  modelRef.value.pageSize = pageSize.value
+  let pageVo: { count: number; rows: any[] }
+  //是否是全量搜索（初始化、刷新）
+  if (init) {
+    pageIndex.value = 1
+    modelRef.value.title = ''
+    modelRef.value.pageIndex = 1
+  } else {
+    //是否是搜索框搜索（需回到第一页）
+    if (search) {
+      pageIndex.value = 1
+      modelRef.value.pageIndex = 1
+    }
+    modelRef.value.pageIndex = pageIndex.value
+  }
+  pageVo = (await getPwdGroupListByUserInfoByPage(modelRef)).data
+  itemTotal.value = pageVo.count
+  accountItemList.value = []
+  pageVo.rows.forEach(item => {
+    accountItemList.value.push(item.dataValues)
+  })
+}
+
+
 //router:返回密码组管理页面
 const backToPwdMgt = () => {
   store.currentGroupId = null
@@ -111,7 +140,7 @@ const backToPwdMgt = () => {
               :bordered="false"
               allow-clear
               :onblur="searchInputBlur"
-              @keyup.enter="searchGroupItemByPage(false,true)"
+              @keyup.enter="searchItemsByPage(false,true)"
               placeholder="回车搜索↵"
           />
         </div>
@@ -119,7 +148,7 @@ const backToPwdMgt = () => {
       </transition>
     </a-space>
     <!--  新增弹框-->
-    <AddItemModal :visible="addItemModalVisible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
+    <AddItemModal :addItemModalVisible="addItemModalVisible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
     <!--右侧-->
     <a-space style="float: right">
       <a-button class="tool-btn" type="text" size="large" @click="searchGroupItemByPage(true)">
@@ -131,23 +160,24 @@ const backToPwdMgt = () => {
     </a-space>
   </a-layout-header>
   <!--账号列表-->
-    <a-layout-content id="card-view">
-      <a-row :gutter="16">
-        <a-col v-for="(item) in accountItemArr" :span="8" style="margin-bottom: 15px">
-          <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true" size="small" head-style=""
-                  @click="showGroupItem($event)">
-            <template #extra>
-              <a-button class="card-extra-btn" type="link">
-                <MoreOutlined/>
-              </a-button>
-            </template>
-            <p>card content</p>
-          </a-card>
-        </a-col>
-      </a-row>
-      <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="groupTotal"
-                    show-less-items @change="searchGroupByPage(false)"/>
-    </a-layout-content>
+  <a-layout-content id="card-view">
+    <a-row :gutter="16">
+      <a-col v-for="(item) in accountItemList" :span="8" style="margin-bottom: 15px">
+        <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true"
+                size="small" head-style=""
+                @click="">
+          <template #extra>
+            <a-button class="card-extra-btn" type="link">
+              <MoreOutlined/>
+            </a-button>
+          </template>
+          <p>card content</p>
+        </a-card>
+      </a-col>
+    </a-row>
+    <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="itemTotal"
+                  show-less-items @change="searchItemsByPage(false)"/>
+  </a-layout-content>
 </template>
 
 <style scoped lang="less">

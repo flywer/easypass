@@ -3,7 +3,7 @@ import {pwdGroupMapper} from "@main/mapper/pwdGroup.mapper";
 import {PwdGroup, PwdGroupVo} from "@main/model/pwdGroup";
 
 @Injectable()
-export class PwdMgtService {
+export class PwdGroupService {
     constructor(private pwdGroupMapper: pwdGroupMapper) {
     }
 
@@ -15,7 +15,7 @@ export class PwdMgtService {
         return this.pwdGroupMapper.getPwdGroupListByUserInfoByPage(vo);
     }
 
-    public async savePwdGroup(pwdGroup: PwdGroup): Promise<PwdGroup> {
+    public async savePwdGroup(pwdGroup: typeof PwdGroup): Promise<typeof PwdGroup> {
         return await this.pwdGroupMapper.savePwdGroup(pwdGroup)
     }
 

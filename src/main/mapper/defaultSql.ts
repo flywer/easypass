@@ -1,7 +1,8 @@
-import {User} from "@main/model/user";
+
 import {PwdGroup} from "@main/model/pwdGroup"
 import {sequelize} from "@main/sequelize.init";
 import {GroupItem} from "@main/model/groupItem";
+import {SysUser} from "@main/model/sysUser";
 
 /**
  * 数据库初始化
@@ -14,15 +15,15 @@ export const databaseInit = async () => {
             await PwdGroup.sync({force: true})
 
             //用户信息表结构初始化
-            await User.sync({force: true})
+            await SysUser.sync({force: true})
 
             //用户与密码组是一对多的关系
-            User.hasMany(PwdGroup)
-            PwdGroup.belongsTo(User)
+            SysUser.hasMany(PwdGroup)
+            PwdGroup.belongsTo(SysUser)
             await PwdGroup.sync({alter: true})//添加外键
 
             //默认值
-            const user = await User.create({
+            const user = await SysUser.create({
                 name: '小白'
             })
             await PwdGroup.create({
@@ -34,11 +35,8 @@ export const databaseInit = async () => {
             await GroupItem.sync({force: true})
             //密码组与组项是一对多的关系
             PwdGroup.hasMany(GroupItem)
-            GroupItem.belongsTo(PwdGroup, {
-                foreignKey: 'groupId'
-            })
+            GroupItem.belongsTo(PwdGroup)
             await GroupItem.sync({alter: true})//添加外键
-
 
             console.log("database init succeeded :)")
         });

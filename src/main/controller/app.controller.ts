@@ -2,6 +2,7 @@ import {Controller, IpcHandle, IpcSend, Window} from 'einf'
 import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path from "path";
+import {channel} from "@render/api/channel";
 
 @Controller()
 export class AppController {
@@ -15,7 +16,7 @@ export class AppController {
      * 设置主窗体 最大化、最小化、关闭
      * @param setup
      */
-    @IpcHandle('set-window')
+    @IpcHandle(channel.app.setWindow)
     public async handleSetWindow(setup: string) {
         if (setup === 'window-min') {
             this.mainWindow.minimize()
@@ -33,7 +34,7 @@ export class AppController {
      * 设置开机自启
      * @param setup
      */
-    @IpcHandle('set-openAtLogin')
+    @IpcHandle(channel.app.setOpenAtLogin)
     public async handleSetOpenAtLogin(setup: boolean) {
         const exeName = path.basename(process.execPath);
         //mac系统
@@ -55,7 +56,7 @@ export class AppController {
         }
     }
 
-    @IpcHandle('get-openAtLogin')
+    @IpcHandle(channel.app.getOpenAtLogin)
     public handleGetOpenAtLogin() {
         const exeName = path.basename(process.execPath);
 
