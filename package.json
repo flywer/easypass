@@ -22,7 +22,8 @@
     "lodash-es": "^4.17.21",
     "mysql2": "^2.3.3",
     "pg-hstore": "^2.3.4",
-    "vue": "^3.2.38"
+    "vue": "^3.2.38",
+    "vue3-uuid": "^1.0.0"
   },
   "devDependencies": {
     "@ant-design/icons-vue": "^6.1.0",

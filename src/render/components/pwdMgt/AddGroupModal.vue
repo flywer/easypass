@@ -28,7 +28,7 @@ const rulesRef = reactive({
       min: 1,
       max: 10,
       message: '组名长度范围为1-10',
-      trigger: 'blur',
+      trigger: 'change',
     },
   ],
 })

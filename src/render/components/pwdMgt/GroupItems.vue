@@ -2,14 +2,14 @@
 <script setup lang="ts">
 
 import {store} from "@render/store";
-import {nextTick, onMounted, ref} from "vue";
-import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, ArrowLeftOutlined} from '@ant-design/icons-vue'
 import {useRouter} from "vue-router";
-import {getPwdGroupById, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
+import {nextTick, onMounted, ref} from "vue";
+import {getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
 import AddItemModal from "@render/components/pwdMgt/AddItemModal.vue";
+import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, ArrowLeftOutlined} from '@ant-design/icons-vue'
 
 const router = useRouter()
-let modalVisible  = ref<boolean>(false)
+let modalVisible = ref<boolean>(false)
 //从后端传过来的分组数据
 let accountItemList = ref([{name: '默认'}])
 //当前页数
@@ -53,7 +53,8 @@ const setVisible = (value) => {
 
 // click:显示添加账号项
 const showAddItemModal = () => {
-  addItemModalVisible.value = true
+  //addItemModalVisible.value = true
+  router.push({name: 'commonPassword'})
 }
 
 // click:搜索框显示
@@ -121,7 +122,7 @@ const backToPwdMgt = () => {
         <a-typography-title :level="5" style="margin-bottom: 2px">{{ groupModelRef.name }}</a-typography-title>
         <a-divider type="vertical" class="divider"/>
       </a-space>
-      <!--新增弹出框 -->
+      <!--新增-->
       <a-button class="tool-btn" type="text" size="large" @click="showAddItemModal">
         <PlusOutlined class="icon"/>
       </a-button>
@@ -148,10 +149,12 @@ const backToPwdMgt = () => {
       </transition>
     </a-space>
     <!--  新增弹框-->
-    <AddItemModal :addItemModalVisible="addItemModalVisible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
+    <AddItemModal :addItemModalVisible="addItemModalVisible" @getVisible="setVisible"
+                  @createGroup="searchItemsByPage(true)"/>
     <!--右侧-->
     <a-space style="float: right">
-      <a-button class="tool-btn" type="text" size="large" @click="searchGroupItemByPage(true)">
+      <!--刷新-->
+      <a-button class="tool-btn" type="text" size="large" @click="searchItemsByPage(true)">
         <reload-outlined class="icon"/>
       </a-button>
       <a-button class="tool-btn" type="text" size="large">
@@ -160,7 +163,7 @@ const backToPwdMgt = () => {
     </a-space>
   </a-layout-header>
   <!--账号列表-->
-  <a-layout-content id="card-view">
+  <a-layout-content id="content-view">
     <a-row :gutter="16">
       <a-col v-for="(item) in accountItemList" :span="8" style="margin-bottom: 15px">
         <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true"
@@ -181,44 +184,6 @@ const backToPwdMgt = () => {
 </template>
 
 <style scoped lang="less">
-#tool-header {
-  background: #fff;
-  margin: 40px 8px 8px 8px;
-  -webkit-border-radius: 5px;
-  height: auto;
-  line-height: normal;
-  padding: 2px 8px 2px 8px;
-
-  .divider {
-    height: 23px;
-    width: 2px;
-    background-color: #ececec;
-    padding-left: 0;
-    padding-right: 0;
-    text-align: center;
-  }
-
-  .icon {
-    font-size: 20px;
-    color: #545454;
-  }
-
-  .tool-btn {
-    padding: 0 2px;
-  }
-}
-
-#card-view {
-  margin: 0 8px;
-  background-color: #ececec;
-  padding: 20px 20px 10px 20px;
-  min-height: auto;
-
-  .pagination {
-    text-align: center;
-    bottom: 10px;
-  }
-}
 
 @keyframes searchWith {
   from {

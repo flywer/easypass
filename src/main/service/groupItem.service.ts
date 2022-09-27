@@ -7,7 +7,7 @@ export class GroupItemService {
     constructor(private groupItemMapper: groupItemMapper) {
     }
 
-    public saveGroupItem(groupItem: typeof GroupItem) {
-        return this.groupItemMapper.saveGroupItem(groupItem)
+    public saveGroupItems(groupItems: typeof GroupItem[]) {
+        return this.groupItemMapper.saveGroupItems(groupItems)
     }
 }

@@ -36,6 +36,8 @@ let modelRef = reactive({
   pageIndex: pageIndex.value,
   pageSize: pageSize.value
 })
+//加载效果是否显示
+let spinning = ref(true)
 
 //region emit
 //emit:是否显示弹出框，一般用于弹出框关闭时回调
@@ -83,6 +85,8 @@ const searchInputBlur = () => {
 
 //enter:搜索
 const searchGroupByPage = async (init: boolean, search?: true) => {
+  spinning.value = true
+
   modelRef.pageSize = pageSize.value
   let pageVo: { count: number; rows: any[] }
   //是否是全量搜索（初始化、刷新）
@@ -98,7 +102,17 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
     }
     modelRef.pageIndex = pageIndex.value
   }
-  pageVo = (await getPwdGroupListByUserInfoByPage(modelRef)).data
+
+  let result = await getPwdGroupListByUserInfoByPage(modelRef).then((res) => {
+    spinning.value = false
+    return res
+  }).catch((err) => {
+    spinning.value = false
+    console.log('错误' + err)
+    return null
+  })
+
+  pageVo = result.data
   groupTotal.value = pageVo.count
   pwdGroupList.value = []
   pageVo.rows.forEach(item => {
@@ -107,7 +121,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
 }
 
 //router: 跳转到组项页面
-const showGroupItem = (event,id) => {
+const showGroupItem = (event, id) => {
   console.log(id)
   store.currentGroupId = event.currentTarget.dataset.id
   store.currentGroupName = event.currentTarget.dataset.name
@@ -158,56 +172,31 @@ const showGroupItem = (event,id) => {
   <!--  新增弹框-->
   <AddGroupModal :visible="visible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
   <!--组-->
-  <a-layout-content id="card-view">
-    <a-row :gutter="16">
-      <a-col v-for="(item) in pwdGroupList" :span="8" style="margin-bottom: 15px">
-        <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true" size="small" head-style=""
-                @click="showGroupItem($event,item.id)">
-          <template #extra>
-            <a-button class="card-extra-btn" type="link">
-              <MoreOutlined/>
-            </a-button>
-          </template>
-          <p>card content</p>
-        </a-card>
-      </a-col>
-    </a-row>
-    <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="groupTotal"
-                  show-less-items @change="searchGroupByPage(false)"/>
+
+  <a-layout-content id="content-view">
+    <a-spin :spinning="spinning">
+      <a-row :gutter="16">
+        <a-col v-for="(item) in pwdGroupList" :span="8" style="margin-bottom: 15px">
+          <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true"
+                  size="small" head-style=""
+                  @click="showGroupItem($event,item.id)">
+            <template #extra>
+              <a-button class="card-extra-btn" type="link">
+                <MoreOutlined/>
+              </a-button>
+            </template>
+            <p>card content</p>
+          </a-card>
+        </a-col>
+      </a-row>
+      <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="groupTotal"
+                    show-less-items @change="searchGroupByPage(false)"/>
+    </a-spin>
   </a-layout-content>
+
 </template>
 
 <style scoped lang="less">
-#tool-header {
-  background: #fff;
-  margin: 40px 8px 8px 8px;
-  -webkit-border-radius: 5px;
-  height: auto;
-  line-height: normal;
-  padding: 2px 8px 2px 8px;
-
-  .icon {
-    font-size: 20px;
-    color: #545454;
-  }
-
-  .tool-btn {
-    padding: 0 2px;
-  }
-
-}
-
-#card-view {
-  margin: 0 8px;
-  background-color: #ececec;
-  padding: 20px 20px 10px 20px;
-  min-height: auto;
-
-  .pagination {
-    text-align: center;
-    bottom: 10px;
-  }
-}
 
 
 @keyframes searchWith {

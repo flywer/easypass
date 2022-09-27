@@ -11,12 +11,12 @@ export class GroupItemController {
 
     /**
      * 新增保存组项信息
-     * @param groupItem
+     * @param groupItems
      */
-    @IpcHandle(channel.groupItem.saveGroupItem)
-    public handleSaveOrUpdatePwdGroup(groupItem: typeof GroupItem) {
+    @IpcHandle(channel.groupItem.saveGroupItems)
+    public handleSaveGroupItems(groupItems: typeof GroupItem[]) {
         try {
-            return this.groupItemService.saveGroupItem(groupItem);
+            return this.groupItemService.saveGroupItems(groupItems);
         } catch (e) {
             throw new Error(e)
         }

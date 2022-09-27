@@ -69,7 +69,6 @@ const groupItemForm = reactive<{ groupItems: typeof GroupItem[] }>({
     {name: '密码', value: '', isPassword: true}],
 });
 
-
 const removeUser = (item: typeof GroupItem) => {
   let index = groupItemForm.groupItems.indexOf(item);
   if (index !== -1) {

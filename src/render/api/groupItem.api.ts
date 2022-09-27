@@ -1,6 +1,6 @@
 import {ipcInstance} from '@render/plugins'
 import {channel} from "@render/api/channel";
 
-export function saveGroupItem(obj: {}) {
-    return ipcInstance.send(channel.groupItem.saveGroupItem, obj)
+export function saveGroupItems(obj: {}) {
+    return ipcInstance.send(channel.groupItem.saveGroupItems, obj)
 }
