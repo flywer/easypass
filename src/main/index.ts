@@ -11,6 +11,7 @@ import {GroupItem} from "@main/model/groupItem";
 import path from "path";
 import {trayInit} from "@main/app/app.tray";
 import {SysUser} from "@main/model/sysUser";
+import {GroupItemController} from "@main/controller/groupItem.controller";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -81,7 +82,7 @@ async function bootstrap() {
 
         await createEinf({
             window: createWindow,
-            controllers: [AppController, PwdGroupController],
+            controllers: [AppController, PwdGroupController, GroupItemController],
             injects: [{
                 name: 'IS_DEV',
                 inject: !app.isPackaged,
@@ -102,7 +103,6 @@ async function bootstrap() {
 
             /*            const user =  await SysUser.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
                         console.log(user.id)*/
-
 
 
         }).catch(err => {

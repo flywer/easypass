@@ -113,6 +113,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   })
 
   pageVo = result.data
+  console.log(pageVo.count)
   groupTotal.value = pageVo.count
   pwdGroupList.value = []
   pageVo.rows.forEach(item => {
@@ -122,7 +123,6 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
 
 //router: 跳转到组项页面
 const showGroupItem = (event, id) => {
-  console.log(id)
   store.currentGroupId = event.currentTarget.dataset.id
   store.currentGroupName = event.currentTarget.dataset.name
   router.push({name: 'groupItems'})

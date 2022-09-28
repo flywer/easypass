@@ -33,7 +33,6 @@ export class pwdGroupMapper {
     public async savePwdGroup(pwdGroup: typeof PwdGroup): Promise<typeof PwdGroup> {
         try {
             return await sequelize.transaction(() => {
-                console.log(pwdGroup)
                 return PwdGroup.create(pwdGroup)
             })
         } catch (error) {

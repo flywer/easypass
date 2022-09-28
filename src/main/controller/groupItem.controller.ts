@@ -14,13 +14,25 @@ export class GroupItemController {
      * @param groupItems
      */
     @IpcHandle(channel.groupItem.saveGroupItems)
-    public handleSaveGroupItems(groupItems: typeof GroupItem[]) {
+    public handleSaveGroupItems(groupItems: typeof GroupItem[],groupId) {
+        let result
         try {
-            return this.groupItemService.saveGroupItems(groupItems);
+            result = this.groupItemService.saveGroupItems(groupItems,groupId);
         } catch (e) {
             throw new Error(e)
         }
+        return result
     }
 
+    @IpcHandle(channel.groupItem.getGroupItemsListByPage)
+    public handleGetGroupItemsListByPage(vo) {
+        let result
+        try {
+            result = this.groupItemService.getGroupItemsList(vo)
+        } catch (e) {
+
+        }
+        return result
+    }
 
 }

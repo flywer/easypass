@@ -4,14 +4,15 @@
 import {store} from "@render/store";
 import {useRouter} from "vue-router";
 import {nextTick, onMounted, ref} from "vue";
-import {getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
-import AddItemModal from "@render/components/pwdMgt/AddItemModal.vue";
 import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, ArrowLeftOutlined} from '@ant-design/icons-vue'
+import {getGroupItemsListByPage} from "@render/api/groupItem.api";
+
+import empty from '@render/assets/img/empty.png'
 
 const router = useRouter()
 let modalVisible = ref<boolean>(false)
 //从后端传过来的分组数据
-let accountItemList = ref([{name: '默认'}])
+let accountItemList = ref([])
 //当前页数
 let pageIndex = ref<number>(1)
 //每页总数
@@ -24,7 +25,8 @@ let searchInputVisible = ref<boolean>(false)
 let blur = true
 //查询model
 let modelRef = ref({
-  title: '',
+  value: '',
+  groupId: store.currentGroupId,
   pageIndex: pageIndex.value,
   pageSize: pageSize.value
 });
@@ -35,8 +37,13 @@ let groupModelRef = ref({
 })
 //是否显示新增弹窗
 let addItemModalVisible = ref<boolean>(false)
+//加载效果是否显示
+let spinning = ref(true)
+//空状态显示
+let showEmpty = ref<boolean>(false)
 
 onMounted(async () => {
+  await searchItemsByPage(true)
   setInterval(() => {
     if (blur && searchInputVisible.value)
       searchInputVisible.value = false
@@ -76,12 +83,14 @@ const searchInputBlur = () => {
 }
 
 const searchItemsByPage = async (init: boolean, search?: true) => {
+  spinning.value = true
+
   modelRef.value.pageSize = pageSize.value
   let pageVo: { count: number; rows: any[] }
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
-    modelRef.value.title = ''
+    modelRef.value.value = ''
     modelRef.value.pageIndex = 1
   } else {
     //是否是搜索框搜索（需回到第一页）
@@ -91,12 +100,22 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
     }
     modelRef.value.pageIndex = pageIndex.value
   }
-  pageVo = (await getPwdGroupListByUserInfoByPage(modelRef)).data
+  let result = await getGroupItemsListByPage(modelRef.value).then((res) => {
+    spinning.value = false
+    return res
+  }).catch((err) => {
+    spinning.value = false
+    console.log('错误' + err)
+    return null
+  })
+  pageVo = result.data
   itemTotal.value = pageVo.count
   accountItemList.value = []
-  pageVo.rows.forEach(item => {
-    accountItemList.value.push(item.dataValues)
-  })
+  if (pageVo.rows.length > 0)
+    pageVo.rows.forEach(item => {
+      accountItemList.value.push(item.dataValues)
+    })
+  else showEmpty.value = true
 }
 
 
@@ -136,7 +155,7 @@ const backToPwdMgt = () => {
             v-if="searchInputVisible"
             style="width: 120px;border-bottom:1px solid #cbcbcb;">
           <a-input
-              v-model:value="modelRef.name"
+              v-model:value="modelRef.value"
               id="search-input"
               :bordered="false"
               allow-clear
@@ -164,22 +183,35 @@ const backToPwdMgt = () => {
   </a-layout-header>
   <!--账号列表-->
   <a-layout-content id="content-view">
-    <a-row :gutter="16">
-      <a-col v-for="(item) in accountItemList" :span="8" style="margin-bottom: 15px">
-        <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true"
-                size="small" head-style=""
-                @click="">
-          <template #extra>
-            <a-button class="card-extra-btn" type="link">
-              <MoreOutlined/>
-            </a-button>
-          </template>
-          <p>card content</p>
-        </a-card>
-      </a-col>
-    </a-row>
-    <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="itemTotal"
-                  show-less-items @change="searchItemsByPage(false)"/>
+    <a-spin :spinning="spinning">
+      <a-row :gutter="16">
+        <a-col v-for="(item) in accountItemList" :span="8" style="margin-bottom: 15px">
+          <a-card :title="item.value" :data-id="item.itemId" :bordered="false" :hoverable="true"
+                  size="small" head-style=""
+                  @click="">
+            <template #extra>
+              <a-button class="card-extra-btn" type="link">
+                <MoreOutlined/>
+              </a-button>
+            </template>
+            <p>card content</p>
+          </a-card>
+        </a-col>
+      </a-row>
+      <a-pagination v-if="accountItemList.length>0" class="pagination" v-model:current="pageIndex"
+                    :default-page-size="pageSize" :total="itemTotal"
+                    show-less-items @change="searchItemsByPage(false)"/>
+      <a-empty v-show="showEmpty"
+               :image="empty"
+               :image-style="{
+      height: '60px',}"
+      >
+        <template #description>
+        </template>
+        <a-button type="primary" @click="showAddItemModal">创建</a-button>
+      </a-empty>
+
+    </a-spin>
   </a-layout-content>
 </template>
 

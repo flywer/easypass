@@ -14,6 +14,7 @@ export const channel = reactive({
         savePwdGroup: 'pwdGroup/savePwdGroup'
     },
     groupItem: {
-        saveGroupItems: 'groupItem/saveGroupItems'
+        saveGroupItems: 'groupItem/saveGroupItems',
+        getGroupItemsListByPage: "groupItem/getGroupItemsListByPage"
     }
 })

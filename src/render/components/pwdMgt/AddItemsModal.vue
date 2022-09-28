@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, reactive, ref, createVNode, onMounted} from 'vue';
-import type {Ref, UnwrapRef} from 'vue';
+import type {Ref} from 'vue';
 import {
   CheckOutlined,
   MoreOutlined,
@@ -11,9 +11,10 @@ import {
 import {useRouter} from "vue-router";
 import {GroupItem} from "@main/model/groupItem";
 import {uuid} from 'vue3-uuid';
-import {Form, FormInstance, Modal} from "ant-design-vue";
+import {Form, FormInstance, Modal, message} from "ant-design-vue";
 import {cloneDeep, isEqual} from "lodash-es";
 import {saveGroupItems} from "@render/api/groupItem.api";
+import {store} from "@render/store";
 
 const router = useRouter()
 /*表头*/
@@ -45,11 +46,7 @@ const columns = [
   }
 ];
 /*数据*/
-const formDataRef: Ref<typeof GroupItem[]> = ref([
-  {name: '标题', value: '', isTitle: true, key: uuid.v1()},
-  {name: '账号', value: '', isAccount: true, key: uuid.v1()},
-  {name: '密码', value: '', isPassword: true, key: uuid.v1()}
-]);
+const formDataRef: Ref<typeof GroupItem[]> = ref();
 /*起始数据*/
 const originData = [
   {name: '标题', value: '', isTitle: true, key: uuid.v1()},
@@ -58,11 +55,16 @@ const originData = [
 ];
 /*数据量+1*/
 const count = computed(() => formDataRef.value.length + 1);
+/*表单响应实例*/
+const formRef = ref<FormInstance>()
+/*加载消息key*/
+const loadingKey = 'save'
 
 onMounted(() => {
   formDataRef.value = cloneDeep(originData)
 })
 
+/*添加组项*/
 const handleAdd = () => {
   const newData = {
     name: `名称${count.value}`,
@@ -72,11 +74,12 @@ const handleAdd = () => {
   formDataRef.value.push(newData);
 };
 
+/*删除*/
 const onDelete = (key: string) => {
-  formDataRef.value =
-      formDataRef.value.filter(item => item.key !== key);
+  formDataRef.value = formDataRef.value.filter(item => item.key !== key);
 };
 
+/*返回*/
 const handleBack = () => {
   if (!isEqual(formDataRef.value, originData)) {
     Modal.confirm({
@@ -94,20 +97,33 @@ const handleBack = () => {
   }
 }
 
+/*提交*/
 const handleSubmit = () => {
   formRef.value
       ?.validate()
       .then((res) => {
-        saveGroupItems(formDataRef.value)
-        console.log(formDataRef.value)
+        message.loading({
+          content: '保存中...', key: loadingKey, style: {marginTop: '30px'}
+        });
+        saveGroupItems(formDataRef.value,store.currentGroupId).then((res) => {
+          if (res.data == null)
+            console.log('失败', res.error)
+          else {
+            message.success({
+              content: '创建成功!',
+              key: loadingKey,
+              duration: 1,
+              style: {marginTop: '30px'}
+            }).then(() => {
+              router.back()
+            })
+          }
+        })
       })
       .catch((err) => {
         console.log('失败', err)
       })
 }
-
-const formRef = ref<FormInstance>()
-
 
 </script>
 

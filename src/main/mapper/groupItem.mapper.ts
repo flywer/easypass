@@ -1,7 +1,8 @@
 import {Injectable} from "einf";
 import {sequelize} from "@main/sequelize.init";
 import {GroupItem} from "@main/model/groupItem";
-import {uuid} from "vue3-uuid";
+import {Op} from "sequelize";
+import {sqlLikePack} from "@main/utils";
 
 @Injectable()
 export class groupItemMapper {
@@ -9,14 +10,27 @@ export class groupItemMapper {
     }
 
     public async saveGroupItems(groupItems: typeof GroupItem[]) {
-        const res = await sequelize.transaction(() => {
-            const itemId = uuid.v4
-            for (let item in groupItems) {
-
-            }
+        return await sequelize.transaction(() => {
             return GroupItem.bulkCreate(groupItems)
         })
-        console.log(res)
-        return res
+    }
+
+    public async getGroupItemsList(vo) {
+        console.log(vo)
+        const {count, rows} = await GroupItem.findAndCountAll({
+            attributes: ['itemId', 'value'],
+            where: {
+                [Op.and]: {
+                    value: {
+                        [Op.like]: sqlLikePack(vo.value, true, true)
+                    },
+                    PwdGroupId: vo.groupId,
+                    isTitle: 1
+                }
+            },
+            offset: (vo.pageIndex - 1) * vo.pageSize,
+            limit: vo.pageSize
+        })
+        return {rows, count}
     }
 }

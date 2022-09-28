@@ -23,10 +23,10 @@ watch(() => props.menuKey, () => {
           params: {key: props.menuKey},
         })
   } else if (props.menuKey === '200') {
-    router.push(
+   /* router.push(
         {
           name: 'commonPassword',
-        })
+        })*/
   } else if (props.menuKey === '500') {
     router.push(
         {
