@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
 import {nextTick, onMounted, reactive, ref, toRaw, watch} from 'vue'
-import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined} from '@ant-design/icons-vue'
+import {
+  MoreOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  SettingOutlined,
+  EllipsisOutlined,
+  EditOutlined
+} from '@ant-design/icons-vue'
 import {getPwdGroupListByUserInfo, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
 import {getIpcResponseData} from '@common/types'
 import AddGroupModal from '@render/components/pwdMgt/AddGroupModal.vue'
@@ -113,7 +121,6 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   })
 
   pageVo = result.data
-  console.log(pageVo.count)
   groupTotal.value = pageVo.count
   pwdGroupList.value = []
   pageVo.rows.forEach(item => {
@@ -177,15 +184,14 @@ const showGroupItem = (event, id) => {
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
         <a-col v-for="(item) in pwdGroupList" :span="8" style="margin-bottom: 15px">
-          <a-card :title="item.name" :data-id="item.id" :data-name="item.name" :bordered="false" :hoverable="true"
-                  size="small" head-style=""
-                  @click="showGroupItem($event,item.id)">
-            <template #extra>
-              <a-button class="card-extra-btn" type="link">
-                <MoreOutlined/>
-              </a-button>
+          <a-card :bordered="false" :hoverable="true" size="small">
+            <a-card-meta :title="item.name" description="This is the description" :data-id="item.id"
+                         :data-name="item.name" @click="showGroupItem($event,item.id)"/>
+            <template #actions>
+              <setting-outlined/>
+              <edit-outlined/>
+              <ellipsis-outlined/>
             </template>
-            <p>card content</p>
           </a-card>
         </a-col>
       </a-row>
@@ -197,8 +203,6 @@ const showGroupItem = (event, id) => {
 </template>
 
 <style scoped lang="less">
-
-
 @keyframes searchWith {
   from {
     width: 0;
@@ -222,4 +226,5 @@ const showGroupItem = (event, id) => {
 .card-extra-btn {
   padding-right: 0;
 }
+
 </style>
