@@ -201,11 +201,7 @@ const backToPwdMgt = () => {
       <a-pagination v-if="accountItemList.length>0" class="pagination" v-model:current="pageIndex"
                     :default-page-size="pageSize" :total="itemTotal"
                     show-less-items @change="searchItemsByPage(false)"/>
-      <a-empty v-show="showEmpty"
-               :image="empty"
-               :image-style="{
-      height: '60px',}"
-      >
+      <a-empty v-show="showEmpty" :image="empty" :image-style="{height: '60px',}">
         <template #description>
         </template>
         <a-button type="primary" @click="showAddItemModal">创建</a-button>
@@ -216,8 +212,7 @@ const backToPwdMgt = () => {
 </template>
 
 <style scoped lang="less">
-
-@keyframes searchWith {
+@keyframes searchWidth {
   from {
     width: 0;
   }
@@ -227,11 +222,11 @@ const backToPwdMgt = () => {
 }
 
 .search-enter-active {
-  animation: searchWith 0.5s;
+  animation: searchWidth 0.5s;
 }
 
 .search-leave-active {
-  animation: searchWith 0.5s reverse;
+  animation: searchWidth 0.5s reverse;
 }
 
 </style>

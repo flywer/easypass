@@ -203,7 +203,7 @@ const showGroupItem = (event, id) => {
 </template>
 
 <style scoped lang="less">
-@keyframes searchWith {
+@keyframes searchWidth {
   from {
     width: 0;
   }
@@ -213,11 +213,11 @@ const showGroupItem = (event, id) => {
 }
 
 .search-enter-active {
-  animation: searchWith 0.5s;
+  animation: searchWidth 0.5s;
 }
 
 .search-leave-active {
-  animation: searchWith 0.5s reverse;
+  animation: searchWidth 0.5s reverse;
 }
 
 </style>

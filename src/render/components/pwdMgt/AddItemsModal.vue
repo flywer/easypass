@@ -29,11 +29,11 @@ const columns = [
     dataIndex: 'value',
     width: '40%',
   },
-  {
+  /*{
     title: '是否为账号',
     dataIndex: 'isAccount',
     width: '15%',
-  },
+  },*/
   {
     title: '是否为密码',
     dataIndex: 'isPassword',
@@ -196,7 +196,7 @@ const handleSubmit = () => {
             </div>
           </template>
           <template v-else-if="column.dataIndex === 'isPassword'">
-            <a-switch v-model:checked="record.isPassword"/>
+            <a-switch v-model:checked="record.isPassword" v-if="!record.isTitle&& !record.isAccount"/>
           </template>
           <template v-else-if="column.dataIndex === 'operation'">
             <a-popconfirm
@@ -240,4 +240,5 @@ const handleSubmit = () => {
 .ant-table-striped :deep(.table-striped) td {
   background-color: rgba(248, 248, 248, 0.98);
 }
+
 </style>
