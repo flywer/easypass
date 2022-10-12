@@ -15,11 +15,19 @@ export class PwdGroupService {
         return this.pwdGroupMapper.getPwdGroupListByUserInfoByPage(vo);
     }
 
-    public async savePwdGroup(pwdGroup: typeof PwdGroup): Promise<typeof PwdGroup> {
-        return await this.pwdGroupMapper.savePwdGroup(pwdGroup)
+    public async savePwdGroup(pwdGroup: typeof PwdGroup) {
+        await this.pwdGroupMapper.savePwdGroup(pwdGroup)
+    }
+
+    public async updatePwdGroup(pwdGroup: typeof PwdGroup) {
+        await this.pwdGroupMapper.updatePwdGroup(pwdGroup)
     }
 
     public getPwdGroupById(groupId: string) {
         return this.pwdGroupMapper.getPwdGroupById(groupId);
+    }
+
+    public async deleteGroupById(id: string) {
+        await this.pwdGroupMapper.deleteGroupById(id)
     }
 }

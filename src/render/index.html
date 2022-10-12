@@ -17,7 +17,7 @@
 <style lang="less">
   body {
     overflow: hidden; /*顶级app不显示滚动条*/
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
   }
 
   #app {
@@ -43,6 +43,11 @@
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     background-color: #F5F5F5;
+  }
+
+  /*全局消息弹窗默认margin-top不适用于子系统*/
+  .ant-message {
+    margin-top: 24px;
   }
 
 </style>

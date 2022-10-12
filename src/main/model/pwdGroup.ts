@@ -1,6 +1,6 @@
 import {sequelize} from "@main/sequelize.init";
 import {DataTypes} from "sequelize";
-import {BaseVo} from "@main/model/baseVo";
+import {PageVo} from "@main/vo/pageVo";
 
 /**
  * 密码组信息model
@@ -11,11 +11,15 @@ export const PwdGroup = sequelize.define('group', {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         primaryKey: true,
-        comment: '主键ID',
+        comment: '主键ID'
     },
     name: {
         type: DataTypes.STRING(36),
         comment: '组名'
+    },
+    description: {
+        type: DataTypes.STRING(128),
+        comment: '描述'
     },
     groupIndex: {
         type: DataTypes.INTEGER,
@@ -28,7 +32,7 @@ export const PwdGroup = sequelize.define('group', {
     comment: '密码组信息表'
 })
 
-export class PwdGroupVo extends BaseVo {
+export class PwdGroupVo extends PageVo {
     id: string
     name: string
     groupIndex: number

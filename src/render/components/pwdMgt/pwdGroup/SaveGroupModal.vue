@@ -1,7 +1,7 @@
 <!-- 添加分组弹窗 -->
 <script setup lang="ts">
-import {reactive} from 'vue'
-import {Form} from 'ant-design-vue'
+import {onMounted, reactive, watch} from 'vue'
+import {Form, message} from 'ant-design-vue'
 import {savePwdGroup} from "@render/api/pwdMgt.api";
 
 // 父组件传过来的值，是否显示
@@ -10,12 +10,14 @@ const props = defineProps({
 })
 
 // 定义事件
-const emit = defineEmits(['getVisible', 'createGroup'])
+const emit = defineEmits(['setVisible', 'updateTable'])
 
 // region 校验表单、提交表单
 // 表单属性
 const modelRef = reactive({
+  id: null,
   name: '',
+  description: ''
 })
 
 // 校验规则
@@ -31,6 +33,14 @@ const rulesRef = reactive({
       trigger: 'change',
     },
   ],
+  description: [
+    {
+      required: false
+    }, {
+      max: 13,
+      message: '描述过长',
+    }
+  ]
 })
 
 // 提取检验方法
@@ -41,14 +51,23 @@ const {resetFields, validate, validateInfos} = useForm(modelRef, rulesRef)
 const handleOk = (e) => {
   // 校验表单
   validate().then(async () => {
-    // 关闭弹窗
-    emit('getVisible', false)
-    if ((await savePwdGroup(modelRef)).data != null) {
+    //空值则为null
+    if (Object.is(modelRef.description, ''))
+      modelRef.description = null
+    savePwdGroup(modelRef).then(res => {
+      if (res.data.success) {
+        message.success(res.data.message)
+      } else {
+        message.error(res.data.message + res.data.result)
+      }
+    }).then(() => {
+      // 关闭弹窗
+      emit('setVisible', false)
+      //重置model
+      resetFields()
       // 刷新界面
-      emit('createGroup', true)
-    } else
-      console.log('新增失败!')
-    resetFields()
+      emit('updateTable', true)
+    })
   }).catch((err) => {
     console.log('error', err)
   })
@@ -57,7 +76,7 @@ const handleOk = (e) => {
 
 // 取消
 const handleCancel = () => {
-  emit('getVisible', false)
+  emit('setVisible', false)
 }
 
 </script>
@@ -65,20 +84,22 @@ const handleCancel = () => {
 <template>
   <a-modal
       v-model:visible='visible'
-      title="添加分组"
       width="50%"
-      body-style="padding:10px"
       getContainer="#tool-header"
-      ok-text="确定"
+      :closable="true"
+      ok-text="添加"
       cancel-text="取消"
       @ok="handleOk"
       @cancel="handleCancel"
   >
-    <a-form autocomplete="off">
+    <template #title>
+      添加分组
+    </template>
+
+    <a-form autocomplete="off" :label-col="{span: 5, offset: 0,style: { width: '150px' }}" :wrapper-col="{span: 18}">
       <a-form-item
           label="分组名"
           name="name"
-          style="margin-bottom: 0"
           v-bind="validateInfos.name"
       >
         <a-input
@@ -86,10 +107,32 @@ const handleCancel = () => {
             placeholder="分组名称最多10个字"
         />
       </a-form-item>
+      <a-form-item
+          label="描述"
+          name="name"
+          v-bind="validateInfos.description"
+      >
+        <a-input
+            v-model:value="modelRef.description"
+            placeholder="对分组进行描述"
+        />
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <style scoped>
+</style>
+<style>
+.ant-modal-body {
+  padding: 12px;
+}
 
+.ant-modal-header {
+  border-radius: 12px 12px 0 0;
+}
+
+.ant-modal-content {
+  border-radius: 12px;
+}
 </style>

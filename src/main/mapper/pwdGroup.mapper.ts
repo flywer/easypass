@@ -30,14 +30,18 @@ export class pwdGroupMapper {
         }
     }
 
-    public async savePwdGroup(pwdGroup: typeof PwdGroup): Promise<typeof PwdGroup> {
-        try {
-            return await sequelize.transaction(() => {
-                return PwdGroup.create(pwdGroup)
-            })
-        } catch (error) {
-            return null
-        }
+    public async savePwdGroup(pwdGroup: typeof PwdGroup) {
+        await sequelize.transaction(() => {
+            return PwdGroup.create(pwdGroup)
+        })
+    }
+
+    public async updatePwdGroup(pwdGroup: typeof PwdGroup) {
+        await PwdGroup.update(pwdGroup, {
+            where: {
+                id: pwdGroup.id
+            }
+        })
     }
 
     public async getPwdGroupListByUserInfoByPage(vo: typeof PwdGroup): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
@@ -58,4 +62,11 @@ export class pwdGroupMapper {
         }
     }
 
+    public async deleteGroupById(id: string) {
+        await PwdGroup.destroy({
+            where: {
+                id: id
+            }
+        })
+    }
 }

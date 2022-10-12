@@ -1,6 +1,5 @@
 import {sequelize} from "@main/sequelize.init";
 import {DataTypes} from "sequelize";
-import {BaseVo} from "@main/model/baseVo";
 
 /**
  * 账号组项model：每个密码组有多个组项，每个组项若itemId相同代表为同一组（不是指密码组）
@@ -41,6 +40,11 @@ export const GroupItem = sequelize.define('groupItem', {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         comment: '是否为密码项'
+    },
+    pwdGroupId: {
+        type: DataTypes.STRING,
+        defaultValue: false,
+        comment: '所属密码组ID'
     }
 }, {
     tableName: 'group_item',

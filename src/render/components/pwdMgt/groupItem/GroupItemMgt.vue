@@ -3,22 +3,32 @@
 
 import {store} from "@render/store";
 import {useRouter} from "vue-router";
-import {nextTick, onMounted, ref} from "vue";
-import {MoreOutlined, PlusOutlined, ReloadOutlined, SearchOutlined, ArrowLeftOutlined} from '@ant-design/icons-vue'
-import {getGroupItemsListByPage} from "@render/api/groupItem.api";
-
+import {createVNode, nextTick, onMounted, ref} from "vue";
+import {
+  EditOutlined,
+  MoreOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  ArrowLeftOutlined,
+  TableOutlined,
+  CopyOutlined,
+  DeleteOutlined, ExclamationCircleOutlined
+} from '@ant-design/icons-vue'
+import {deleteGroupItemByItemId, getGroupItemsListByPage} from "@render/api/groupItem.api";
 import empty from '@render/assets/img/empty.png'
+import {copyText} from "@render/utils/clipboard";
+import {message, Modal} from "ant-design-vue";
 
 const router = useRouter()
-let modalVisible = ref<boolean>(false)
 //从后端传过来的分组数据
-let accountItemList = ref([])
+let groupItemsList = ref([])
 //当前页数
 let pageIndex = ref<number>(1)
 //每页总数
-let pageSize = ref<number>(9)
+let pageSize = ref<number>(6)
 //分组总数
-let itemTotal = ref<number>()
+let groupItemsCount = ref<number>()
 //搜索框显示
 let searchInputVisible = ref<boolean>(false)
 //搜索框是否失去焦点
@@ -41,6 +51,8 @@ let addItemModalVisible = ref<boolean>(false)
 let spinning = ref(true)
 //空状态显示
 let showEmpty = ref<boolean>(false)
+//刷新动画
+let refreshSpin = ref(false)
 
 onMounted(async () => {
   await searchItemsByPage(true)
@@ -60,8 +72,7 @@ const setVisible = (value) => {
 
 // click:显示添加账号项
 const showAddItemModal = () => {
-  //addItemModalVisible.value = true
-  router.push({name: 'commonPassword'})
+  router.push({name: 'groupItemTableForm'})
 }
 
 // click:搜索框显示
@@ -82,11 +93,21 @@ const searchInputBlur = () => {
   blur = true
 }
 
+//刷新动画
+const refreshSpinning = () => {
+  refreshSpin.value = true
+  setTimeout(() => {
+    refreshSpin.value = false
+  }, 1000)
+}
+
+//分页搜索
 const searchItemsByPage = async (init: boolean, search?: true) => {
   spinning.value = true
+  refreshSpinning()
 
   modelRef.value.pageSize = pageSize.value
-  let pageVo: { count: number; rows: any[] }
+
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
@@ -100,30 +121,74 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
     }
     modelRef.value.pageIndex = pageIndex.value
   }
-  let result = await getGroupItemsListByPage(modelRef.value).then((res) => {
+  //
+  let itemsRows
+  getGroupItemsListByPage(modelRef.value).then(res => {
+    if (res.data.success) {
+      itemsRows = res.data.result.rows
+      groupItemsCount.value = res.data.result.count.length
+      groupItemsList.value = []
+      if (res.data.result.rows.length > 0)
+        res.data.result.rows.forEach(arr => {
+          let itemObj = {itemId: null, title: '暂无', account: ''}
+          //每个组里有多个项，提取每个的dataValues
+          arr.forEach(row => {
+            if (row.dataValues.isTitle) {
+              itemObj.itemId = row.dataValues.itemId
+              itemObj.title = row.dataValues.value
+            }
+            if (row.dataValues.isAccount) {
+              itemObj.account = row.dataValues.value
+            }
+          })
+          groupItemsList.value.push(itemObj)
+        })
+      else showEmpty.value = true
+    } else {
+      message.error(res.data.message)
+    }
+  }).then(() => {
     spinning.value = false
-    return res
-  }).catch((err) => {
-    spinning.value = false
-    console.log('错误' + err)
-    return null
   })
-  pageVo = result.data
-  itemTotal.value = pageVo.count
-  accountItemList.value = []
-  if (pageVo.rows.length > 0)
-    pageVo.rows.forEach(item => {
-      accountItemList.value.push(item.dataValues)
-    })
-  else showEmpty.value = true
 }
-
 
 //router:返回密码组管理页面
 const backToPwdMgt = () => {
   store.currentGroupId = null
   store.currentGroupName = null
   router.back()
+}
+
+const showUpdateModal = (item) => {
+  console.log(item)
+}
+
+const showAccountItems = (itemId: string) => {
+  console.log(itemId)
+}
+
+const handleDelete = (itemId: string) => {
+  Modal.confirm({
+    title: '提示',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '确认删除当前组？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      deleteGroupItem(itemId)
+    },
+  });
+}
+
+//删除账号组
+const deleteGroupItem = (itemId: string) => {
+  deleteGroupItemByItemId(itemId).then(res => {
+    if (res.data.success) {
+      message.success("删除成功！")
+      searchItemsByPage(true)
+    } else
+      message.error(res.data.message)
+  })
 }
 
 </script>
@@ -164,7 +229,6 @@ const backToPwdMgt = () => {
               placeholder="回车搜索↵"
           />
         </div>
-
       </transition>
     </a-space>
     <!--  新增弹框-->
@@ -174,34 +238,64 @@ const backToPwdMgt = () => {
     <a-space style="float: right">
       <!--刷新-->
       <a-button class="tool-btn" type="text" size="large" @click="searchItemsByPage(true)">
-        <reload-outlined class="icon"/>
+        <reload-outlined class="icon" :spin="refreshSpin"/>
       </a-button>
       <a-button class="tool-btn" type="text" size="large">
         <MoreOutlined class="icon"/>
       </a-button>
     </a-space>
   </a-layout-header>
-  <!--账号列表-->
+  <!--列表-->
   <a-layout-content id="content-view">
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
-        <a-col v-for="(item) in accountItemList" :span="8" style="margin-bottom: 15px">
-          <a-card :title="item.value" :data-id="item.itemId" :bordered="false" :hoverable="true"
-                  size="small" head-style=""
-                  @click="">
-            <template #extra>
-              <a-button class="card-extra-btn" type="link">
-                <MoreOutlined/>
-              </a-button>
+        <a-col v-for="(item) in groupItemsList" :span="24" style="margin-bottom: 15px">
+          <a-card :data-id="item.itemId" :bordered="false" :hoverable="true"
+                  size="small"
+          >
+            <template #title>
+              <a-space>
+                {{ item.title }}
+                <a-space>
+                  <a-divider type="vertical" style="background-color: #f0f0f0"/>
+                  <span>账号：{{ item.account }}</span>
+                  <copy-outlined @click="copyText(item.account,true)"/>
+                </a-space>
+              </a-space>
             </template>
-            <p>card content</p>
+
+            <template #extra>
+              <a-space :size="10">
+                <a-divider type="vertical" style="background-color: #f0f0f0"/>
+                <a-button type="text" class="card-extra-btn" title="详情">
+                  <table-outlined @click="showAccountItems(item.itemId)"/>
+                </a-button>
+
+                <a-button type="text" class="card-extra-btn" title="编辑">
+                  <edit-outlined @click="showUpdateModal(item)"/>
+                </a-button>
+
+                <a-button type="text" class="card-extra-btn" title="删除">
+                  <delete-outlined @click="handleDelete(item.itemId)"/>
+                </a-button>
+
+                <!--                <a-popover placement="bottom" trigger="click">
+                                  <template #content>
+                                    <span>这里什么都没有</span>
+                                  </template>
+                                  <a-button class="card-extra-btn" type="text" title="更多">
+                                    <MoreOutlined/>
+                                  </a-button>
+                                </a-popover>-->
+              </a-space>
+            </template>
           </a-card>
         </a-col>
       </a-row>
-      <a-pagination v-if="accountItemList.length>0" class="pagination" v-model:current="pageIndex"
-                    :default-page-size="pageSize" :total="itemTotal"
+      <a-pagination v-if="groupItemsList.length>0" class="pagination" v-model:current="pageIndex"
+                    :default-page-size="pageSize" :total="groupItemsCount"
                     show-less-items @change="searchItemsByPage(false)"/>
-      <a-empty v-show="showEmpty" :image="empty" :image-style="{height: '60px',}">
+      <a-empty v-show="showEmpty" :image="empty" :image-style="{height: '60px'}">
         <template #description>
         </template>
         <a-button type="primary" @click="showAddItemModal">创建</a-button>
@@ -233,6 +327,6 @@ const backToPwdMgt = () => {
 
 <style>
 .card-extra-btn {
-  padding-right: 0;
+  padding: 0;
 }
 </style>

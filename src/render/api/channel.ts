@@ -11,10 +11,13 @@ export const channel = reactive({
         getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',
         getPwdGroupListByUserInfoByPage: 'pwdGroup/getPwdGroupListByUserInfoByPage',
         getPwdGroupById: 'pwdGroup/getPwdGroupById',
-        savePwdGroup: 'pwdGroup/savePwdGroup'
+        savePwdGroup: 'pwdGroup/savePwdGroup',
+        updatePwdGroup: "pwdGroup/updatePwdGroup",
+        deleteGroupById: "groupItem/deleteGroupById",
     },
     groupItem: {
         saveGroupItems: 'groupItem/saveGroupItems',
-        getGroupItemsListByPage: "groupItem/getGroupItemsListByPage"
+        getGroupItemsListByPage: "groupItem/getGroupItemsListByPage",
+        deleteGroupItemByItemId: "groupItem/deleteGroupItemByItemId",
     }
 })

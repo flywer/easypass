@@ -4,11 +4,4 @@ import {Injectable} from 'einf'
 export class AppService {
     constructor() {
     }
-    public getDelayTime(): number {
-        return 2
-    }
-
-    public getUserInfo() {
-
-    }
 }

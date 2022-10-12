@@ -103,17 +103,16 @@ const handleSubmit = () => {
       ?.validate()
       .then((res) => {
         message.loading({
-          content: '保存中...', key: loadingKey, style: {marginTop: '30px'}
+          content: '保存中...', key: loadingKey
         });
-        saveGroupItems(formDataRef.value,store.currentGroupId).then((res) => {
+        saveGroupItems(formDataRef.value, store.currentGroupId).then((res) => {
           if (res.data == null)
             console.log('失败', res.error)
           else {
             message.success({
               content: '创建成功!',
               key: loadingKey,
-              duration: 1,
-              style: {marginTop: '30px'}
+              duration: 1
             }).then(() => {
               router.back()
             })
@@ -160,7 +159,7 @@ const handleSubmit = () => {
           :data-source="formDataRef"
           :columns="columns"
           size="small"
-          :pagination="{defaultCurrent:1,pageSize: 6}"
+          :pagination="false"
           class="ant-table-striped"
           :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)"
           bordered
@@ -172,6 +171,7 @@ const handleSubmit = () => {
               <!--主标题不可更改-->
               <div v-if="!record.isTitle" class="editable-cell-input-wrapper">
                 <a-form-item
+                    has-feedback
                     :name="[index,'name']"
                     style="margin: 0"
                     :rules="[
@@ -188,9 +188,10 @@ const handleSubmit = () => {
           <template v-else-if="column.dataIndex === 'value'">
             <div class="editable-cell-input-wrapper">
               <a-form-item
+                  has-feedback
                   :name="[index,'value']"
                   style="margin: 0"
-                  :rules="[{required:true,message: '内容不能为空',trigger:'blur'}]">
+                  :rules="[{required:true,message: '内容不能为空',trigger:'change'}]">
                 <a-input v-model:value="record.value" :bordered="false" placeholder="请输入内容..."/>
               </a-form-item>
             </div>
@@ -198,16 +199,17 @@ const handleSubmit = () => {
           <template v-else-if="column.dataIndex === 'isPassword'">
             <a-switch v-model:checked="record.isPassword" v-if="!record.isTitle&& !record.isAccount"/>
           </template>
-          <template v-else-if="column.dataIndex === 'operation'">
+          <template v-else-if="column.dataIndex === 'operation' && !record.isTitle">
             <a-popconfirm
-                v-if="!record.isTitle"
+                v-if="!Object.is(record.value, '')"
                 title="确认删除？"
                 @confirm="onDelete(record.key)"
                 ok-text="确认"
                 cancel-text="取消"
             >
-              <a>删除</a>
+              <a-button>删除</a-button>
             </a-popconfirm>
+            <a-button v-show="Object.is(record.value, '')" @click="onDelete(record.key)">删除</a-button>
           </template>
 
         </template>
@@ -241,4 +243,10 @@ const handleSubmit = () => {
   background-color: rgba(248, 248, 248, 0.98);
 }
 
+</style>
+
+<style>
+.ant-form-item-explain-error {
+  font-size: 12px;
+}
 </style>

@@ -10,8 +10,7 @@ export const sequelizeInit = (database: string, username: string, password: stri
         host: 'rm-2zer84p8izdqu3x8ngo.mysql.rds.aliyuncs.com',
         dialect: "mysql",
         dialectOptions: {
-            charset: 'utf8mb4',
-            collate: 'utf8_general_ci',
+            charset: 'utf8mb4'
         },
         timezone: '+08:00'
     }

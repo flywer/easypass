@@ -23,6 +23,7 @@
     "mysql2": "^2.3.3",
     "pg-hstore": "^2.3.4",
     "vue": "^3.2.38",
+    "vue-clipboard3": "^2.0.0",
     "vue3-uuid": "^1.0.0"
   },
   "devDependencies": {

@@ -13,12 +13,28 @@ export class GroupItemService {
         const itemId = uuid.v4()
         groupItems.forEach((item) => {
             item.itemId = itemId
-            item.PwdGroupId = groupId
+            item.pwdGroupId = groupId
         })
         return this.groupItemMapper.saveGroupItems(groupItems)
     }
 
-    getGroupItemsList(vo) {
-        return this.groupItemMapper.getGroupItemsList(vo)
+    public getItemsTitleList(vo) {
+        return this.groupItemMapper.getItemsTitleList(vo)
+    }
+
+    public async getItemsIdListByPage(vo) {
+        return await this.groupItemMapper.getItemsIdListByPage(vo)
+    }
+
+    public async getItemsByItemId(itemId: string) {
+        return await this.groupItemMapper.getItemsByItemId(itemId)
+    }
+
+    public async deleteGroupItemByItemId(itemId: string) {
+        await this.groupItemMapper.deleteGroupItemByItemId(itemId)
+    }
+
+    public  async deleteGroupItemByGroupId(id: string) {
+        await this.groupItemMapper.deleteGroupItemByGroupId(id)
     }
 }

@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
-import {nextTick, onMounted, reactive, ref, toRaw, watch} from 'vue'
+import {createVNode, nextTick, onMounted, reactive, ref, watch} from 'vue'
 import {
   MoreOutlined,
   PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
-  SettingOutlined,
-  EllipsisOutlined,
-  EditOutlined
+  DeleteOutlined,
+  EditOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons-vue'
-import {getPwdGroupListByUserInfo, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
-import {getIpcResponseData} from '@common/types'
-import AddGroupModal from '@render/components/pwdMgt/AddGroupModal.vue'
+import {deleteGroupById, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
 import {useRouter} from "vue-router";
 import {store} from "@render/store";
+import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
+import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModal.vue";
+import {message, Modal} from "ant-design-vue";
+import {deleteGroupItemByItemId} from "@render/api/groupItem.api";
 
 //路由
 const route = useRoute()
@@ -25,7 +26,9 @@ watch(() => route.params.key, (newValue) => {
   menuKey.value = (newValue as string) // 断言推断，类型选择
 })
 //是否显示新增弹窗
-let visible = ref<boolean>(false)
+const saveModalVisible = ref<boolean>(false)
+//是否显示更新弹窗
+const updateModalVisible = ref<boolean>(false)
 //当前页数
 let pageIndex = ref<number>(1)
 //每页总数
@@ -39,27 +42,44 @@ let searchInputVisible = ref<boolean>(false)
 //搜索框是否失去焦点
 let blur = true
 //搜索提交表单
-let modelRef = reactive({
+let searchModelRef = reactive({
   name: '',
   pageIndex: pageIndex.value,
   pageSize: pageSize.value
 })
 //加载效果是否显示
 let spinning = ref(true)
+//传入弹框的组ID，没有则为新建
+//let modalGroupId = ref()
 
+let modalRef = ref({
+  id: '',
+  name: '',
+  description: ''
+})
 //region emit
-//emit:是否显示弹出框，一般用于弹出框关闭时回调
-const setVisible = (value) => {
-  visible.value = value
+//emit:是否显示新增弹出框，一般用于弹出框关闭时回调
+const setSaveModalVisible = (value) => {
+  saveModalVisible.value = value
+}
+//emit:是否显示更新弹出框
+const setUpdateModalVisible = (value) => {
+  updateModalVisible.value = value
 }
 
 //endregion
 
 //region click
 
-// click:显示弹出框
-const showAddCardModal = () => {
-  visible.value = true
+// click:显示新增密码组弹出框
+const showSaveModal = () => {
+  saveModalVisible.value = true
+}
+
+//click: 显示编辑密码组弹出框
+const showUpdateModal = (group) => {
+  modalRef.value = group
+  updateModalVisible.value = true
 }
 
 // click:搜索框显示
@@ -74,7 +94,6 @@ const showSearchInput = () => {
     blur = true
   }
 }
-
 
 //endregion
 
@@ -95,23 +114,23 @@ const searchInputBlur = () => {
 const searchGroupByPage = async (init: boolean, search?: true) => {
   spinning.value = true
 
-  modelRef.pageSize = pageSize.value
+  searchModelRef.pageSize = pageSize.value
   let pageVo: { count: number; rows: any[] }
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
-    modelRef.name = ''
-    modelRef.pageIndex = 1
+    searchModelRef.name = ''
+    searchModelRef.pageIndex = 1
   } else {
     //是否是搜索框搜索（需回到第一页）
     if (search) {
       pageIndex.value = 1
-      modelRef.pageIndex = 1
+      searchModelRef.pageIndex = 1
     }
-    modelRef.pageIndex = pageIndex.value
+    searchModelRef.pageIndex = pageIndex.value
   }
 
-  let result = await getPwdGroupListByUserInfoByPage(modelRef).then((res) => {
+  let result = await getPwdGroupListByUserInfoByPage(searchModelRef).then((res) => {
     spinning.value = false
     return res
   }).catch((err) => {
@@ -129,10 +148,34 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
 }
 
 //router: 跳转到组项页面
-const showGroupItem = (event, id) => {
-  store.currentGroupId = event.currentTarget.dataset.id
-  store.currentGroupName = event.currentTarget.dataset.name
+const showGroupItem = (id: string, name: string) => {
+  store.currentGroupId = id
+  store.currentGroupName = name
   router.push({name: 'groupItems'})
+}
+
+const handleDelete = (id: string) => {
+  Modal.confirm({
+    title: '提示',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '确认删除当前密码组？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      deleteGroupItem(id)
+    },
+  });
+}
+
+//删除密码组
+const deleteGroupItem = (id: string) => {
+  deleteGroupById(id).then(res => {
+    if (res.data.success) {
+      message.success("删除成功！")
+      searchGroupByPage(true)
+    } else
+      message.error(res.data.message)
+  })
 }
 
 </script>
@@ -142,7 +185,7 @@ const showGroupItem = (event, id) => {
   <a-layout-header id="tool-header">
     <a-space>
       <!--新增弹出框 -->
-      <a-button class="tool-btn" type="text" size="large" @click="showAddCardModal">
+      <a-button class="tool-btn" type="text" size="large" @click="showSaveModal">
         <PlusOutlined class="icon"/>
       </a-button>
       <!--搜索-->
@@ -155,7 +198,7 @@ const showGroupItem = (event, id) => {
             v-if="searchInputVisible"
             style="width: 120px;border-bottom:1px solid #cbcbcb;">
           <a-input
-              v-model:value="modelRef.name"
+              v-model:value="searchModelRef.name"
               id="search-input"
               :bordered="false"
               allow-clear
@@ -176,21 +219,19 @@ const showGroupItem = (event, id) => {
       </a-button>
     </a-space>
   </a-layout-header>
-  <!--  新增弹框-->
-  <AddGroupModal :visible="visible" @getVisible="setVisible" @createGroup="searchGroupByPage(true)"/>
   <!--组-->
-
   <a-layout-content id="content-view">
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
         <a-col v-for="(item) in pwdGroupList" :span="8" style="margin-bottom: 15px">
           <a-card :bordered="false" :hoverable="true" size="small">
-            <a-card-meta :title="item.name" description="This is the description" :data-id="item.id"
-                         :data-name="item.name" @click="showGroupItem($event,item.id)"/>
+            <a-card-meta :title="item.name" :description="item.description!=null?item.description:'暂无'"
+                         :data-id="item.id"
+                         :data-name="item.name" @click="showGroupItem(item.id,item.name)"/>
             <template #actions>
-              <setting-outlined/>
-              <edit-outlined/>
-              <ellipsis-outlined/>
+              <edit-outlined @click="showUpdateModal(item)"/>
+              <delete-outlined @click="handleDelete(item.id)"/>
+              <!--<setting-outlined/>-->
             </template>
           </a-card>
         </a-col>
@@ -199,6 +240,12 @@ const showGroupItem = (event, id) => {
                     show-less-items @change="searchGroupByPage(false)"/>
     </a-spin>
   </a-layout-content>
+  <!--  新增密码组弹框-->
+  <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
+                  @updateTable="searchGroupByPage(true)"/>
+  <!--  更新密码组弹框-->
+  <UpdateGroupModal :visible="updateModalVisible" :modalRef="modalRef" @setVisible="setUpdateModalVisible"
+                    @updateTable="searchGroupByPage(true)"/>
 
 </template>
 

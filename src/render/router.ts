@@ -1,19 +1,19 @@
 import type {RouteRecordRaw} from 'vue-router'
 import {createRouter, createWebHashHistory} from 'vue-router'
 
-const PwdMgt = () => import('@render/components/pwdMgt/PwdMgt.vue')
+const PwdMgt = () => import('@render/components/pwdMgt/pwdGroup/PwdMgt.vue')
 const Settings = () => import('@render/components/settings/Settings.vue')
-const GroupItems = () => import('@render/components/pwdMgt/GroupItems.vue')
-const DataTableForm = () => import('@render/components/pwdMgt/AddItemsModal.vue')
+const GroupItems = () => import('@render/components/pwdMgt/groupItem/GroupItemMgt.vue')
+const GroupItemTableForm = () => import('@render/components/pwdMgt/groupItem/SaveItemTable1.vue')
 // 定义一些路由
 // 每个路由都需要映射到一个组件。
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        redirect: '/pwd-mgt/100',
+        redirect: '/group/100',
     },
     {
-        path: '/pwd-mgt/:key',
+        path: '/group/:key',
         name: 'pwdMgt',
         component: PwdMgt,
     },
@@ -22,13 +22,13 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settings',
         component: Settings
     }, {
-        path: '/group-items',
+        path: '/items',
         name: 'groupItems',
         component: GroupItems
     }, {
-        path: '/commonPassword',
-        name: 'commonPassword',
-        component: DataTableForm
+        path: '/save_item',
+        name: 'groupItemTableForm',
+        component: GroupItemTableForm
     }
 ]
 

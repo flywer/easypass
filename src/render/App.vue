@@ -22,8 +22,3 @@ const getMenuKey = (value) => {
     <CenterContent :menu-key="manuKey"/>
   </a-layout>
 </template>
-
-<style scoped>
-
-
-</style>
