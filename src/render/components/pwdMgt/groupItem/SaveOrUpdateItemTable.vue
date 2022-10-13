@@ -167,8 +167,8 @@ const handleSubmit = () => {
           <a-divider class="my-form-divider"/>
         </a-form-item>
         <a-divider type="vertical" class="my-form-divider-vertical"/>
-        <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value">
-          <a-input placeholder="内容" :bordered="false" v-model:value="item.value"/>
+        <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value" s>
+          <a-input placeholder="内容" :bordered="false" v-model:value="item.value" style="width: 250px;"/>
           <a-divider class="my-form-divider"/>
         </a-form-item>
         <template v-if="!item.isTitle">

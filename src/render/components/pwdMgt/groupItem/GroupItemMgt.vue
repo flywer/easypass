@@ -134,7 +134,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
       groupItemsList.value = []
       if (res.data.result.rows.length > 0)
         res.data.result.rows.forEach(arr => {
-          let itemObj = {itemId: null, title: '暂无', account: ''}
+          let itemObj = {itemId: null, title: '暂无', account: '', showItems: []}
           //每个组里有多个项，提取每个的dataValues
           arr.forEach(row => {
             if (row.dataValues.isTitle) {
@@ -143,6 +143,13 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
             }
             if (row.dataValues.isAccount) {
               itemObj.account = row.dataValues.value
+            }
+            /*展示出来的组项*/
+            if (row.dataValues.isShow && !row.dataValues.isTitle) {
+              let showItem = {title: null, value: null}
+              showItem.title = row.dataValues.name
+              showItem.value = row.dataValues.value
+              itemObj.showItems.push(showItem)
             }
           })
           groupItemsList.value.push(itemObj)
@@ -163,7 +170,7 @@ const backToPwdMgt = () => {
   router.back()
 }
 
-const showUpdateModal = (itemId:string) => {
+const showUpdateModal = (itemId: string) => {
   router.push(
       {
         name: 'groupItemTableForm',
@@ -279,10 +286,10 @@ const deleteGroupItem = (itemId: string) => {
             <template #title>
               <a-space>
                 {{ item.title }}
-                <a-space>
+                <a-space v-for="(showItem) in item.showItems">
                   <a-divider type="vertical" style="background-color: #f0f0f0"/>
-                  <span>账号：{{ item.account }}</span>
-                  <copy-outlined @click="copyText(item.account,true)"/>
+                  <span>{{ showItem.title }}：{{ showItem.value }}</span>
+                  <copy-outlined @click="copyText(showItem.value,true)"/>
                 </a-space>
               </a-space>
             </template>
@@ -301,15 +308,6 @@ const deleteGroupItem = (itemId: string) => {
                 <a-button type="text" class="card-extra-btn" title="删除">
                   <delete-outlined @click="handleDelete(item.itemId)"/>
                 </a-button>
-
-                <!--                <a-popover placement="bottom" trigger="click">
-                                  <template #content>
-                                    <span>这里什么都没有</span>
-                                  </template>
-                                  <a-button class="card-extra-btn" type="text" title="更多">
-                                    <MoreOutlined/>
-                                  </a-button>
-                                </a-popover>-->
               </a-space>
             </template>
           </a-card>

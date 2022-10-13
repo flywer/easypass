@@ -2,7 +2,7 @@
 <script setup lang="ts">
 
 // 父组件传过来的值，是否显示
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import {GroupItem} from "@main/model/groupItem";
 import {CopyOutlined} from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
@@ -35,37 +35,40 @@ const editItems = () => {
   )
 }
 
+const modalWrap = ref()
+
 </script>
 
 <template>
-  <a-modal
-      v-model:visible='visible'
-      width="50%"
-      getContainer="#tool-header"
-      :closable="false"
-      class="my-modal"
-  >
-    <template #title>
-      <a-row>
-        <a-col :span="8">
-          <a-typography-title :level="5" style="margin-top: 4px;">{{ title }}</a-typography-title>
-        </a-col>
-        <a-col :span="8" :offset="8">
-          <a-button type="link" style="float: right" @click="editItems">编辑</a-button>
+  <div ref="modalWrap" class="modalWrap">
+    <a-modal
+        v-model:visible='visible'
+        width="50%"
+        :closable="false"
+        :getContainer="modalWrap"
+        :footer="null"
+    >
+      <template #title>
+        <a-row>
+          <a-col :span="8">
+            <a-typography-title :level="5" style="margin-top: 4px;">{{ title }}</a-typography-title>
+          </a-col>
+          <a-col :span="8" :offset="8">
+            <a-button type="link" style="float: right" @click="editItems">编辑</a-button>
+          </a-col>
+        </a-row>
+      </template>
+
+      <a-row v-for="(item) in model" style="margin-bottom: 12px" class="row-hover">
+        <a-col :span="4" :offset="1" align="right" style="float: right">{{ item.name }}&nbsp;:</a-col>
+        <a-col :span="16" style="margin-left: 9px;">{{ item.value }}</a-col>
+        <a-col :span="2" :offset="0">
+          <copy-outlined @click="copyText(item.value,true)"/>
         </a-col>
       </a-row>
-    </template>
-
-    <a-row v-for="(item) in model" style="margin-bottom: 12px" class="row-hover">
-      <a-col :span="4" :offset="1" align="right" style="float: right">{{ item.name }}&nbsp;:</a-col>
-      <a-col :span="16" style="margin-left: 9px;">{{ item.value }}</a-col>
-      <a-col :span="2" :offset="0">
-        <copy-outlined @click="copyText(item.value,true)"/>
-      </a-col>
-    </a-row>
-
-    <template #footer/>
-  </a-modal>
+      <template #footer/>
+    </a-modal>
+  </div>
 </template>
 
 <style lang="less" scoped>
@@ -73,19 +76,20 @@ const editItems = () => {
   background-color: #f8f8f8;
 }
 
-/*.my-modal .ant-modal-header /deep/{
-  background-color: #982626 !important;
-}*/
+.modalWrap {
+  :deep(.ant-modal-header) {
+    padding-bottom: 0;
+    border-radius: 12px 12px 0 0;
+  }
 
+  :deep(.ant-modal-body) {
+    max-height: 364px;
+    overflow-y: auto;
+  }
+
+  :deep(.ant-modal-content) {
+    border-radius: 12px;
+  }
+}
 </style>
 
-<style>
-.ant-modal-footer {
-  display: none;
-}
-
-.ant-modal-body {
-  max-height: 364px;
-  overflow-y: auto;
-}
-</style>
