@@ -10,9 +10,12 @@ export class groupItemMapper {
     constructor() {
     }
 
-    public async saveGroupItems(groupItems: typeof GroupItem[]) {
-        return await sequelize.transaction(() => {
-            return GroupItem.bulkCreate(groupItems)
+    public async saveOrUpdateGroupItems(groupItems: typeof GroupItem[]) {
+        return await sequelize.transaction(async () => {
+            return await GroupItem.bulkCreate(groupItems, {
+                updateOnDuplicate:
+                    ['name', 'value', 'isTitle', 'isAccount', 'isPassword', 'isShow', 'itemIndex']
+            })
         })
     }
 
@@ -53,11 +56,12 @@ export class groupItemMapper {
         return {rows, count}
     }
 
-    public async getItemsByItemId(itemId: string) {
+    public async getItemsListByItemId(itemId: string) {
         return await GroupItem.findAll({
             where: {
                 itemId: itemId
-            }
+            },
+            order: ['itemIndex']
         })
     }
 
@@ -73,6 +77,20 @@ export class groupItemMapper {
         await GroupItem.destroy({
             where: {
                 pwdGroupId: id
+            }
+        })
+    }
+
+    public async updateGroupItems(groupItems: typeof GroupItem[]) {
+        await sequelize.transaction(() => {
+            GroupItem.update()
+        })
+    }
+
+    public async deleteItemById(id) {
+        await GroupItem.destroy({
+            where: {
+                id: id
             }
         })
     }

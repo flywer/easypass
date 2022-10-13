@@ -96,7 +96,7 @@ const handleCancel = () => {
       @ok="handleOk"
       @cancel="handleCancel"
   >
-    <template #title>
+    <template #title style="padding-bottom: 12px">
       {{ modelRef.name }}
     </template>
 
@@ -134,6 +134,7 @@ const handleCancel = () => {
 
 .ant-modal-header {
   border-radius: 12px 12px 0 0;
+  padding-bottom: 12px;
 }
 
 .ant-modal-content {

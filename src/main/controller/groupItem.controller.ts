@@ -3,6 +3,7 @@ import {GroupItemService} from "@main/service/groupItem.service";
 import {GroupItem} from "@main/model/groupItem";
 import {channel} from "@render/api/channel";
 import {failure, Result, success} from "@main/vo/resultVo";
+import {getItemsListByItemId} from "@render/api/groupItem.api";
 
 @Controller()
 export class GroupItemController {
@@ -13,13 +14,21 @@ export class GroupItemController {
      * 新增保存组项信息
      * @param groupItems
      */
-    @IpcHandle(channel.groupItem.saveGroupItems)
-    public handleSaveGroupItems(groupItems: typeof GroupItem[], groupId: string) {
+    @IpcHandle(channel.groupItem.saveOrUpdateGroupItems)
+    public async handleSaveOrUpdateGroupItems(groupItems: any[], groupId: string, isUpdate: boolean) {
         let result
         try {
-            result = this.groupItemService.saveGroupItems(groupItems, groupId);
+            for (const item of groupItems) {
+                if (item.deleteTag) {
+                    await this.groupItemService.deleteItemById(item.id)
+                }
+            }
+            await this.groupItemService.saveGroupItems(groupItems.filter(item =>item.deleteTag == false), groupId, isUpdate);
+            result = success()
         } catch (e) {
-            throw new Error(e)
+            console.error(e)
+            result = failure("系统异常")
+            result.result = e
         }
         return result
     }
@@ -36,7 +45,7 @@ export class GroupItemController {
             let {rows, count} = await this.groupItemService.getItemsIdListByPage(vo)
             let itemGroupList = []
             for (const row of rows) {
-                let itemGroup = await this.groupItemService.getItemsByItemId(row.dataValues.itemId)
+                let itemGroup = await this.groupItemService.getItemsListByItemId(row.dataValues.itemId)
                 itemGroupList.push(itemGroup)
             }
             result = success()
@@ -62,6 +71,24 @@ export class GroupItemController {
         } catch (e) {
             console.error(e)
             result = failure("删除失败！系统异常")
+            result.result = e
+        }
+        return result
+    }
+
+    /**
+     * 通过itemId获取组项信息
+     * @param itemId
+     */
+    @IpcHandle(channel.groupItem.getItemsListByItemId)
+    public async handleGetItemsListByItemId(itemId: string) {
+        let result
+        try {
+            result = success()
+            result.result = await this.groupItemService.getItemsListByItemId(itemId)
+        } catch (e) {
+            console.error(e)
+            result = failure("系统异常")
             result.result = e
         }
         return result

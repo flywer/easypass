@@ -16,8 +16,9 @@ export const channel = reactive({
         deleteGroupById: "groupItem/deleteGroupById",
     },
     groupItem: {
-        saveGroupItems: 'groupItem/saveGroupItems',
+        saveOrUpdateGroupItems: 'groupItem/saveGroupItems',
         getGroupItemsListByPage: "groupItem/getGroupItemsListByPage",
         deleteGroupItemByItemId: "groupItem/deleteGroupItemByItemId",
+        getItemsListByItemId: "groupItem/getItemsListByItemId",
     }
 })

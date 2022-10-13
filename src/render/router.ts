@@ -4,7 +4,7 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 const PwdMgt = () => import('@render/components/pwdMgt/pwdGroup/PwdMgt.vue')
 const Settings = () => import('@render/components/settings/Settings.vue')
 const GroupItems = () => import('@render/components/pwdMgt/groupItem/GroupItemMgt.vue')
-const GroupItemTableForm = () => import('@render/components/pwdMgt/groupItem/SaveItemTable1.vue')
+const GroupItemTableForm = () => import('@render/components/pwdMgt/groupItem/SaveOrUpdateItemTable.vue')
 // 定义一些路由
 // 每个路由都需要映射到一个组件。
 const routes: Array<RouteRecordRaw> = [

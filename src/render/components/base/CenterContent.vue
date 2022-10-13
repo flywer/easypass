@@ -74,7 +74,7 @@ watch(() => props.menuKey, () => {
   }
 
   .tool-btn {
-    padding: 0 2px;
+    padding: 0 6px;
   }
 }
 

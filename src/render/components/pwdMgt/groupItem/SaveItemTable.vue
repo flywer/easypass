@@ -13,7 +13,7 @@ import {GroupItem} from "@main/model/groupItem";
 import {uuid} from 'vue3-uuid';
 import {Form, FormInstance, Modal, message} from "ant-design-vue";
 import {cloneDeep, isEqual} from "lodash-es";
-import {saveGroupItems} from "@render/api/groupItem.api";
+import {saveOrUpdateGroupItems} from "@render/api/groupItem.api";
 import {store} from "@render/store";
 
 const router = useRouter()
@@ -105,7 +105,7 @@ const handleSubmit = () => {
         message.loading({
           content: '保存中...', key: loadingKey
         });
-        saveGroupItems(formDataRef.value, store.currentGroupId).then((res) => {
+        saveOrUpdateGroupItems(formDataRef.value, store.currentGroupId).then((res) => {
           if (res.data == null)
             console.log('失败', res.error)
           else {

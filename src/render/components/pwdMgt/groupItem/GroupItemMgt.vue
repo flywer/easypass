@@ -15,10 +15,11 @@ import {
   CopyOutlined,
   DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons-vue'
-import {deleteGroupItemByItemId, getGroupItemsListByPage} from "@render/api/groupItem.api";
+import {deleteGroupItemByItemId, getGroupItemsListByPage, getItemsListByItemId} from "@render/api/groupItem.api";
 import empty from '@render/assets/img/empty.png'
 import {copyText} from "@render/utils/clipboard";
 import {message, Modal} from "ant-design-vue";
+import ItemsInfoModal from "@render/components/pwdMgt/groupItem/ItemsInfoModal.vue";
 
 const router = useRouter()
 //从后端传过来的分组数据
@@ -53,7 +54,10 @@ let spinning = ref(true)
 let showEmpty = ref<boolean>(false)
 //刷新动画
 let refreshSpin = ref(false)
-
+//是否显示组详情
+const itemInfoModalVisible = ref(false)
+//详情页信息
+const itemInfoModelRef = ref([])
 onMounted(async () => {
   await searchItemsByPage(true)
   setInterval(() => {
@@ -159,12 +163,31 @@ const backToPwdMgt = () => {
   router.back()
 }
 
-const showUpdateModal = (item) => {
-  console.log(item)
+const showUpdateModal = (itemId:string) => {
+  router.push(
+      {
+        name: 'groupItemTableForm',
+        query: {itemId: itemId}
+      }
+  )
 }
 
-const showAccountItems = (itemId: string) => {
-  console.log(itemId)
+//查看
+const showAccountItems = async (itemId: string) => {
+  await getItemsListByItemId(itemId).then(res => {
+    if (res.data.success) {
+      let model = []
+      res.data.result.forEach(item => {
+        model.push(item.dataValues)
+      })
+      itemInfoModelRef.value = model
+      itemInfoModalVisible.value = true
+    } else {
+      message.error(res.data.message)
+    }
+  }).catch(e => {
+    console.error(e)
+  })
 }
 
 const handleDelete = (itemId: string) => {
@@ -231,7 +254,7 @@ const deleteGroupItem = (itemId: string) => {
         </div>
       </transition>
     </a-space>
-    <!--  新增弹框-->
+    <!--新增-->
     <AddItemModal :addItemModalVisible="addItemModalVisible" @getVisible="setVisible"
                   @createGroup="searchItemsByPage(true)"/>
     <!--右侧-->
@@ -272,7 +295,7 @@ const deleteGroupItem = (itemId: string) => {
                 </a-button>
 
                 <a-button type="text" class="card-extra-btn" title="编辑">
-                  <edit-outlined @click="showUpdateModal(item)"/>
+                  <edit-outlined @click="showUpdateModal(item.itemId)"/>
                 </a-button>
 
                 <a-button type="text" class="card-extra-btn" title="删除">
@@ -302,7 +325,9 @@ const deleteGroupItem = (itemId: string) => {
       </a-empty>
 
     </a-spin>
+    <ItemsInfoModal :visible="itemInfoModalVisible" :model="itemInfoModelRef"/>
   </a-layout-content>
+
 </template>
 
 <style scoped lang="less">

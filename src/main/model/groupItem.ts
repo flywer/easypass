@@ -1,5 +1,5 @@
 import {sequelize} from "@main/sequelize.init";
-import {DataTypes} from "sequelize";
+import {DataTypes, INTEGER} from "sequelize";
 
 /**
  * 账号组项model：每个密码组有多个组项，每个组项若itemId相同代表为同一组（不是指密码组）
@@ -40,6 +40,16 @@ export const GroupItem = sequelize.define('groupItem', {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         comment: '是否为密码项'
+    },
+    isShow: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: '是否展示'
+    },
+    itemIndex: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1000,
+        comment: '排序号'
     },
     pwdGroupId: {
         type: DataTypes.STRING,
