@@ -8,13 +8,13 @@
 </head>
 
 <body>
-    <div id="app"></div>
+    <div id="app" style="background-color: #f0f2f5;"></div>
 <script type="module" src="./main.ts"></script>
 </body>
 
 </html>
 
-<style lang="less">
+<style>
   body {
     overflow: hidden; /*顶级app不显示滚动条*/
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
@@ -22,27 +22,6 @@
 
   #app {
     overflow: auto; /*下级可以显示*/
-  }
-
-  /*自定义滚动条 参考：https://blog.csdn.net/u012551928/article/details/109286853*/
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
-    background-color: #F5F5F5;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(60, 186, 146)), color-stop(0.72, rgb(253, 187, 45)), color-stop(0.86, rgb(253, 187, 45)));
-    transition: 0.3s ease-in-out;
-  }
-
-  ::-webkit-scrollbar-track {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    background-color: #F5F5F5;
   }
 
   /*全局消息弹窗默认margin-top不适用于子系统*/

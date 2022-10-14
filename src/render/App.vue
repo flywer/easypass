@@ -51,3 +51,29 @@ const autoThemeConfig = async () => {
     </a-layout>
   </a-config-provider>
 </template>
+
+<style lang="less">
+@import "ant-design-vue/dist/antd.variable.less";
+
+//自定义滚动条 参考：https://blog.csdn.net/u012551928/article/details/109286853
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  /*-webkit-gradient(linear, left bottom, left top, color-stop(0.44, rgb(40, 93, 76)), color-stop(0.72, rgb(253, 187, 45)), color-stop(0.86, rgb(253, 187, 45)));*/
+  background-color: @primary-3;
+  transition: 0.3s ease-in-out;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #F5F5F5;
+}
+</style>
