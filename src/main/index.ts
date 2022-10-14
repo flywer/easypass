@@ -1,4 +1,4 @@
-import {app, Tray, Menu, nativeImage} from 'electron'
+import {app, Tray, Menu, nativeImage,nativeTheme} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
@@ -88,7 +88,6 @@ async function bootstrap() {
                 inject: !app.isPackaged,
             }],
         })
-
 
         //验证是否连接成功
         sequelize.authenticate().then(async () => {

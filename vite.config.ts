@@ -43,4 +43,11 @@ export default defineConfig({
     testTimeout: 30_000,
     hookTimeout: 30_000,
   },
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true, // 注意，这一句是在less对象中，写在外边不起作用
+      },
+    },
+  },
 })

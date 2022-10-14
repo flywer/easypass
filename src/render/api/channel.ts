@@ -5,7 +5,10 @@ export const channel = reactive({
     app: {
         setWindow: 'app/setWindow',
         setOpenAtLogin: 'app/setOpenAtLogin',
-        getOpenAtLogin: 'app/getOpenAtLogin'
+        getOpenAtLogin: 'app/getOpenAtLogin',
+        getAppTheme: 'app/getAppTheme',
+        setAppTheme: 'app/setAppTheme',
+
     },
     pwdGroup: {
         getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',

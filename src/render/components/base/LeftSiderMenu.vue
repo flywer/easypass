@@ -21,16 +21,17 @@ const menuClick = (item) => {
 </script>
 
 <template>
-<!--  菜单缩放 v-model:collapsed="collapsed" collapsible-->
-  <a-layout-sider id="layout-sider"  width="150">
-    <div class="logo">
-      <!--      <p>easy pass</p> -->
+  <!--  菜单缩放 v-model:collapsed="collapsed" collapsible-->
+  <a-layout-sider id="layout-sider" width="150">
+    <div class="logo" style="background-color: #cebfbf">
+            <p class="title">easy pass</p>
     </div>
     <a-menu
         v-model:selectedKeys="selectedKeys"
-        theme="dark"
+        theme="light"
         mode="inline"
         @click="menuClick"
+        style="height: 472px;"
     >
       <a-menu-item key="100">
         <LockOutlined/>
@@ -57,6 +58,8 @@ const menuClick = (item) => {
 </template>
 
 <style scoped lang="less">
+@import "ant-design-vue/dist/antd.variable.less";
+
 #layout-sider {
   overflow: auto;
   height: 100vh;
@@ -64,6 +67,7 @@ const menuClick = (item) => {
   left: 0;
   top: 32px;
   bottom: 0;
+  background-color: #f8f8f8;
 
   .logo {
     height: 32px;
@@ -82,5 +86,9 @@ const menuClick = (item) => {
       white-space: nowrap;
     }
   }
+}
+
+.title{
+  background-color: @primary-color;
 }
 </style>

@@ -1,5 +1,6 @@
 import {join} from 'path'
 import {BrowserWindow, app} from 'electron'
+import nativeTheme = Electron.nativeTheme;
 
 const isDev = !app.isPackaged
 

@@ -1,7 +1,9 @@
-import { reactive } from 'vue'
+import {reactive} from 'vue'
 
 //全局变量
 export const store = reactive({
     currentGroupId: null,
-    currentGroupName:null
+    currentGroupName: null,
+    theme: {}
 })
+
