@@ -1,6 +1,7 @@
 import {join} from 'path'
 import {BrowserWindow, app} from 'electron'
 import nativeTheme = Electron.nativeTheme;
+import {handleUpdate} from "@main/app/autoUpdater";
 
 const isDev = !app.isPackaged
 
@@ -8,7 +9,7 @@ export async function createWindow() {
     const win = new BrowserWindow({
         width: 900,
         height: 568,
-        resizable:false,
+        resizable: false,
         frame: false, // 无边框
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'), // 放到下面就报错
@@ -34,6 +35,8 @@ export async function createWindow() {
     win.on('closed', () => {
         win.destroy()
     })
+
+    handleUpdate(win)
 
     return win
 }

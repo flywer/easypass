@@ -15,7 +15,6 @@ import {store} from "@render/store";
 import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
 import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModal.vue";
 import {message, Modal} from "ant-design-vue";
-import {deleteGroupItemByItemId} from "@render/api/groupItem.api";
 
 //路由
 const route = useRoute()

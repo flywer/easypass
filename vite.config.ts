@@ -18,6 +18,9 @@ export default defineConfig({
       electron: {
         build: {
           config: './electron-builder.config.js',
+          cliOptions: {
+            publish: 'never', // "onTag" | "onTagOrDraft" | "always" | "never"
+          },
         },
         preload: {
           entry: 'src/preload/index.ts',

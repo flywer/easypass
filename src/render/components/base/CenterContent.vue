@@ -38,7 +38,9 @@ watch(() => props.menuKey, () => {
 
 <template>
   <a-layout id="layout">
+    <keep-alive>
     <router-view/>
+    </keep-alive>
   </a-layout>
 </template>
 
