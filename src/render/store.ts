@@ -4,6 +4,7 @@ import {reactive} from 'vue'
 export const store = reactive({
     currentGroupId: null,
     currentGroupName: null,
-    theme: {}
+    theme: {},
+    isUpdating: false
 })
 

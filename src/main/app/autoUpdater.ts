@@ -18,30 +18,24 @@ export const handleUpdate = (window) => {
     autoUpdater.on('checking-for-update', async function () {
         let result = success()
         result.message = '正在检测更新...'
-        result.tag=1
+        result.tag = 1
         window.webContents.send(channel.app.sendUpdateInfo, result)
     });
 
     //当没有可用更新的时候触发
     autoUpdater.on('update-not-available', function (info) {
         let result = success()
-        result.message = '当前为最新版本'
-        result.tag=2
+        result.message = '当前为最新版本，无需更新'
+        result.tag = 2
         window.webContents.send(channel.app.sendUpdateInfo, result)
     });
 
     //当发现一个可用更新的时候触发
     autoUpdater.on('update-available', function (info) {
         let result = success()
-        result.message = '是否下载最新版本？'
-        result.tag=3
+        result.result = info
+        result.tag = 3
         window.webContents.send(channel.app.sendUpdateInfo, result)
-
-        /* autoUpdater.downloadUpdate().then((path)=>{
-             console.log('download path', path)
-         }).catch((e)=>{
-             console.log(e)
-         })*/
     });
 
     // 更新下载进度事件
@@ -49,7 +43,7 @@ export const handleUpdate = (window) => {
         let result = success()
         result.message = '下载中'
         result.result = progressObj
-        result.tag=4
+        result.tag = 4
         window.webContents.send(channel.app.sendDownloadProgress, result)
     })
 
@@ -57,15 +51,14 @@ export const handleUpdate = (window) => {
     autoUpdater.on('update-downloaded', function () {
         let result = success()
         result.message = '下载完成，是否退出更新？'
-        result.tag=5
-        //退出并安装
-        //autoUpdater.quitAndInstall();
+        result.tag = 5
+        window.webContents.send(channel.app.sendUpdateDownloaded, result)
     });
 
     autoUpdater.on('error', function (error) {
         let result = failure()
         result.message = error
-        result.tag=6
+        result.tag = 6
         window.webContents.send(channel.app.sendUpdateInfo, result)
     });
 }

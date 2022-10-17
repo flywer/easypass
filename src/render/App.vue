@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {createVNode, onMounted, ref} from 'vue'
 import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
-import {ConfigProvider} from 'ant-design-vue';
-import {getAppTheme} from "@render/api/app.api";
+import {ConfigProvider, Modal} from 'ant-design-vue';
+import {getAppTheme, quitAndInstall} from "@render/api/app.api";
 import {store} from "@render/store";
+import {ipcInstance} from "@render/plugins";
+import {channel} from "@render/api/channel";
+import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 
 const manuKey = ref('')
 
@@ -15,6 +18,18 @@ const getMenuKey = (value) => {
 }
 onMounted(() => {
   autoThemeConfig()
+  ipcInstance.on(channel.app.sendUpdateDownloaded, res => {
+    Modal.confirm({
+      title: '提示',
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '是否退出并安装？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        quitAndInstall()
+      },
+    });
+  })
 })
 
 //配置动态主题
@@ -37,6 +52,7 @@ const autoThemeConfig = async () => {
     });
   })
 }
+
 
 </script>
 

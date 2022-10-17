@@ -31,7 +31,6 @@ export async function createWindow() {
         win.webContents.openDevTools()
     else
         win.removeMenu()
-
     win.on('closed', () => {
         win.destroy()
     })

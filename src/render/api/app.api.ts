@@ -53,3 +53,17 @@ export function getAppVersion() {
 export function checkForUpdate() {
     return ipcInstance.send<Result>(channel.app.checkForUpdate)
 }
+
+/**
+ * 下载更新
+ */
+export function downloadUpdate() {
+    return ipcInstance.send<Result>(channel.app.downloadUpdate)
+}
+
+/**
+ * 退出应用并安装
+ */
+export function quitAndInstall(){
+    return ipcInstance.send<Result>(channel.app.quitAndInstall)
+}

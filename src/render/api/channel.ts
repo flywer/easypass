@@ -12,6 +12,9 @@ export const channel = reactive({
         checkForUpdate: 'app/checkForUpdate',
         sendUpdateInfo: 'app/sendUpdateInfo',
         sendDownloadProgress: 'app/sendDownloadProgress',
+        downloadUpdate: 'app/downloadUpdate',
+        sendUpdateDownloaded: 'app/sendUpdateDownloaded',
+        quitAndInstall: 'app/quitAndInstall',
 
 
     },

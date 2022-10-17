@@ -145,11 +145,42 @@ export class AppController {
      * @constructor
      */
     @IpcHandle(channel.app.checkForUpdate)
-    public HandleCheckForUpdate() {
+    public async HandleCheckForUpdate() {
         let result
         try {
             result = success()
-            autoUpdater.checkForUpdates()
+            await autoUpdater.checkForUpdates()
+        } catch (e) {
+            console.error(e)
+            result = failure()
+            result.result = e
+        }
+        return result
+    }
+
+    @IpcHandle(channel.app.downloadUpdate)
+    public async HandleDownloadUpdate() {
+        let result
+        try {
+            result = success()
+            await autoUpdater.downloadUpdate()
+            result.message = '下载开始'
+        } catch (e) {
+            console.error(e)
+            result = failure()
+            result.message = '下载失败'
+            result.result = e
+        }
+        return result
+    }
+
+    @IpcHandle(channel.app.quitAndInstall)
+    public HandleQuitAndInstall() {
+        let result
+        try {
+            result = success()
+            //退出并安装
+            autoUpdater.quitAndInstall();
         } catch (e) {
             console.error(e)
             result = failure()

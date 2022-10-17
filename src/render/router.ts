@@ -21,9 +21,6 @@ const routes: Array<RouteRecordRaw> = [
         path: '/settings',
         name: 'settings',
         component: Settings,
-        meta: {
-            keepAlive: true, // 组件需要缓存
-        }
     }, {
         path: '/items',
         name: 'groupItems',
