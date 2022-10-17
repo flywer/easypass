@@ -15,7 +15,6 @@ import {store} from "@render/store";
 import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
 import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModal.vue";
 import {message, Modal} from "ant-design-vue";
-import {deleteGroupItemByItemId} from "@render/api/groupItem.api";
 
 //路由
 const route = useRoute()
@@ -183,7 +182,7 @@ const deleteGroupItem = (id: string) => {
 <template>
   <!--  顶部按钮栏 -->
   <a-layout-header id="tool-header">
-    <a-space>
+    <a-space style="gap: 4px">
       <!--新增弹出框 -->
       <a-button class="tool-btn" type="text" size="large" @click="showSaveModal">
         <PlusOutlined class="icon"/>

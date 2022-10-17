@@ -2,16 +2,12 @@ import {app, Tray, Menu, nativeImage,nativeTheme} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
-import {sequelizeInit, sequelize} from "@main/sequelize.init";
-import {PwdGroup} from "@main/model/pwdGroup";
-import {logger} from "sequelize/types/utils/logger";
-import {databaseInit} from "@main/mapper/defaultSql";
+import {sequelize} from "@main/sequelize.init";
 import {PwdGroupController} from "@main/controller/pwdGroup.controller";
-import {GroupItem} from "@main/model/groupItem";
 import path from "path";
 import {trayInit} from "@main/app/app.tray";
-import {SysUser} from "@main/model/sysUser";
 import {GroupItemController} from "@main/controller/groupItem.controller";
+import {handleUpdate} from "@main/app/autoUpdater";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 

@@ -1,5 +1,5 @@
 import {Controller, IpcHandle, IpcSend, Window} from 'einf'
-import {app, BrowserWindow} from 'electron'
+import {app, BrowserWindow, dialog, ipcMain} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
@@ -7,6 +7,8 @@ import fs from "fs";
 import {fileExistAndWrite, getUserAppDataFolder, getUserHome, writeFs} from "@main/utils";
 import {failure, success} from "@main/vo/resultVo";
 import * as os from "os";
+import config from "@common/config/config.json"
+import {autoUpdater} from "electron-updater";
 
 @Controller()
 export class AppController {
@@ -90,13 +92,7 @@ export class AppController {
     public async handleGetAppTheme() {
         let result
         try {
-            let defaultTheme = {
-                primaryColor: "#5f0c97",
-                errorColor: "#ff4d4f",
-                warningColor: "#faad14",
-                successColor: "#52c41a",
-                infoColor: "#1890ff"
-            }
+            let defaultTheme = config.defaultTheme
             result = success()
             //判断主题文件是否存在，不存在则创建，并返回实际数据
             const themeBuffer = await fileExistAndWrite(getUserAppDataFolder(), 'theme.json', JSON.stringify(defaultTheme))
@@ -109,12 +105,51 @@ export class AppController {
         return result
     }
 
+    /**
+     * 设置应用主题
+     * @param data
+     */
     @IpcHandle(channel.app.setAppTheme)
     public async handleSetAppTheme(data) {
         let result
         try {
             writeFs(path.join(getUserAppDataFolder(), 'theme.json'), data)
             result = success()
+        } catch (e) {
+            console.error(e)
+            result = failure()
+            result.result = e
+        }
+        return result
+    }
+
+    /**
+     * 获取应用版本信息
+     */
+    @IpcHandle(channel.app.getAppVersion)
+    public handleGetAppVersion() {
+        let result
+        try {
+            result = success()
+            result.result = config.appVersion
+        } catch (e) {
+            console.error(e)
+            result = failure()
+            result.result = e
+        }
+        return result
+    }
+
+    /**
+     * 检查应用是否需要更新
+     * @constructor
+     */
+    @IpcHandle(channel.app.checkForUpdate)
+    public HandleCheckForUpdate() {
+        let result
+        try {
+            result = success()
+            autoUpdater.checkForUpdates()
         } catch (e) {
             console.error(e)
             result = failure()

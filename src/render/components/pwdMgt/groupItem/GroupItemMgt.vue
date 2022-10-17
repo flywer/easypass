@@ -227,7 +227,7 @@ const deleteGroupItem = (itemId: string) => {
 
   <!--  顶部按钮栏 -->
   <a-layout-header id="tool-header">
-    <a-space>
+    <a-space style="gap: 4px">
       <a-space>
         <!--返回-->
         <a-button class="tool-btn" type="text" size="large" @click="backToPwdMgt">

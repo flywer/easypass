@@ -1,32 +1,92 @@
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue";
-import {getOpenAtLogin, setAppTheme, setOpenAtLogin} from "@render/api/app.api";
-import {IpcResponse} from "einf";
-import {ConfigProvider} from "ant-design-vue";
+import {createVNode, onMounted, reactive, ref} from "vue";
+import {
+  checkForUpdate,
+  getAppVersion,
+  getOpenAtLogin,
+  setAppTheme,
+  setOpenAtLogin
+} from "@render/api/app.api";
+import {ConfigProvider, message, Modal} from "ant-design-vue";
 import {store} from "@render/store";
+import {channel} from "@render/api/channel";
+import {ipcInstance} from "@render/plugins";
+import {cloneDeep} from "lodash-es";
+import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
-
+/*设置开机自启*/
 const setOpenAtLoginChecked = () => {
   setOpenAtLogin(openAtLoginChecked.value)
 }
 
+/*是否启用托盘图标*/
 const checked2 = ref<boolean>(false);
 
-onMounted(async () => {
-  openAtLoginChecked.value = (await getOpenAtLogin()).data
-})
+/*当前版本号*/
+const appVersion = ref()
+const updateInfoResult = ref()
+const updateKey = 'updateKey'
+const updateModalVisible = ref(false)
+const modalWrap = ref()
+/*是否更新*/
+const isUpdate = ref(false)
+const progress = ref(0.00)
+const onCheckForUpdate = async () => {
+  ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
+    switch (res.tag) {
+        //检测更新、为最新版本、报错
+      case 1 || 2 || 6:
+        if (res.success)
+          message.info({content: res.message, key: updateKey, duration: 2});
+        else
+          message.error({content: res.message, key: updateKey, duration: 2});
+        break;
+        //有可用更新
+      case 3:
+        Modal.confirm({
+          title: '提示',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: res.message,
+          okText: '确认',
+          cancelText: '取消',
+          onOk() {
+            //downloadUpdate()
+            message.info('下载中。。。')
+            //已经开始下载
+          },
+        });
+    }
 
+    if (res.tag == 1)
+      message.info({content: res.message, key: updateKey, duration: 2})
+    else
+      updateInfoResult.value = cloneDeep(res)
+    message.info({content: res.message, key: updateKey, duration: 2})
+  })
+  //await checkForUpdate()
+
+  //updateModalVisible.value = true
+
+  progress.value = progress.value + 5
+  message.info(progress.value)
+}
+/*下载更新*/
+const onDownloadUpdate = (event) => {
+  isUpdate.value = true
+}
+
+/*主题色*/
 const colorState = reactive(store.theme);
-
+/*改变主题色*/
 const onColorChange = (type: string, e: any) => {
   Object.assign(colorState, {[type]: e.target.value});
   ConfigProvider.config({
     theme: colorState,
   });
 };
-
+/*保存主题色*/
 const handleSaveTheme = async (type: string, e: any) => {
   Object.assign(colorState, {[type]: e.target.value});
   ConfigProvider.config({
@@ -35,28 +95,35 @@ const handleSaveTheme = async (type: string, e: any) => {
   await setAppTheme(JSON.stringify(colorState))
 }
 
+
+onMounted(async () => {
+  openAtLoginChecked.value = (await getOpenAtLogin()).data
+  appVersion.value = (await getAppVersion()).data.result
+  message.info("222222")
+})
+
 </script>
 
 <template>
-  <a-layout-content id="setting-content" style="padding: 10px">
-
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              开机自启动
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="openAtLoginChecked" @click="setOpenAtLoginChecked"/>
-            </div>
-          </a-layout-content>
-        </a-card>
-      </a-col>
-    </a-row>
-
-    <!--    <a-row type="flex">
+      <a-layout-content id="setting-content" style="padding: 10px">
+        <!--开机自启-->
+        <a-row type="flex">
+          <a-col flex="auto">
+            <a-card class="card-view" :bordered="false" size="small"
+                    style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
+              <a-layout-content>
+                <div class="card-left-title">
+                  开机自启动
+                </div>
+                <div style="float: right">
+                  <a-switch v-model:checked="openAtLoginChecked" @click="setOpenAtLoginChecked"/>
+                </div>
+              </a-layout-content>
+            </a-card>
+          </a-col>
+        </a-row>
+        <!--启动时最小化到托盘-->
+        <a-row type="flex">
           <a-col flex="auto">
             <a-card class="card-view" :bordered="false" size="small"
                     style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
@@ -70,55 +137,117 @@ const handleSaveTheme = async (type: string, e: any) => {
               </a-layout-content>
             </a-card>
           </a-col>
-        </a-row>-->
+        </a-row>
+        <!--启用托盘-->
+        <a-row type="flex">
+          <a-col flex="auto">
+            <a-card class="card-view" :bordered="false" size="small"
+                    style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
+              <a-layout-content>
+                <div class="card-left-title">
+                  启用托盘图标
+                  <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
+                  </a-typography-text>
+                </div>
+                <div style="float: right">
+                  <a-switch v-model:checked="checked2"/>
+                </div>
+              </a-layout-content>
+            </a-card>
 
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <a-switch v-model:checked="checked2"/>
-            </div>
-          </a-layout-content>
-        </a-card>
+          </a-col>
+        </a-row>
+        <!--主题色-->
+        <a-row type="flex">
+          <a-col flex="auto">
+            <a-card class="card-view" :bordered="false" size="small"
+                    style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
+              <a-layout-content>
+                <div class="card-left-title">
+                  主题色
+                </div>
+                <div style="float: right">
+                  <input
+                      type="color"
+                      :value="colorState.primaryColor"
+                      @input="onColorChange('primaryColor', $event)"
+                      @blur="handleSaveTheme('primaryColor',$event)"
+                      style="border: none;cursor: pointer"
+                  />
+                  <span style="color: var(--ant-primary-color)"/></div>
+              </a-layout-content>
+            </a-card>
 
-      </a-col>
-    </a-row>
+          </a-col>
+        </a-row>
+        <!--检查更新-->
 
-    <a-row type="flex">
-      <a-col flex="auto">
-        <a-card class="card-view" :bordered="false" size="small"
-                style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
-          <a-layout-content>
-            <div class="card-left-title">
-              主题色
-              <a-typography-text type="secondary" style="font-size: 12px">
-              </a-typography-text>
-            </div>
-            <div style="float: right">
-              <input
-                  type="color"
-                  :value="colorState.primaryColor"
-                  @input="onColorChange('primaryColor', $event)"
-                  @blur="handleSaveTheme('primaryColor',$event)"
-                  style="border: none;cursor: pointer"
-              />
-              <span style="color: var(--ant-primary-color)"/></div>
-          </a-layout-content>
-        </a-card>
+        <a-row type="flex">
+          <a-col flex="auto">
+            <a-card class="card-view" :bordered="false" size="small"
+                    style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
+              <a-layout-content>
+                <div class="card-left-title">
+                  版本号
+                  <a-typography-text type="secondary">
+                    <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">检查更新</a-button>
+                  </a-typography-text>
+                  <a-progress
+                      type="circle"
+                      :width="50"
+                      :strokeWidth="10"
+                      :percent="progress"
+                      style="
+                float: left;
+                position: absolute;
+                bottom: 7%;
+                margin-left: 12px"
+                  />
+                </div>
 
-      </a-col>
-    </a-row>
+                <div style="float: right">
+                  {{ appVersion }}
+                </div>
 
-    <a-divider style="height: 2px;background-color: rgba(211,211,211,0.82);margin: 4px 0 12px 0;padding: 0 2px"/>
+              </a-layout-content>
+            </a-card>
 
-  </a-layout-content>
+          </a-col>
+        </a-row>
+
+
+        <a-divider style="height: 2px;background-color: rgba(211,211,211,0.82);margin: 4px 0 12px 0;padding: 0 2px"/>
+
+      </a-layout-content>
+
+      <div ref="modalWrap" class="modalWrap">
+        <a-modal
+            v-model:visible='updateModalVisible'
+            width="50%"
+            :getContainer="modalWrap"
+            ok-text="确认"
+            cancel-text="取消"
+            :closable="!isUpdate"
+            @ok="onDownloadUpdate($event)"
+            @cancel="updateModalVisible =false"
+        >
+          <template #title>
+            <a-row>
+              <a-col :span="8">
+                <a-typography-title :level="5" style="margin-top: 4px;">检查到新版本</a-typography-title>
+              </a-col>
+            </a-row>
+          </template>
+
+          <div v-if="!isUpdate">是否更新？</div>
+          <div v-else>
+            <a-progress
+                :strokeWidth="12"
+                :percent="12"
+            />
+          </div>
+        </a-modal>
+      </div>
 </template>
 
 <style scoped lang="less">
@@ -139,5 +268,13 @@ const handleSaveTheme = async (type: string, e: any) => {
   }
 }
 
+
+@import "ant-design-vue/dist/antd.variable.less";
+
+.modalWrap {
+  :deep(.ant-progress-bg) {
+    background-image: linear-gradient(to right, @primary-1 0%, @primary-4 100%);;
+  }
+}
 
 </style>

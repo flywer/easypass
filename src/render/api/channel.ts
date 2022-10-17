@@ -8,6 +8,11 @@ export const channel = reactive({
         getOpenAtLogin: 'app/getOpenAtLogin',
         getAppTheme: 'app/getAppTheme',
         setAppTheme: 'app/setAppTheme',
+        getAppVersion: 'app/getAppVersion',
+        checkForUpdate: 'app/checkForUpdate',
+        sendUpdateInfo: 'app/sendUpdateInfo',
+        sendDownloadProgress: 'app/sendDownloadProgress',
+
 
     },
     pwdGroup: {

@@ -23,10 +23,10 @@ watch(() => props.menuKey, () => {
           params: {key: props.menuKey},
         })
   } else if (props.menuKey === '200') {
-   /* router.push(
-        {
-          name: 'commonPassword',
-        })*/
+    /* router.push(
+         {
+           name: 'commonPassword',
+         })*/
   } else if (props.menuKey === '500') {
     router.push(
         {
@@ -38,7 +38,9 @@ watch(() => props.menuKey, () => {
 
 <template>
   <a-layout id="layout">
+    <keep-alive>
     <router-view/>
+    </keep-alive>
   </a-layout>
 </template>
 
@@ -51,6 +53,8 @@ watch(() => props.menuKey, () => {
 
 <!--全局css-->
 <style lang="less">
+@import "ant-design-vue/dist/antd.variable.less";
+
 #tool-header {
   background: #fff;
   margin: 40px 8px 8px 8px;
@@ -68,14 +72,18 @@ watch(() => props.menuKey, () => {
     text-align: center;
   }
 
+  .ant-space-item:hover {
+    background-color: @primary-1;
+  }
+
   .icon {
     font-size: 20px;
     color: #545454;
   }
 
-  .tool-btn {
-    padding: 0 6px;
-  }
+  /*  .tool-btn {
+      padding: 0 6px;
+    }*/
 }
 
 #content-view {
