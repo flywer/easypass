@@ -39,11 +39,11 @@ const menuClick = (item) => {
       </a-menu-item>
       <a-menu-item key="200">
         <DesktopOutlined/>
-        <span>常用密码</span>
+        <span>常用账号</span>
       </a-menu-item>
       <a-menu-item key="300">
         <UploadOutlined/>
-        <span>导入密码</span>
+        <span>批量导入</span>
       </a-menu-item>
       <a-menu-item key="400">
         <DatabaseOutlined/>

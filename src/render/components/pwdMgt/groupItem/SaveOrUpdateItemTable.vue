@@ -149,8 +149,8 @@ const handleSubmit = () => {
     <!--右侧-->
     <a-space style="float: right">
       <!--保存-->
-      <a-button class="tool-btn" type="text" size="large" @click="handleSubmit">
-        <check-outlined class="icon" style="color: #52c41a"/>
+      <a-button class="tool-btn" size="large" @click="handleSubmit" style="padding: 0 12px;">
+        保存
       </a-button>
       <a-button class="tool-btn" type="text" size="large">
         <MoreOutlined class="icon"/>

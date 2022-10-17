@@ -13,7 +13,6 @@ const setOpenAtLoginChecked = () => {
 }
 
 const checked2 = ref<boolean>(false);
-const checked3 = ref<boolean>(false);
 
 onMounted(async () => {
   openAtLoginChecked.value = (await getOpenAtLogin()).data
