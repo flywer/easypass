@@ -1,8 +1,8 @@
 <!-- 窗口的右上角三个操作按钮 -->
 <script setup lang="ts">
-import { BorderOutlined, CloseOutlined, MinusOutlined } from '@ant-design/icons-vue'
-import { setWindow } from '@render/api/app.api'
-import { ref } from 'vue'
+import {BorderOutlined, CloseOutlined, MinusOutlined} from '@ant-design/icons-vue'
+import {setWindow} from '@render/api/app.api'
+import {ref} from 'vue'
 
 const appName = ref('easyPass')
 
@@ -26,14 +26,14 @@ async function closeWindowBtn() {
         {{ appName }}
       </div>
       <section id="btnGroup" style="float: right">
-        <a-button type="text" @click="minWindowBtn">
-          <MinusOutlined />
+        <a-button type="text" class="windowBtn" @click="minWindowBtn">
+          <MinusOutlined/>
         </a-button>
-        <a-button type="text" @click="maxWindowBtn">
-          <BorderOutlined />
-        </a-button>
-        <a-button type="text" @click="closeWindowBtn">
-          <CloseOutlined />
+<!--        <a-button type="text" class="windowBtn" @click="maxWindowBtn">
+          <BorderOutlined/>
+        </a-button>-->
+        <a-button type="text" class="windowBtn" @click="closeWindowBtn">
+          <CloseOutlined/>
         </a-button>
       </section>
     </a-layout-content>
@@ -41,6 +41,7 @@ async function closeWindowBtn() {
 </template>
 
 <style scoped lang="less">
+
 #topBar {
   -webkit-app-region: drag;
   background-color: white;
@@ -67,5 +68,11 @@ async function closeWindowBtn() {
 a {
   text-decoration-line: none;
   text-decoration-color: #1a1a1a;
+}
+
+@import "ant-design-vue/dist/antd.variable.less";
+
+.windowBtn:hover{
+  background-color: @primary-3;
 }
 </style>

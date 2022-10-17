@@ -183,7 +183,7 @@ const deleteGroupItem = (id: string) => {
 <template>
   <!--  顶部按钮栏 -->
   <a-layout-header id="tool-header">
-    <a-space>
+    <a-space style="gap: 4px">
       <!--新增弹出框 -->
       <a-button class="tool-btn" type="text" size="large" @click="showSaveModal">
         <PlusOutlined class="icon"/>
