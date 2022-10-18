@@ -1,11 +1,11 @@
 import {Injectable} from "einf";
-import {groupItemMapper} from "@main/mapper/groupItem.mapper";
+import {GroupItemMapper} from "@main/mapper/group-item-mapper.service";
 import {GroupItem} from "@main/model/groupItem";
 import {uuid} from "vue3-uuid";
 
 @Injectable()
 export class GroupItemService {
-    constructor(private groupItemMapper: groupItemMapper) {
+    constructor(private groupItemMapper: GroupItemMapper) {
     }
 
     public saveGroupItems(groupItems: typeof GroupItem[], groupId: string, isUpdate: boolean) {

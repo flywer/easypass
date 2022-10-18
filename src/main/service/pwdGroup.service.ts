@@ -1,17 +1,17 @@
 import {Injectable} from "einf";
-import {pwdGroupMapper} from "@main/mapper/pwdGroup.mapper";
+import {PwdGroupMapper} from "@main/mapper/pwd-group-mapper.service";
 import {PwdGroup, PwdGroupVo} from "@main/model/pwdGroup";
 
 @Injectable()
 export class PwdGroupService {
-    constructor(private pwdGroupMapper: pwdGroupMapper) {
+    constructor(private pwdGroupMapper: PwdGroupMapper) {
     }
 
     public getPwdGroupListByUserInfo(user: {}) {
         return this.pwdGroupMapper.getPwdGroupListByUserInfo(user);
     }
 
-    public getPwdGroupListByUserInfoByPage(vo: PwdGroupVo) {
+    public getPwdGroupListByUserInfoByPage(vo) {
         return this.pwdGroupMapper.getPwdGroupListByUserInfoByPage(vo);
     }
 

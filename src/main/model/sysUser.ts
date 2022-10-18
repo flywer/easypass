@@ -20,6 +20,11 @@ export const SysUser = sequelize.define('sysUser', {
         defaultValue: DataTypes.UUIDV4,
         unique: 'tokenIndex',
         comment: '用户唯一秘钥'
+    },
+    mac: {
+        type: DataTypes.STRING(17),
+        defaultValue: null,
+        comment: '用户Mac地址'
     }
 }, {
     tableName: 'sys_user',

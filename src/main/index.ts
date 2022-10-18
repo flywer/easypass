@@ -7,11 +7,13 @@ import {PwdGroupController} from "@main/controller/pwdGroup.controller";
 import path from "path";
 import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
-import {handleUpdate} from "@main/app/autoUpdater";
-import webContents from 'electron'
-import {channel} from "@render/api/channel";
 import installExtension, {VUEJS3_DEVTOOLS, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
-
+import {UserController} from "@main/controller/user.controller";
+import {getMacExist} from "@render/api/user.api";
+import {message} from "ant-design-vue";
+import {getNetworkInfo} from "@main/utils";
+import {SysUser} from "@main/model/sysUser";
+import {store} from "@render/store";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -95,7 +97,7 @@ async function bootstrap() {
 
         await createEinf({
             window: createWindow,
-            controllers: [AppController, PwdGroupController, GroupItemController],
+            controllers: [AppController, PwdGroupController, GroupItemController, UserController],
             injects: [{
                 name: 'IS_DEV',
                 inject: !app.isPackaged,
@@ -115,8 +117,6 @@ async function bootstrap() {
 
             /*            const user =  await SysUser.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
                         console.log(user.id)*/
-
-
         }).catch(err => {
             console.error('=================Database connection failed :( ===================', err);
         });

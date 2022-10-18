@@ -6,7 +6,7 @@ import {sqlLikePack} from "@main/utils";
 import {GroupedCountResultItem} from "sequelize/types/model";
 
 @Injectable()
-export class pwdGroupMapper {
+export class PwdGroupMapper {
     constructor() {
     }
 
@@ -44,12 +44,15 @@ export class pwdGroupMapper {
         })
     }
 
-    public async getPwdGroupListByUserInfoByPage(vo: typeof PwdGroup): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
+    public async getPwdGroupListByUserInfoByPage(vo): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
         try {
             const {count, rows} = await PwdGroup.findAndCountAll({
                 where: {
-                    name: {
-                        [Op.like]: sqlLikePack(vo.name, true, true)
+                    [Op.and]: {
+                        name: {
+                            [Op.like]: sqlLikePack(vo.name, true, true)
+                        },
+                        userId: [sequelize.literal(`select id from sys_user where  mac = '${vo.mac}' `)]
                     }
                 },
                 offset: (vo.pageIndex - 1) * vo.pageSize,

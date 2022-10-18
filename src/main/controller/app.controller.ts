@@ -8,6 +8,7 @@ import {fileExistAndWrite, getUserAppDataFolder, writeFs} from "@main/utils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/config.json"
 import {autoUpdater} from "electron-updater";
+import * as os from "os";
 
 @Controller()
 export class AppController {
@@ -16,6 +17,7 @@ export class AppController {
         @Window() private readonly mainWindow: BrowserWindow // 主窗口实例
     ) {
     }
+
     /**
      * 设置主窗体 最大化、最小化、关闭
      * @param setup
@@ -192,6 +194,33 @@ export class AppController {
             result = failure()
             result.result = e
         }
+        return result
+    }
+
+    /**
+     * 获取网络接口、MAC地址等信息
+     * @constructor
+     */
+    @IpcHandle(channel.app.getNetworkInterfaces)
+    public HandleGetNetworkInterfaces() {
+        let result
+        try {
+            result = success()
+            result.result = {
+                mac: null,
+                hostname: null
+            }
+            if (os.networkInterfaces().WLAN) {
+                result.result.mac = os.networkInterfaces().WLAN[0].mac
+            } else {
+                result.result.mac = os.networkInterfaces()['以太网'][0].mac
+            }
+            result.result.hostname = os.hostname()
+        } catch (e) {
+            result = failure()
+            console.error(e)
+        }
+        console.log(result)
         return result
     }
 }

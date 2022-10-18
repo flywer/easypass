@@ -6,7 +6,7 @@ import {sqlLikePack} from "@main/utils";
 import {PwdGroup} from "@main/model/pwdGroup";
 
 @Injectable()
-export class groupItemMapper {
+export class GroupItemMapper {
     constructor() {
     }
 

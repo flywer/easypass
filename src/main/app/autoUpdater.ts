@@ -13,8 +13,6 @@ export const handleUpdate = (window) => {
     //不启用自动更新，会在每次检测到可更新版本时自动更新
     autoUpdater.autoDownload = false
 
-    console.log(autoUpdater.currentVersion.version)
-
     //开始检测更新
     autoUpdater.on('checking-for-update', async function () {
         let result = success()

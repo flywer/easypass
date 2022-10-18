@@ -1,5 +1,7 @@
 import fs from 'fs'
 import path from "path";
+import {failure, success} from "@main/vo/resultVo";
+import os from "os";
 
 /**
  * 包装sql中like语句所需要的'%'
@@ -69,4 +71,25 @@ export const getUserAppDataFolder = () => {
     } else {
         return path.join(userHome, '/easyPass')
     }
+}
+
+/**
+ * 获取网络接口信息
+ */
+export const getNetworkInfo = () => {
+    let result = {
+        mac: null,
+        hostname: null
+    }
+    try {
+        if (os.networkInterfaces().WLAN) {
+            result.mac = os.networkInterfaces().WLAN[0].mac
+        } else {
+            result.mac = os.networkInterfaces()['以太网'][0].mac
+        }
+        result.hostname = os.hostname()
+    } catch (e) {
+        console.error(e)
+    }
+    return result
 }

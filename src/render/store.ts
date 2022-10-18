@@ -6,6 +6,9 @@ export const store = reactive({
     currentGroupName: null,
     theme: {},
     isUpdating: false,
-    isDownloaded:false
+    isDownloaded: false,
+    mac: null,
+    isLogin:false,
+    userId:null
 })
 

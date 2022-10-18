@@ -15,6 +15,8 @@ import {store} from "@render/store";
 import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
 import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModal.vue";
 import {message, Modal} from "ant-design-vue";
+import {getNetworkInterfaces} from "@render/api/app.api";
+import {getMacExist} from "@render/api/user.api";
 
 //路由
 const route = useRoute()
@@ -96,12 +98,13 @@ const showSearchInput = () => {
 
 //endregion
 
-onMounted(() => {
-  searchGroupByPage(true)
+onMounted(async () => {
+  await searchGroupByPage(true)
   setInterval(() => {
     if (blur && searchInputVisible.value)
       searchInputVisible.value = false
   }, 600)
+
 })
 
 // blur:搜索框失去焦点时触发
@@ -111,8 +114,18 @@ const searchInputBlur = () => {
 
 //enter:搜索
 const searchGroupByPage = async (init: boolean, search?: true) => {
-  spinning.value = true
+  let checkUser = (await getMacExist()).data.result
+  if (checkUser.id != null) {
+    store.isLogin = true
+    store.userId = checkUser.id
+    store.mac = checkUser.mac
+    spinning.value = false
+  } else {
+    store.isLogin = false
+    return null
+  }
 
+  spinning.value = true
   searchModelRef.pageSize = pageSize.value
   let pageVo: { count: number; rows: any[] }
   //是否是全量搜索（初始化、刷新）

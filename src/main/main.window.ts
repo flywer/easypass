@@ -1,8 +1,8 @@
 import {join} from 'path'
 import {BrowserWindow, app} from 'electron'
-import nativeTheme = Electron.nativeTheme;
 import {handleUpdate} from "@main/app/autoUpdater";
 import {channel} from "@render/api/channel";
+import {getNetworkInfo} from "@main/utils";
 
 const isDev = !app.isPackaged
 
@@ -32,6 +32,8 @@ export async function createWindow() {
         win.webContents.send(channel.app.sendDefaultTheme)
         //自动更新组件
         handleUpdate(win)
+        //发送网络接口信息
+        win.webContents.send(channel.app.sendNetworkInfo, getNetworkInfo())
     })
 
     if (isDev) {

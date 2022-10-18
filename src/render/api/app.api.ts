@@ -64,6 +64,14 @@ export function downloadUpdate() {
 /**
  * 退出应用并安装
  */
-export function quitAndInstall(){
+export function quitAndInstall() {
     return ipcInstance.send<Result>(channel.app.quitAndInstall)
 }
+
+/**
+ * 获取网络接口信息
+ */
+export function getNetworkInterfaces() {
+    return ipcInstance.send<Result>(channel.app.getNetworkInterfaces)
+}
+

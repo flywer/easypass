@@ -4,12 +4,13 @@ import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
 import {ConfigProvider, message, Modal} from 'ant-design-vue';
-import {getAppTheme, quitAndInstall} from "@render/api/app.api";
+import {getAppTheme, getNetworkInterfaces, quitAndInstall} from "@render/api/app.api";
 import {store} from "@render/store";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import config from "@common/config/config.json"
+import {getMacExist} from "@render/api/user.api";
 
 const manuKey = ref('')
 
@@ -18,7 +19,8 @@ const getMenuKey = (value) => {
   manuKey.value = value
 }
 
-onMounted(() => {
+onMounted(async () => {
+  /*接收主题更新*/
   ipcInstance.on(channel.app.sendDefaultTheme, () => {
     autoThemeConfig()
   })
@@ -35,6 +37,11 @@ onMounted(() => {
         quitAndInstall()
       },
     });
+  })
+
+  /*接收网络接口信息*/
+  ipcInstance.on(channel.app.sendNetworkInfo, res => {
+    store.mac = res.mac
   })
 })
 

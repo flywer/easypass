@@ -1,7 +1,8 @@
 <!-- 中心内容组件载体 -->
 <script setup lang="ts">
-import {ref, watch} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import {useRouter} from 'vue-router'
+import {getNetworkInterfaces} from "@render/api/app.api";
 
 const props = defineProps({
   menuKey: {
@@ -34,6 +35,7 @@ watch(() => props.menuKey, () => {
         })
   }
 })
+
 </script>
 
 <template>
