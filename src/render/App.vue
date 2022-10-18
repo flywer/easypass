@@ -3,12 +3,13 @@ import {createVNode, onMounted, ref} from 'vue'
 import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
-import {ConfigProvider, Modal} from 'ant-design-vue';
+import {ConfigProvider, message, Modal} from 'ant-design-vue';
 import {getAppTheme, quitAndInstall} from "@render/api/app.api";
 import {store} from "@render/store";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
+import config from "@common/config/config.json"
 
 const manuKey = ref('')
 
@@ -21,7 +22,9 @@ onMounted(() => {
   ipcInstance.on(channel.app.sendDefaultTheme, () => {
     autoThemeConfig()
   })
+
   ipcInstance.on(channel.app.sendUpdateDownloaded, res => {
+    store.isDownloaded = true
     Modal.confirm({
       title: '提示',
       icon: createVNode(ExclamationCircleOutlined),
@@ -41,21 +44,15 @@ const autoThemeConfig = async () => {
     if (res.data.success) {
       store.theme = res.data.result
     } else {
-      console.error(res.data.message)
-      store.theme = {
-        "primaryColor": "#1890ff",
-        "errorColor": "#ff4d4f",
-        "warningColor": "#faad14",
-        "successColor": "#52c41a",
-        "infoColor": "#1890ff"
-      }
+      //异常
+      message.info(res.data.message)
+      store.theme = config.defaultTheme
     }
     ConfigProvider.config({
       theme: store.theme,
     });
   })
 }
-
 
 </script>
 

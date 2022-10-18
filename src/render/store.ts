@@ -5,6 +5,7 @@ export const store = reactive({
     currentGroupId: null,
     currentGroupName: null,
     theme: {},
-    isUpdating: false
+    isUpdating: false,
+    isDownloaded:false
 })
 

@@ -45,30 +45,26 @@ async function electronAppInit() {
     app.whenReady().then(async () => {
         trayInit()
         if (isDev) {
-            // Install Vue Devtools
-            try {
-                //不能用beta版
-                const vue_devtools = {id: "nhdogjmejiglipccpnnnanhbledajbpd", electron: ">=1.2.1"}
-                const result = await installExtension(vue_devtools)
-                if (result) {
-                    console.log("success load : " + result)
-                }
-            } catch (e) {
-                console.error('Vue Devtools failed to install:', e.toString())
-            }
+            //安装vue开发者工具
+            await installVueDevtools()
         }
     })
-
-    app.on('web-contents-created', () => {
-        if (BrowserWindow.getFocusedWindow() != null)
-            BrowserWindow.getFocusedWindow().webContents.send(channel.app.sendDefaultTheme)
-    })
-
 }
 
-const appFolder = path.dirname(process.execPath);
+//安装vue开发者工具
+async function installVueDevtools() {
+    try {
+        //不能用beta版
+        const vue_devtools = {id: "nhdogjmejiglipccpnnnanhbledajbpd", electron: ">=1.2.1"}
+        const result = await installExtension(vue_devtools)
+        if (result) {
+            console.log("success load : " + result)
+        }
+    } catch (e) {
+        console.error('Vue Devtools failed to install:', e.toString())
+    }
+}
 
-//const updateExe = path.resolve(appFolder, "..", "Update.exe");
 
 function launchAtStartup() {
     const exeName = path.basename(process.execPath);

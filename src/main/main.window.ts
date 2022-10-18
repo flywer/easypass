@@ -2,6 +2,7 @@ import {join} from 'path'
 import {BrowserWindow, app} from 'electron'
 import nativeTheme = Electron.nativeTheme;
 import {handleUpdate} from "@main/app/autoUpdater";
+import {channel} from "@render/api/channel";
 
 const isDev = !app.isPackaged
 
@@ -25,17 +26,24 @@ export async function createWindow() {
         ? process.env.DS_RENDERER_URL
         : `file://${join(app.getAppPath(), 'dist/render/index.html')}`
 
-    await win.loadURL(URL)
+    //不加await 开发者工具出不来，不知道为什么
+    await win.loadURL(URL).then(() => {
+        //设置主题
+        win.webContents.send(channel.app.sendDefaultTheme)
+        //自动更新组件
+        handleUpdate(win)
+    })
 
-    if (isDev)
+    if (isDev) {
         win.webContents.openDevTools()
-    else
+
+    } else
         win.removeMenu()
+
+    //窗口关闭时触发
     win.on('closed', () => {
         win.destroy()
     })
-
-    handleUpdate(win)
 
     return win
 }

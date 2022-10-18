@@ -4,14 +4,14 @@
  */
 const config = {
   productName: 'easyPass',
-  // copyright: "0.0.1", //应用版本
+  // copyright: "", //应用版本
   directories: {
     output: 'dist/electron', // 构建后保存的位置
   },
   /*    extraResources: {
-        from: "/src/config/", //将源代码中的资源进行拷贝打包
-        to: "config"
-    }, */
+          from: "/src/config/", //将源代码中的资源进行拷贝打包
+          to: "config"
+      }, */
   win: {
     // icon: "./build/icons/earth.ico", //windows下应用的图标
     target: [
@@ -29,7 +29,7 @@ const config = {
     // "installerHeaderIcon": "./build/icons/earth.ico", // 安装时头部图标
     createDesktopShortcut: true, // 创建桌面图标
     createStartMenuShortcut: true, // 创建开始菜单图标
-    shortcutName: '***', // 快捷方式名称
+    shortcutName: 'easyPass', // 快捷方式名称
   },
   publish: [
     {

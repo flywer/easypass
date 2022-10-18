@@ -15,7 +15,6 @@ export const sqlLikePack = (content: any, left?: boolean, right?: boolean) => {
     return content
 }
 
-
 /**
  * 异步写入本地文件，没有则创建
  * @param path

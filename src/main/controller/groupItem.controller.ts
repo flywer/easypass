@@ -1,9 +1,7 @@
 import {Controller, IpcHandle} from "einf";
 import {GroupItemService} from "@main/service/groupItem.service";
-import {GroupItem} from "@main/model/groupItem";
 import {channel} from "@render/api/channel";
 import {failure, Result, success} from "@main/vo/resultVo";
-import {getItemsListByItemId} from "@render/api/groupItem.api";
 
 @Controller()
 export class GroupItemController {

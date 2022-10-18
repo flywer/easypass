@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {createVNode, onMounted, reactive, ref} from "vue";
+import {computed, createVNode, onMounted, reactive, ref, watch} from "vue";
 import {
   checkForUpdate,
   downloadUpdate,
@@ -28,8 +28,6 @@ const checked2 = ref<boolean>(false);
 /*当前版本号*/
 const appVersion = ref()
 const updateKey = 'updateKey'
-const updateModalVisible = ref(false)
-const modalWrap = ref()
 let progressInfo = ref({
   total: 0,
   delta: 0,
@@ -68,13 +66,18 @@ const onCheckForUpdate = async () => {
 /*下载更新*/
 const onDownloadUpdate = async () => {
   store.isUpdating = true
-  downloadUpdate().then(res => {
-    if (res.data.success)
-      message.info({content: res.data.message, key: updateKey, duration: 2});
-    else
-      message.warn({content: res.data.message, key: updateKey, duration: 2})
+  await downloadUpdate().catch(() => {
+    message.error('系统异常')
   })
 }
+
+/*设置进度条百分比*/
+watch(() => store.isDownloaded, () => {
+  //已下载完毕或者已有安装包
+  if (store.isDownloaded) {
+    progressInfo.value.percent = 100
+  }
+})
 
 /*主题色*/
 const colorState = reactive(store.theme);
@@ -146,8 +149,8 @@ onMounted(async () => {
                 style="height: 60px;line-height: 36px;padding: 0 12px;text-align: center">
           <a-layout-content>
             <div class="card-left-title">
-              启用托盘图标
-              <a-typography-text type="secondary" style="font-size: 12px">禁用此选项时关闭主窗口将直接退出程序
+              启用托盘
+              <a-typography-text type="secondary" style="font-size: 12px;margin-left: 6px">禁用此选项后关闭主窗口将直接退出程序
               </a-typography-text>
             </div>
             <div style="float: right">
@@ -196,55 +199,21 @@ onMounted(async () => {
                           type="circle"
                           :width="50"
                           :strokeWidth="10"
-                          :percent="progressInfo.percent"
+                          :percent="parseInt(progressInfo.percent.toString())"
                           class="update-progress"
               />
             </div>
-            <div>{{ JSON.stringify(progressInfo) }}</div>
-
             <div style="float: right">
-              {{ appVersion }}
+              <div class="app-version-div">{{ appVersion }}</div>
             </div>
-
           </a-layout-content>
         </a-card>
-
       </a-col>
     </a-row>
-
 
     <a-divider style="height: 2px;background-color: rgba(211,211,211,0.82);margin: 4px 0 12px 0;padding: 0 2px"/>
 
   </a-layout-content>
-
-  <div ref="modalWrap" class="modalWrap">
-    <a-modal
-        v-model:visible='updateModalVisible'
-        width="50%"
-        :getContainer="modalWrap"
-        ok-text="确认"
-        cancel-text="取消"
-        :closable="!isUpdate"
-        @ok="onDownloadUpdate()"
-        @cancel="updateModalVisible =false"
-    >
-      <template #title>
-        <a-row>
-          <a-col :span="8">
-            <a-typography-title :level="5" style="margin-top: 4px;">检查到新版本</a-typography-title>
-          </a-col>
-        </a-row>
-      </template>
-
-      <div v-if="!isUpdate">是否更新？</div>
-      <div v-else>
-        <a-progress
-            :strokeWidth="12"
-            :percent="12"
-        />
-      </div>
-    </a-modal>
-  </div>
 </template>
 
 <style scoped lang="less">
@@ -272,13 +241,11 @@ onMounted(async () => {
   }
 }
 
-
 @import "ant-design-vue/dist/antd.variable.less";
 
-.modalWrap {
-  :deep(.ant-progress-bg) {
-    background-image: linear-gradient(to right, @primary-1 0%, @primary-4 100%);;
-  }
+.app-version-div {
+  background-color: #f5f5f5;
+  padding: 0 14px;
 }
 
 </style>

@@ -1,12 +1,11 @@
-import {Controller, IpcHandle, IpcOn, IpcSend, Window} from 'einf'
-import {app, BrowserWindow, dialog, ipcMain} from 'electron'
+import {Controller, IpcHandle, Window} from 'einf'
+import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
 import fs from "fs";
-import {fileExistAndWrite, getUserAppDataFolder, getUserHome, writeFs} from "@main/utils";
+import {fileExistAndWrite, getUserAppDataFolder, writeFs} from "@main/utils";
 import {failure, success} from "@main/vo/resultVo";
-import * as os from "os";
 import config from "@common/config/config.json"
 import {autoUpdater} from "electron-updater";
 
@@ -130,7 +129,7 @@ export class AppController {
         let result
         try {
             result = success()
-            result.result = config.appVersion
+            result.result = autoUpdater.currentVersion.version
         } catch (e) {
             console.error(e)
             result = failure()

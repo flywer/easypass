@@ -1,6 +1,5 @@
 import {Menu, nativeImage, Tray} from "electron";
 
-
 // 注意: 你的 contextMenu, Tooltip 和 Title 代码需要写在这里!
 
 export let tray
