@@ -25,7 +25,7 @@ export async function createWindow() {
         ? process.env.DS_RENDERER_URL
         : `file://${join(app.getAppPath(), 'dist/render/index.html')}`
 
-    win.loadURL(URL)
+    await win.loadURL(URL)
 
     if (isDev)
         win.webContents.openDevTools()

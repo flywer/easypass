@@ -1,4 +1,4 @@
-import {Controller, IpcHandle, IpcSend, Window} from 'einf'
+import {Controller, IpcHandle, IpcOn, IpcSend, Window} from 'einf'
 import {app, BrowserWindow, dialog, ipcMain} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
@@ -17,7 +17,6 @@ export class AppController {
         @Window() private readonly mainWindow: BrowserWindow // 主窗口实例
     ) {
     }
-
     /**
      * 设置主窗体 最大化、最小化、关闭
      * @param setup
@@ -158,6 +157,10 @@ export class AppController {
         return result
     }
 
+    /**
+     * 启用下载更新
+     * @constructor
+     */
     @IpcHandle(channel.app.downloadUpdate)
     public async HandleDownloadUpdate() {
         let result
@@ -174,6 +177,10 @@ export class AppController {
         return result
     }
 
+    /**
+     * 退出并安装应用
+     * @constructor
+     */
     @IpcHandle(channel.app.quitAndInstall)
     public HandleQuitAndInstall() {
         let result

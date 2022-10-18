@@ -16,8 +16,11 @@ const manuKey = ref('')
 const getMenuKey = (value) => {
   manuKey.value = value
 }
+
 onMounted(() => {
-  autoThemeConfig()
+  ipcInstance.on(channel.app.sendDefaultTheme, () => {
+    autoThemeConfig()
+  })
   ipcInstance.on(channel.app.sendUpdateDownloaded, res => {
     Modal.confirm({
       title: '提示',

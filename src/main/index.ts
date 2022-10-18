@@ -1,5 +1,5 @@
-import {app, Tray, Menu, nativeImage,nativeTheme} from 'electron'
-import {createEinf} from 'einf'
+import {app, Tray, Menu, nativeImage, nativeTheme, BrowserWindow} from 'electron'
+import {createEinf, IpcSend} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
 import {sequelize} from "@main/sequelize.init";
@@ -8,6 +8,10 @@ import path from "path";
 import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import {handleUpdate} from "@main/app/autoUpdater";
+import webContents from 'electron'
+import {channel} from "@render/api/channel";
+import installExtension, {VUEJS3_DEVTOOLS, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
+
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -38,8 +42,26 @@ async function electronAppInit() {
     }
 
     ///应用启动后的操作
-    app.whenReady().then(() => {
+    app.whenReady().then(async () => {
         trayInit()
+        if (isDev) {
+            // Install Vue Devtools
+            try {
+                //不能用beta版
+                const vue_devtools = {id: "nhdogjmejiglipccpnnnanhbledajbpd", electron: ">=1.2.1"}
+                const result = await installExtension(vue_devtools)
+                if (result) {
+                    console.log("success load : " + result)
+                }
+            } catch (e) {
+                console.error('Vue Devtools failed to install:', e.toString())
+            }
+        }
+    })
+
+    app.on('web-contents-created', () => {
+        if (BrowserWindow.getFocusedWindow() != null)
+            BrowserWindow.getFocusedWindow().webContents.send(channel.app.sendDefaultTheme)
     })
 
 }
@@ -70,7 +92,6 @@ function launchAtStartup() {
 
 /**
  * 启动主进程时在这里进行初始化操作
- * Initialize here when starting the main process
  */
 async function bootstrap() {
     try {

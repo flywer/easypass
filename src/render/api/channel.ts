@@ -15,8 +15,7 @@ export const channel = reactive({
         downloadUpdate: 'app/downloadUpdate',
         sendUpdateDownloaded: 'app/sendUpdateDownloaded',
         quitAndInstall: 'app/quitAndInstall',
-
-
+        sendDefaultTheme: 'app/sendDefaultTheme',
     },
     pwdGroup: {
         getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',
