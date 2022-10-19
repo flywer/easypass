@@ -53,41 +53,6 @@ async function electronAppInit() {
     })
 }
 
-//安装vue开发者工具
-async function installVueDevtools() {
-    try {
-        //不能用beta版
-        const vue_devtools = {id: "nhdogjmejiglipccpnnnanhbledajbpd", electron: ">=1.2.1"}
-        const result = await installExtension(vue_devtools)
-        if (result) {
-            console.log("success load : " + result)
-        }
-    } catch (e) {
-        console.error('Vue Devtools failed to install:', e.toString())
-    }
-}
-
-
-function launchAtStartup() {
-    const exeName = path.basename(process.execPath);
-    if (process.platform === "darwin") {
-        app.setLoginItemSettings({
-            openAtLogin: true,
-            openAsHidden: true
-        });
-    } else {
-        app.setLoginItemSettings({
-            openAtLogin: true,
-            openAsHidden: true,
-            path: process.execPath,
-            args: [
-                "--processStart", `"${exeName}"`,
-                "--process-start-args", `"--hidden"`
-            ]
-        });
-    }
-}
-
 /**
  * 启动主进程时在这里进行初始化操作
  */
@@ -128,3 +93,37 @@ async function bootstrap() {
 }
 
 bootstrap()
+
+function launchAtStartup() {
+    const exeName = path.basename(process.execPath);
+    if (process.platform === "darwin") {
+        app.setLoginItemSettings({
+            openAtLogin: true,
+            openAsHidden: true
+        });
+    } else {
+        app.setLoginItemSettings({
+            openAtLogin: true,
+            openAsHidden: true,
+            path: process.execPath,
+            args: [
+                "--processStart", `"${exeName}"`,
+                "--process-start-args", `"--hidden"`
+            ]
+        });
+    }
+}
+
+//安装vue开发者工具
+async function installVueDevtools() {
+    try {
+        //不能用beta版
+        const vue_devtools = {id: "nhdogjmejiglipccpnnnanhbledajbpd", electron: ">=1.2.1"}
+        const result = await installExtension(vue_devtools)
+        if (result) {
+            console.log("success load : " + result)
+        }
+    } catch (e) {
+        console.error('Vue Devtools failed to install:', e.toString())
+    }
+}

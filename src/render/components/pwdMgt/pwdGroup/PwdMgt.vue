@@ -114,16 +114,9 @@ const searchInputBlur = () => {
 
 //enter:搜索
 const searchGroupByPage = async (init: boolean, search?: true) => {
-  let checkUser = (await getMacExist()).data.result
-  if (checkUser.id != null) {
-    store.isLogin = true
-    store.userId = checkUser.id
-    store.mac = checkUser.mac
-    spinning.value = false
-  } else {
-    store.isLogin = false
-    return null
-  }
+
+  spinning.value = false
+
 
   spinning.value = true
   searchModelRef.pageSize = pageSize.value
