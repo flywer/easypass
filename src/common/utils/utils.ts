@@ -53,6 +53,17 @@ export const getUserAppDataFolder = () => {
 }
 
 /**
+ * 获取应用资源位置
+ * 开发环境：项目根目录
+ * 生产环境：根目录下的resources文件夹
+ */
+export const getResourcePath = () => {
+    return !process.env.NODE_ENV || process.env.NODE_ENV === "production"
+        ? process.resourcesPath // Live Mode
+        : process.cwd(); // Dev Mode
+}
+
+/**
  * 获取网络接口信息
  */
 export const getNetworkInfo = () => {

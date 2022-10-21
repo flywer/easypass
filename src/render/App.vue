@@ -12,6 +12,7 @@ import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import config from "@common/config/appConfig.json"
 import {checkLogin, getUserByMac} from "@render/api/user.api";
 import {cloneDeep} from "lodash-es";
+import {Model} from "sequelize";
 
 const manuKey = ref('')
 
@@ -67,6 +68,8 @@ onMounted(async () => {
   })
   await autoThemeConfig()
   updateDownloadedListener()
+
+  //Modal.confirm({content: JSON.stringify((await getAppInfo()).data.result)})
 })
 
 </script>

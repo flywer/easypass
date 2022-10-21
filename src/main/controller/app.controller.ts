@@ -3,7 +3,7 @@ import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
-import {getUserAppDataFolder} from "@common/utils/utils";
+import {getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
 import {fileExistAndWrite, writeFs} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
@@ -235,7 +235,8 @@ export class AppController {
         result.result = {
             appPath: app.getAppPath(),
             URL: `file://${join(app.getAppPath(), 'dist/render/index.html')}`,
-            isPackaged: app.isPackaged
+            isPackaged: app.isPackaged,
+            resourcesPath: getResourcePath()
         }
         return result
     }

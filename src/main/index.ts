@@ -9,7 +9,6 @@ import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension, {VUEJS3_DEVTOOLS, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getMacExist} from "@render/api/user.api";
 import {message} from "ant-design-vue";
 import {getNetworkInfo} from "@common/utils/utils";
 import {SysUser} from "@main/model/sysUser";
@@ -114,7 +113,9 @@ function launchAtStartup() {
     }
 }
 
-//安装vue开发者工具
+/**
+ * 安装vue开发者工具
+ */
 async function installVueDevtools() {
     try {
         //不能用beta版

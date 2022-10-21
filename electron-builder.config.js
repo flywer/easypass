@@ -9,7 +9,7 @@ const config = {
     output: 'dist/electron', // 构建后保存的位置
   },
   extraResources: {
-    from: '/config/', // 将源代码中的资源进行拷贝打包
+    from: './config/', // 将源代码中的资源进行拷贝打包
     to: 'config',
   },
   win: {
