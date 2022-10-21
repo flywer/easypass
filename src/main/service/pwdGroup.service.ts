@@ -7,7 +7,7 @@ export class PwdGroupService {
     constructor(private pwdGroupMapper: PwdGroupMapper) {
     }
 
-    public getPwdGroupListByUserInfo(user: {}) {
+    public getPwdGroupListByUserInfo(user) {
         return this.pwdGroupMapper.getPwdGroupListByUserInfo(user);
     }
 
@@ -27,7 +27,7 @@ export class PwdGroupService {
         return this.pwdGroupMapper.getPwdGroupById(groupId);
     }
 
-    public async deleteGroupById(id: string) {
+    public async deleteGroupById(id) {
         await this.pwdGroupMapper.deleteGroupById(id)
     }
 }

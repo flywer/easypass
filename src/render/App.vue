@@ -4,13 +4,14 @@ import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
 import {ConfigProvider, message, Modal} from 'ant-design-vue';
-import {getAppTheme, getNetworkInterfaces, quitAndInstall} from "@render/api/app.api";
+import {getAppInfo, getAppTheme, getNetworkInterfaces, quitAndInstall} from "@render/api/app.api";
 import {store} from "@render/store";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
-import config from "@common/config/config.json"
-import {getMacExist} from "@render/api/user.api";
+import config from "@common/config/appConfig.json"
+import {checkLogin, getUserByMac} from "@render/api/user.api";
+import {cloneDeep} from "lodash-es";
 
 const manuKey = ref('')
 
@@ -35,14 +36,6 @@ const autoThemeConfig = async () => {
   })
 }
 
-/*检查用户是否已注册*/
-const checkLogin = async () => {
-  let checkUser = (await getMacExist()).data.result
-  store.isLogin = checkUser.id != null;
-  store.userId = checkUser.id
-  store.mac = checkUser.mac
-}
-
 /*监听应用更新下载完毕回调*/
 const updateDownloadedListener = () => {
   ipcInstance.on(channel.app.sendUpdateDownloaded, res => {
@@ -61,7 +54,17 @@ const updateDownloadedListener = () => {
 }
 
 onMounted(async () => {
-  await checkLogin()
+  /*检查是否有已登录账号*/
+  checkLogin().then(res => {
+    if (res.data.result != null) {
+      store.isLogin = true
+      store.user = cloneDeep(res.data.result)
+    } else
+      store.isLogin = false
+
+    //跨平台模式
+    store.user.mode = '02'
+  })
   await autoThemeConfig()
   updateDownloadedListener()
 })

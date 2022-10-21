@@ -1,6 +1,5 @@
 <!--组项列表-->
 <script setup lang="ts">
-
 import {store} from "@render/store";
 import {useRouter} from "vue-router";
 import {createVNode, nextTick, onMounted, ref} from "vue";

@@ -4,11 +4,12 @@ import {onMounted, reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
 import {savePwdGroup, updatePwdGroup} from "@render/api/pwdMgt.api";
 import {cloneDeep} from "lodash-es";
+import {store} from "@render/store";
 
 // 父组件传过来的值，是否显示
 const props = defineProps({
   visible: Boolean,
-  modalRef: {default: {id: null, name: '', description: ''}}
+  modalRef: {default: {id: null, name: '', description: '', userId: store.user.id}}
 })
 
 watch(() => props.modalRef.id, () => {

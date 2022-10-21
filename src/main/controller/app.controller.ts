@@ -3,10 +3,10 @@ import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
-import fs from "fs";
-import {fileExistAndWrite, getUserAppDataFolder, writeFs} from "@main/utils";
+import {getUserAppDataFolder} from "@common/utils/utils";
+import {fileExistAndWrite, writeFs} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
-import config from "@common/config/config.json"
+import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
 import * as os from "os";
 
@@ -221,6 +221,22 @@ export class AppController {
             console.error(e)
         }
         console.log(result)
+        return result
+    }
+
+    /**
+     * 获取应用基本信息
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppInfo)
+    public HandleGetAppInfo() {
+        let result
+        result = success()
+        result.result = {
+            appPath: app.getAppPath(),
+            URL: `file://${join(app.getAppPath(), 'dist/render/index.html')}`,
+            isPackaged: app.isPackaged
+        }
         return result
     }
 }

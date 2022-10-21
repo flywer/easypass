@@ -2,7 +2,7 @@ import {join} from 'path'
 import {BrowserWindow, app} from 'electron'
 import {handleUpdate} from "@main/app/autoUpdater";
 import {channel} from "@render/api/channel";
-import {getNetworkInfo} from "@main/utils";
+import {getNetworkInfo} from "@common/utils/utils";
 
 const isDev = !app.isPackaged
 

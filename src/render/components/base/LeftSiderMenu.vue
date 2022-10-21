@@ -8,11 +8,10 @@ import {
   UploadOutlined,
 } from '@ant-design/icons-vue'
 import {ref} from 'vue'
+import {store} from "@render/store";
 
 // 使用defineEmits注册一个自定义事件
 const emit = defineEmits(['getKey'])
-//const collapsed = ref<boolean>(false)
-const selectedKeys = ref<string[]>(['100'])
 
 // 菜单点击事件，每次点击，通过getKey事件发送selectedKeys的值
 const menuClick = (item) => {
@@ -21,13 +20,12 @@ const menuClick = (item) => {
 </script>
 
 <template>
-  <!--  菜单缩放 v-model:collapsed="collapsed" collapsible-->
   <a-layout-sider id="layout-sider" width="150">
     <div class="logo" style="background-color: #cebfbf">
-            <p class="title">easy pass</p>
+      <p class="title">easy pass</p>
     </div>
     <a-menu
-        v-model:selectedKeys="selectedKeys"
+        v-model:selectedKeys="store.selectedMenuKeys"
         theme="light"
         mode="inline"
         @click="menuClick"
@@ -88,7 +86,7 @@ const menuClick = (item) => {
   }
 }
 
-.title{
+.title {
   background-color: @primary-color;
 }
 </style>

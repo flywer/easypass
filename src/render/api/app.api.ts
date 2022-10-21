@@ -75,3 +75,10 @@ export function getNetworkInterfaces() {
     return ipcInstance.send<Result>(channel.app.getNetworkInterfaces)
 }
 
+/**
+ * 获取应用信息
+ */
+export function getAppInfo() {
+    return ipcInstance.send<Result>(channel.app.getAppInfo)
+}
+

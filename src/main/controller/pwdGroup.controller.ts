@@ -5,7 +5,7 @@ import {GroupedCountResultItem} from "sequelize/types/model";
 import {channel} from "@render/api/channel";
 import {success, Result, failure} from "@main/vo/resultVo";
 import {GroupItemService} from "@main/service/groupItem.service";
-import {getNetworkInfo} from "@main/utils";
+import {getNetworkInfo} from "@common/utils/utils";
 
 @Controller()
 export class PwdGroupController {
@@ -20,7 +20,7 @@ export class PwdGroupController {
      * @param user
      */
     @IpcHandle(channel.pwdGroup.getPwdGroupListByUserInfo)
-    public handleGetPwdGroupListByUserInfo(user: {}): Promise<typeof PwdGroup[]> {
+    public handleGetPwdGroupListByUserInfo(user): Promise<typeof PwdGroup[]> {
         return this.pwdGroupService.getPwdGroupListByUserInfo(user)
     }
 
@@ -30,7 +30,7 @@ export class PwdGroupController {
      */
     @IpcHandle(channel.pwdGroup.getPwdGroupListByUserInfoByPage)
     public handleGetPwdGroupListByUserInfoByPage(vo): Promise<{ rows: []; count: GroupedCountResultItem[] }> {
-        vo.mac = getNetworkInfo().mac
+        //vo.mac = getNetworkInfo().mac
         return this.pwdGroupService.getPwdGroupListByUserInfoByPage(vo)
     }
 

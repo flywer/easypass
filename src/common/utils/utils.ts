@@ -1,7 +1,8 @@
-import fs from 'fs'
 import path from "path";
-import {failure, success} from "@main/vo/resultVo";
 import os from "os";
+import moment from "moment/moment";
+
+//region 字符串
 
 /**
  * 包装sql中like语句所需要的'%'
@@ -17,42 +18,20 @@ export const sqlLikePack = (content: any, left?: boolean, right?: boolean) => {
     return content
 }
 
+//endregion
+
+// region 时间
 /**
- * 异步写入本地文件，没有则创建
- * @param path
- * @param data
+ * 获取当前时间
  */
-export const writeFs = (path: string, data) => {
-    fs.writeFile(path, data, {flag: 'w+'}, (err) => {
-        if (err) throw  err
-    });
+export const getDateString = () => {
+    moment.locale('zh-cn') //设置时区
+    return moment().format('YYYY-MM-DD HH:mm:ss')
 }
 
-/**
- * 判断此路径、文件是否存在，存在则修改，不存在则创建
- * @param folderPath
- * @param fileName
- * @param data
- */
-export const fileExistAndWrite = async (folderPath: string, fileName: string, data?) => {
-    return new Promise((resolve, reject) => {
-        fs.open(path.join(folderPath, fileName), 'r', (e) => {
-            //不存在
-            if (e) {
-                if (e.code === 'ENOENT') {
-                    console.info(fileName + ' does not exist, will be created')
-                    fs.mkdir(folderPath, {recursive: true}, (err) => {
-                        if (err) throw err;
-                    })
-                    //写入
-                    fs.writeFileSync(path.join(folderPath, fileName), data, {flag: 'w'})
-                }
-            }
-            resolve(fs.readFileSync(path.join(folderPath, fileName)))
-        })
-    })
-}
+//endregion
 
+//region 应用
 /**
  * 获取操作系统home文件夹
  */
@@ -93,3 +72,5 @@ export const getNetworkInfo = () => {
     }
     return result
 }
+
+//endregion

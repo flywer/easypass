@@ -2,7 +2,7 @@ import {Injectable} from "einf";
 import {PwdGroup, PwdGroupVo} from "@main/model/pwdGroup";
 import {sequelize} from "@main/sequelize.init";
 import {Op, UUIDV4} from "sequelize"
-import {sqlLikePack} from "@main/utils";
+import {sqlLikePack} from "@common/utils/utils";
 import {GroupedCountResultItem} from "sequelize/types/model";
 
 @Injectable()
@@ -10,10 +10,13 @@ export class PwdGroupMapper {
     constructor() {
     }
 
-    public getPwdGroupListByUserInfo(user: {}) {
+    public getPwdGroupListByUserInfo(user) {
         try {
             return PwdGroup.findAll({
-                order: ['groupIndex']
+                order: ['groupIndex'],
+                where: {
+                    userId: user.id
+                }
             }).then(res => {
                 return res
             })
@@ -52,7 +55,7 @@ export class PwdGroupMapper {
                         name: {
                             [Op.like]: sqlLikePack(vo.name, true, true)
                         },
-                        userId: [sequelize.literal(`select id from sys_user where  mac = '${vo.mac}' `)]
+                        userId: vo.userId //[sequelize.literal(`select id from sys_user where  mac = '${vo.mac}' `)]
                     }
                 },
                 offset: (vo.pageIndex - 1) * vo.pageSize,
@@ -65,7 +68,7 @@ export class PwdGroupMapper {
         }
     }
 
-    public async deleteGroupById(id: string) {
+    public async deleteGroupById(id) {
         await PwdGroup.destroy({
             where: {
                 id: id

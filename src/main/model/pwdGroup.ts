@@ -26,6 +26,10 @@ export const PwdGroup = sequelize.define('group', {
         autoIncrement: true,
         unique: true,
         comment: '排序号'
+    },
+    userId: {
+        type: DataTypes.STRING,
+        comment: '所属用户ID'
     }
 }, {
     tableName: 'pwd_group',

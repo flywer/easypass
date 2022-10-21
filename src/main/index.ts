@@ -11,7 +11,7 @@ import installExtension, {VUEJS3_DEVTOOLS, VUEJS_DEVTOOLS} from 'electron-devtoo
 import {UserController} from "@main/controller/user.controller";
 import {getMacExist} from "@render/api/user.api";
 import {message} from "ant-design-vue";
-import {getNetworkInfo} from "@main/utils";
+import {getNetworkInfo} from "@common/utils/utils";
 import {SysUser} from "@main/model/sysUser";
 import {store} from "@render/store";
 

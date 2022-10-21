@@ -38,7 +38,7 @@ export class GroupItemService {
         await this.groupItemMapper.deleteGroupItemByItemId(itemId)
     }
 
-    public async deleteGroupItemByGroupId(id: string) {
+    public async deleteGroupItemByGroupId(id) {
         await this.groupItemMapper.deleteGroupItemByGroupId(id)
     }
 

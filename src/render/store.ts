@@ -1,4 +1,5 @@
 import {reactive} from 'vue'
+import {SysUser} from "@main/model/sysUser";
 
 //全局变量
 export const store = reactive({
@@ -7,8 +8,8 @@ export const store = reactive({
     theme: {},
     isUpdating: false,
     isDownloaded: false,
-    mac: null,
-    isLogin:false,
-    userId:null
+    isLogin: false,
+    selectedMenuKeys: ['100'],
+    user: <typeof SysUser>{}
 })
 

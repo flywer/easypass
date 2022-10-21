@@ -3,6 +3,7 @@
 import {onMounted, reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
 import {savePwdGroup} from "@render/api/pwdMgt.api";
+import {store} from "@render/store";
 
 // 父组件传过来的值，是否显示
 const props = defineProps({
@@ -17,7 +18,8 @@ const emit = defineEmits(['setVisible', 'updateTable'])
 const modelRef = reactive({
   id: null,
   name: '',
-  description: ''
+  description: '',
+  userId:store.user.id
 })
 
 // 校验规则

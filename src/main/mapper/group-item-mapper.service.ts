@@ -2,7 +2,7 @@ import {Injectable} from "einf";
 import {sequelize} from "@main/sequelize.init";
 import {GroupItem} from "@main/model/groupItem";
 import {Op} from "sequelize";
-import {sqlLikePack} from "@main/utils";
+import {sqlLikePack} from "@common/utils/utils";
 import {PwdGroup} from "@main/model/pwdGroup";
 
 @Injectable()
@@ -73,17 +73,11 @@ export class GroupItemMapper {
         })
     }
 
-    public async deleteGroupItemByGroupId(id: string) {
+    public async deleteGroupItemByGroupId(id) {
         await GroupItem.destroy({
             where: {
                 pwdGroupId: id
             }
-        })
-    }
-
-    public async updateGroupItems(groupItems: typeof GroupItem[]) {
-        await sequelize.transaction(() => {
-            GroupItem.update()
         })
     }
 

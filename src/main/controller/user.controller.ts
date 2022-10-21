@@ -2,33 +2,51 @@ import {Controller, IpcHandle, Window} from "einf";
 import {BrowserWindow} from "electron";
 import {UserService} from "@main/service/user.service";
 import {channel} from "@render/api/channel";
-import {getNetworkInfo} from "@main/utils";
+import {
+    getDateString,
+    getNetworkInfo,
+    getUserAppDataFolder,
+} from "@common/utils/utils";
+import {
+    deleteFileFs,
+    fileExistAndWrite,
+    readFs,
+    readFsSync,
+    writeFs
+} from '@common/utils/fsUtils'
 import {failure, success} from "@main/vo/resultVo";
+import path from "path";
+import {PwdGroupService} from "@main/service/pwdGroup.service";
+import parseJson from 'parse-json'
+import {GroupItemService} from "@main/service/groupItem.service";
+import {SnowflakeIdGenerate} from "@common/utils/snowflake";
 
 @Controller()
 export class UserController {
     constructor(
         private userService: UserService,
+        private pwdGroupService: PwdGroupService,
+        private groupItemService: GroupItemService,
         @Window() private readonly mainWindow: BrowserWindow // 主窗口实例
     ) {
     }
+
+    static userConfig = path.join(getUserAppDataFolder(), 'userConfig.json')
 
     /**
      * 检查Mac地址是否已注册
      * @constructor
      */
-    @IpcHandle(channel.user.getMacExist)
-    public async HandleGetMacExist() {
+    @IpcHandle(channel.user.getUserByMac)
+    public async HandleGetUserByMac() {
         let mac = getNetworkInfo().mac
         let result
         try {
             result = success()
-            let user = await this.userService.getUserByMac(mac)
-            if (user != null) {
-                result.result = {
-                    id: user.at(0).dataValues.id,
-                    mac: mac
-                }
+            let res = await this.userService.getUserByMac(mac)
+            if (res != null && res.length > 0) {
+                const user = res.at(0).dataValues
+                result.result = user
             } else {
                 result.result = {
                     id: null,
@@ -41,4 +59,183 @@ export class UserController {
         }
         return result
     }
+
+    /**
+     * 注册
+     * @param user
+     * @constructor
+     */
+    @IpcHandle(channel.user.register)
+    public async HandleRegister(user) {
+        let result
+        try {
+            //获取本机mac地址
+            user.mac = getNetworkInfo().mac
+            /*//生成账号
+            const idGenerate: SnowflakeIdGenerate = new SnowflakeIdGenerate();
+            user.account = idGenerate.generate().toString()*/
+            let res = await this.userService.register(user)
+            await this.pwdGroupService.savePwdGroup({name: '默认', userId: res.id})
+            result = success('注册成功！')
+        } catch (e) {
+            console.error(e)
+            result = failure('注册失败！系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 登录
+     * @param user
+     * @constructor
+     */
+    @IpcHandle(channel.user.login)
+    public async HandleLogin(user) {
+        let result
+        try {
+            result = success()
+            result.result = await this.userService.login(user)
+            if (result.result == null) {
+                result.tag = 1
+                result.message = '账号密码不正确！'
+            } else {
+                const data = result.result.dataValues
+                data.lastLoginTime = getDateString()
+                writeFs(UserController.userConfig, JSON.stringify(data))
+                result.tag = 2
+                result.message = '登录成功！'
+            }
+        } catch (e) {
+            console.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+    /**
+     * 检查本地是否有账号,有则登录测试
+     * @constructor
+     */
+    @IpcHandle(channel.user.checkLogin)
+    public async HandleCheckLogin() {
+        let result
+        try {
+            result = success()
+            let buffer = await readFsSync(UserController.userConfig)
+            if (buffer != null) {
+                let userInfo = parseJson(buffer.toString())
+                let res = await this.userService.login(userInfo)
+                if (res == null) {
+                    //本地用户信息错误
+                    result.result = null
+                } else {
+                    let data = res.dataValues
+                    data.lastLoginTime = getDateString()
+                    result.result = data
+                    writeFs(UserController.userConfig, JSON.stringify(data))
+                }
+            } else {
+                //不存在本地记录
+                result.result = null
+            }
+        } catch (e) {
+            console.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+    /**
+     * 退出
+     * @constructor
+     */
+    @IpcHandle(channel.user.logout)
+    public async HandleLogout() {
+        let result
+        try {
+            result = success()
+            //删除本地账号记录
+            deleteFileFs(UserController.userConfig)
+        } catch (e) {
+            console.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+    /**
+     * 账号注销
+     * @param user
+     * @constructor
+     */
+    @IpcHandle(channel.user.cancellation)
+    public async HandleCancellation(user) {
+        let result
+        try {
+            //删除本地账号记录
+            deleteFileFs(UserController.userConfig)
+            //查询密码组信息
+            const pwdGroupIdList = (await this.pwdGroupService.getPwdGroupListByUserInfo(user)).map(item => item.dataValues.id)
+            //删除账号组项
+            await this.groupItemService.deleteGroupItemByGroupId(pwdGroupIdList)
+            //删除密码组
+            await this.pwdGroupService.deleteGroupById(pwdGroupIdList)
+            //删除账号
+            await this.userService.deleteUserById(user.id)
+            result = success('注销成功！')
+        } catch (e) {
+            console.error(e)
+            result = failure('注销失败！服务器异常')
+        }
+        return result
+    }
+
+    /**
+     * 通过用户ID更新用户信息
+     * @param vo
+     * @constructor
+     */
+    @IpcHandle(channel.user.updateUserInfoByUserId)
+    public async HandleUpdateUserInfoByUserId(vo) {
+        let result
+        try {
+            if (vo.id == null)
+                result = failure('数据不全，更新失败')
+            else {
+                await this.userService.updateUserInfoByUserId(vo)
+                let user = await this.userService.getUserById(vo.id)
+                //更新本地文件
+                writeFs(UserController.userConfig, JSON.stringify(user))
+                result = success("更新成功！")
+            }
+        } catch (error) {
+            console.error(error)
+            result = failure("更新失败！")
+            result.result = error
+        }
+        return result
+    }
+
+    /**
+     * 检查密码是否正确
+     * @param user
+     * @constructor
+     */
+    @IpcHandle(channel.user.checkPassword)
+    public async HandleCheckPassword(user) {
+        let result
+        try {
+            let data = await this.userService.login(user)
+            if (data == null) {
+                result = failure()
+            } else {
+                result = success()
+            }
+        } catch (e) {
+            console.error(e)
+            result = failure()
+        }
+        return result
+    }
 }
+

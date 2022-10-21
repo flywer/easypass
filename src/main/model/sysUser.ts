@@ -15,6 +15,14 @@ export const SysUser = sequelize.define('sysUser', {
         type: DataTypes.STRING(36),
         comment: '昵称'
     },
+    account:{
+        type: DataTypes.STRING(36),
+        comment: '账号'
+    },
+    password: {
+        type: DataTypes.STRING(36),
+        comment: '密码'
+    },
     token: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -23,8 +31,11 @@ export const SysUser = sequelize.define('sysUser', {
     },
     mac: {
         type: DataTypes.STRING(17),
-        defaultValue: null,
         comment: '用户Mac地址'
+    },
+    mode: {
+        type: DataTypes.STRING(3),
+        comment: '账号登录模式'
     }
 }, {
     tableName: 'sys_user',

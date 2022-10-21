@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
-import {createVNode, nextTick, onMounted, reactive, ref, watch} from 'vue'
+import {createVNode, h, nextTick, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import {
   MoreOutlined,
   PlusOutlined,
@@ -14,9 +14,9 @@ import {useRouter} from "vue-router";
 import {store} from "@render/store";
 import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
 import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModal.vue";
-import {message, Modal} from "ant-design-vue";
-import {getNetworkInterfaces} from "@render/api/app.api";
-import {getMacExist} from "@render/api/user.api";
+import {Button, message, Modal, notification} from "ant-design-vue";
+import empty from '@render/assets/img/empty.png'
+import LoginModal from "@render/components/pwdMgt/pwdGroup/LoginModal.vue";
 
 //路由
 const route = useRoute()
@@ -44,20 +44,23 @@ let searchInputVisible = ref<boolean>(false)
 let blur = true
 //搜索提交表单
 let searchModelRef = reactive({
+  userId: null,
   name: '',
   pageIndex: pageIndex.value,
   pageSize: pageSize.value
 })
 //加载效果是否显示
-let spinning = ref(true)
-//传入弹框的组ID，没有则为新建
-//let modalGroupId = ref()
-
-let modalRef = ref({
+let spinning = ref(false)
+/*传入更新弹出框的model*/
+let modelRef = ref({
   id: '',
   name: '',
   description: ''
 })
+//空状态显示
+let showEmpty = ref<boolean>(false)
+//登录弹框显示
+const loginModalVisible = ref(false)
 //region emit
 //emit:是否显示新增弹出框，一般用于弹出框关闭时回调
 const setSaveModalVisible = (value) => {
@@ -68,18 +71,23 @@ const setUpdateModalVisible = (value) => {
   updateModalVisible.value = value
 }
 
+const setLoginModalVisible = (value) => {
+  loginModalVisible.value = value
+}
+
 //endregion
 
 //region click
 
 // click:显示新增密码组弹出框
 const showSaveModal = () => {
-  saveModalVisible.value = true
+  if (store.isLogin)
+    saveModalVisible.value = true
 }
 
 //click: 显示编辑密码组弹出框
 const showUpdateModal = (group) => {
-  modalRef.value = group
+  modelRef.value = group
   updateModalVisible.value = true
 }
 
@@ -98,15 +106,6 @@ const showSearchInput = () => {
 
 //endregion
 
-onMounted(async () => {
-  await searchGroupByPage(true)
-  setInterval(() => {
-    if (blur && searchInputVisible.value)
-      searchInputVisible.value = false
-  }, 600)
-
-})
-
 // blur:搜索框失去焦点时触发
 const searchInputBlur = () => {
   blur = true
@@ -114,9 +113,11 @@ const searchInputBlur = () => {
 
 //enter:搜索
 const searchGroupByPage = async (init: boolean, search?: true) => {
-
-  spinning.value = false
-
+  if (!store.isLogin) {
+    spinning.value = false
+    showEmpty.value = true
+    return null
+  }
 
   spinning.value = true
   searchModelRef.pageSize = pageSize.value
@@ -135,6 +136,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
     searchModelRef.pageIndex = pageIndex.value
   }
 
+  searchModelRef.userId = store.user.id
   let result = await getPwdGroupListByUserInfoByPage(searchModelRef).then((res) => {
     spinning.value = false
     return res
@@ -147,9 +149,13 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   pageVo = result.data
   groupTotal.value = pageVo.count
   pwdGroupList.value = []
-  pageVo.rows.forEach(item => {
-    pwdGroupList.value.push(item.dataValues)
-  })
+  if (pageVo.rows.length > 0) {
+    pageVo.rows.forEach(item => {
+      pwdGroupList.value.push(item.dataValues)
+    })
+    showEmpty.value = false
+  } else
+    showEmpty.value = true
 }
 
 //router: 跳转到组项页面
@@ -159,7 +165,7 @@ const showGroupItem = (id: string, name: string) => {
   router.push({name: 'groupItems'})
 }
 
-const handleDelete = (id: string) => {
+const onDelete = (id: string) => {
   Modal.confirm({
     title: '提示',
     icon: createVNode(ExclamationCircleOutlined),
@@ -167,21 +173,58 @@ const handleDelete = (id: string) => {
     okText: '确认',
     cancelText: '取消',
     onOk() {
-      deleteGroupItem(id)
+      //删除密码组
+      deleteGroupById(id).then(res => {
+        if (res.data.success) {
+          message.success("删除成功！")
+          searchGroupByPage(true)
+        } else
+          message.error(res.data.message)
+      })
     },
   });
 }
 
-//删除密码组
-const deleteGroupItem = (id: string) => {
-  deleteGroupById(id).then(res => {
-    if (res.data.success) {
-      message.success("删除成功！")
-      searchGroupByPage(true)
-    } else
-      message.error(res.data.message)
-  })
-}
+/*注册提醒*/
+const notificationKey = `open${Date.now()}`;
+const openUnLoginNotification = () => {
+  notification.open({
+    message: '提醒',
+    description:
+        '当前为跨平台模式但未登录，是否前往登录？',
+    placement: "bottomRight",
+    btn: () =>
+        h(
+            Button,
+            {
+              type: 'primary',
+              size: 'small',
+              onClick: () => {
+                //store.selectedMenuKeys = ['500']
+                //router.push({name: 'settings'})
+                loginModalVisible.value = true
+                notification.close(notificationKey)
+              },
+            },
+            {default: () => '登录'},
+        ),
+    key: notificationKey,
+  });
+};
+
+onMounted(async () => {
+  if (!store.isLogin)
+    openUnLoginNotification()
+  await searchGroupByPage(true)
+  setInterval(() => {
+    if (blur && searchInputVisible.value)
+      searchInputVisible.value = false
+  }, 600)
+})
+
+onUnmounted(() => {
+  notification.close(notificationKey)
+})
 
 </script>
 
@@ -235,23 +278,32 @@ const deleteGroupItem = (id: string) => {
                          :data-name="item.name" @click="showGroupItem(item.id,item.name)"/>
             <template #actions>
               <edit-outlined @click="showUpdateModal(item)"/>
-              <delete-outlined @click="handleDelete(item.id)"/>
+              <delete-outlined @click="onDelete(item.id)"/>
               <!--<setting-outlined/>-->
             </template>
           </a-card>
         </a-col>
       </a-row>
-      <a-pagination class="pagination" v-model:current="pageIndex" :default-page-size="pageSize" :total="groupTotal"
+      <a-pagination class="pagination" v-if="store.isLogin && !showEmpty" v-model:current="pageIndex"
+                    :default-page-size="pageSize"
+                    :total="groupTotal"
                     show-less-items @change="searchGroupByPage(false)"/>
     </a-spin>
+    <a-empty v-show="showEmpty" :image="empty" :image-style="{height: '60px'}">
+      <template #description>
+      </template>
+      <a-button type="primary" v-if="store.isLogin" @click="showSaveModal">创建</a-button>
+    </a-empty>
   </a-layout-content>
+
   <!--  新增密码组弹框-->
   <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
                   @updateTable="searchGroupByPage(true)"/>
   <!--  更新密码组弹框-->
-  <UpdateGroupModal :visible="updateModalVisible" :modalRef="modalRef" @setVisible="setUpdateModalVisible"
+  <UpdateGroupModal :visible="updateModalVisible" :modalRef="modelRef" @setVisible="setUpdateModalVisible"
                     @updateTable="searchGroupByPage(true)"/>
-
+  <!--登录弹框-->
+  <LoginModal :visible="loginModalVisible" @setVisible="setLoginModalVisible" @updateTable="searchGroupByPage(true)"/>
 </template>
 
 <style scoped lang="less">

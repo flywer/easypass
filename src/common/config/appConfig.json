@@ -5,5 +5,7 @@
     "warningColor": "#faad14",
     "successColor": "#52c41a",
     "infoColor": "#1890ff"
-  }
+  },
+  "storageMode": "public",
+  "versionType": "02"
 }
