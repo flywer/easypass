@@ -20,6 +20,7 @@ import {PwdGroupService} from "@main/service/pwdGroup.service";
 import parseJson from 'parse-json'
 import {GroupItemService} from "@main/service/groupItem.service";
 import {SnowflakeIdGenerate} from "@common/utils/snowflake";
+import log from 'electron-log'
 
 @Controller()
 export class UserController {
@@ -54,7 +55,7 @@ export class UserController {
                 }
             }
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
         }
         return result
@@ -78,7 +79,7 @@ export class UserController {
             await this.pwdGroupService.savePwdGroup({name: '默认', userId: res.id})
             result = success('注册成功！')
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure('注册失败！系统异常')
         }
         return result
@@ -106,7 +107,7 @@ export class UserController {
                 result.message = '登录成功！'
             }
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
         }
         return result
@@ -139,7 +140,7 @@ export class UserController {
                 result.result = null
             }
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
         }
         return result
@@ -157,7 +158,7 @@ export class UserController {
             //删除本地账号记录
             deleteFileFs(UserController.userConfig)
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
         }
         return result
@@ -184,7 +185,7 @@ export class UserController {
             await this.userService.deleteUserById(user.id)
             result = success('注销成功！')
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure('注销失败！服务器异常')
         }
         return result
@@ -209,7 +210,7 @@ export class UserController {
                 result = success("更新成功！")
             }
         } catch (error) {
-            console.error(error)
+            log.error(error)
             result = failure("更新失败！")
             result.result = error
         }
@@ -232,7 +233,7 @@ export class UserController {
                 result = success()
             }
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
         }
         return result

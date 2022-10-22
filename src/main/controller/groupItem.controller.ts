@@ -2,6 +2,7 @@ import {Controller, IpcHandle} from "einf";
 import {GroupItemService} from "@main/service/groupItem.service";
 import {channel} from "@render/api/channel";
 import {failure, Result, success} from "@main/vo/resultVo";
+import log from 'electron-log'
 
 @Controller()
 export class GroupItemController {
@@ -24,7 +25,7 @@ export class GroupItemController {
             await this.groupItemService.saveGroupItems(groupItems.filter(item =>item.deleteTag == false), groupId, isUpdate);
             result = success()
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure("系统异常")
             result.result = e
         }
@@ -49,7 +50,7 @@ export class GroupItemController {
             result = success()
             result.result = {rows: itemGroupList, count: count}
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure("系统异常")
             result.result = e
         }
@@ -67,7 +68,7 @@ export class GroupItemController {
             await this.groupItemService.deleteGroupItemByItemId(itemId)
             result = success()
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure("删除失败！系统异常")
             result.result = e
         }
@@ -85,7 +86,7 @@ export class GroupItemController {
             result = success()
             result.result = await this.groupItemService.getItemsListByItemId(itemId)
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure("系统异常")
             result.result = e
         }

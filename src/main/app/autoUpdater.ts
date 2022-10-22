@@ -1,10 +1,7 @@
-import {app} from 'electron'
 import {failure, success} from "@main/vo/resultVo";
 import {channel} from "@render/api/channel";
-
-const {autoUpdater} = require("electron-updater");
-
-const isDev = !app.isPackaged
+import log from "electron-log";
+import {autoUpdater} from "electron-updater";
 
 /**
  * 自动更新处理
@@ -56,7 +53,8 @@ export const handleUpdate = (window) => {
 
     autoUpdater.on('error', function (error) {
         let result = failure()
-        result.message = error
+        log.error(error)
+        result.result = error
         result.tag = 6
         window.webContents.send(channel.app.sendUpdateInfo, result)
     });

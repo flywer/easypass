@@ -21,20 +21,19 @@ export async function createWindow() {
         },
         autoHideMenuBar: !isDev,
     })
-
+    //渲染进程URL
     const URL = isDev
         ? process.env.DS_RENDERER_URL
         : `file://${join(app.getAppPath(), 'dist/render/index.html')}`
-
-     win.loadURL(URL).then(() => {
-         if (isDev) {
-             win.webContents.openDevTools()
-         } else
-             win.removeMenu()
-         //自动更新组件
-         handleUpdate(win)
+    //主窗口加载页面
+    win.loadURL(URL).then(() => {
+        if (isDev) {
+            win.webContents.openDevTools()
+        } else
+            win.removeMenu()
+        //自动更新组件
+        handleUpdate(win)
     })
-
     //窗口关闭时触发
     win.on('closed', () => {
         win.destroy()

@@ -1,4 +1,5 @@
 import {DataTypes, Options, Sequelize} from "sequelize";
+import log from 'electron-log'
 
 /* 选择 'mysql' | 'mariadb' | 'postgres' | 'mssql' 其一 */
 export const sequelizeInit = (database: string, username: string, password: string, options: Options) => {
@@ -12,7 +13,7 @@ export const sequelizeInit = (database: string, username: string, password: stri
     }
 
     sequelize = new Sequelize(database, username, password, options)
-    console.log('===================sequelizeInit-end====================')
+    log.log('===================sequelize init success :)====================')
     return sequelize
 }
 

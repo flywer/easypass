@@ -1,8 +1,8 @@
-
 import {PwdGroup} from "@main/model/pwdGroup"
 import {sequelize} from "@main/sequelize.init";
 import {GroupItem} from "@main/model/groupItem";
 import {SysUser} from "@main/model/sysUser";
+import log from 'electron-log'
 
 /**
  * 数据库初始化
@@ -38,9 +38,10 @@ export const databaseInit = async () => {
             GroupItem.belongsTo(PwdGroup)
             await GroupItem.sync({alter: true})//添加外键
 
-            console.log("database init succeeded :)")
+            log.log("database init succeeded :)")
         });
     } catch (error) {
+        log.error(error)
         throw new Error("database init failed :( :" + error)
     }
 }

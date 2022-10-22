@@ -9,6 +9,7 @@ import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
 import * as os from "os";
+import log from "electron-log";
 
 @Controller()
 export class AppController {
@@ -98,7 +99,7 @@ export class AppController {
             const themeBuffer = await fileExistAndWrite(getUserAppDataFolder(), 'theme.json', JSON.stringify(defaultTheme))
             result.result = JSON.parse(themeBuffer.toString())
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
             result.result = e
         }
@@ -116,7 +117,7 @@ export class AppController {
             writeFs(path.join(getUserAppDataFolder(), 'theme.json'), data)
             result = success()
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
             result.result = e
         }
@@ -133,7 +134,7 @@ export class AppController {
             result = success()
             result.result = autoUpdater.currentVersion.version
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
             result.result = e
         }
@@ -151,7 +152,7 @@ export class AppController {
             result = success()
             await autoUpdater.checkForUpdates()
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
             result.result = e
         }
@@ -170,7 +171,7 @@ export class AppController {
             await autoUpdater.downloadUpdate()
             result.message = '下载开始'
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
             result.message = '下载失败'
             result.result = e
@@ -190,7 +191,7 @@ export class AppController {
             //退出并安装
             autoUpdater.quitAndInstall();
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure()
             result.result = e
         }
@@ -218,9 +219,8 @@ export class AppController {
             result.result.hostname = os.hostname()
         } catch (e) {
             result = failure()
-            console.error(e)
+            log.error(e)
         }
-        console.log(result)
         return result
     }
 

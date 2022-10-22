@@ -6,6 +6,7 @@ import {channel} from "@render/api/channel";
 import {success, Result, failure} from "@main/vo/resultVo";
 import {GroupItemService} from "@main/service/groupItem.service";
 import {getNetworkInfo} from "@common/utils/utils";
+import log from 'electron-log'
 
 @Controller()
 export class PwdGroupController {
@@ -57,7 +58,7 @@ export class PwdGroupController {
             await this.pwdGroupService.savePwdGroup(pwdGroup)
             result = success("新增成功！")
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure("更新失败！")
             result.result = e
         }
@@ -75,7 +76,7 @@ export class PwdGroupController {
             await this.pwdGroupService.updatePwdGroup(pwdGroup)
             result = success("更新成功！")
         } catch (error) {
-            console.log(error)
+            log.log(error)
             result = failure("更新失败！")
             result.result = error
         }
@@ -94,7 +95,7 @@ export class PwdGroupController {
             await this.pwdGroupService.deleteGroupById(id)
             result = success()
         } catch (e) {
-            console.error(e)
+            log.error(e)
             result = failure("删除失败！系统异常")
             result.result = e
         }

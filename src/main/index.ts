@@ -7,18 +7,25 @@ import {PwdGroupController} from "@main/controller/pwdGroup.controller";
 import path from "path";
 import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
-import installExtension, {VUEJS3_DEVTOOLS, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
+import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {message} from "ant-design-vue";
-import {getNetworkInfo} from "@common/utils/utils";
-import {SysUser} from "@main/model/sysUser";
-import {store} from "@render/store";
+import {getNetworkInfo, getUserAppDataFolder} from "@common/utils/utils";
+import log from 'electron-log'
+import * as Path from "path";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
+//设置日志存储位置
+log.transports.file.resolvePath = () => Path.join(getUserAppDataFolder(), 'logs/main.log')
 
 async function electronAppInit() {
     const isDev = !app.isPackaged
 
+    //禁用硬件加速技术
+    app.disableHardwareAcceleration()
+    //应用单例运行，不可存在多个同时运行
+    if (!app.requestSingleInstanceLock()) app.quit();
+
+    //当应用程序关闭所有窗口时触发
     app.on('window-all-closed', () => {
         //Mac操作系统下的用户体验准则:
         // 应用程序关闭所有窗口后，应用不退出，而是继续保留在Dock栏
@@ -70,7 +77,7 @@ async function bootstrap() {
 
         //验证是否连接成功
         sequelize.authenticate().then(async () => {
-            console.log('===================Database connection succeeded :) ================');
+            log.info('===================Database connection succeeded :) ================');
             //await databaseInit()
 
             /* await GroupItem.sync({force:true})
@@ -80,13 +87,13 @@ async function bootstrap() {
              await GroupItem.sync({alter: true})//添加外键*/
 
             /*            const user =  await SysUser.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
-                        console.log(user.id)*/
+                        log.log(user.id)*/
         }).catch(err => {
-            console.error('=================Database connection failed :( ===================', err);
+            log.error('=================Database connection failed :( ===================', err);
         });
 
     } catch (error) {
-        console.error(error)
+        log.error(error)
         app.quit()
     }
 }
@@ -122,9 +129,9 @@ async function installVueDevtools() {
         const vue_devtools = {id: "nhdogjmejiglipccpnnnanhbledajbpd", electron: ">=1.2.1"}
         const result = await installExtension(vue_devtools)
         if (result) {
-            console.log("success load : " + result)
+            log.log("success load : " + result)
         }
     } catch (e) {
-        console.error('Vue Devtools failed to install:', e.toString())
+        log.error('Vue Devtools failed to install:', e.toString())
     }
 }

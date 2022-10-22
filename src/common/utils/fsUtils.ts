@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import log from 'electron-log'
 
 /**
  * 异步写入本地文件，没有则创建
@@ -8,13 +9,13 @@ import path from "path";
  */
 export const writeFs = (filePath: string, data) => {
     fs.open(filePath, 'w+', (e, fd) => {
-        if (e) console.error(e)
+        if (e) log.error(e)
         else {
             fs.write(fd, data, () => {
-                if (e) console.error(e)
+                if (e) log.error(e)
             })
             fs.close(fd, function () {
-                console.log(filePath + '\twrite success!\n');
+                log.log(filePath + '\twrite success!\n');
             });
         }
     })
@@ -34,7 +35,7 @@ export const readFs = (filePath: string) => {
                     resolve(buffer)
                 })
                 fs.close(fd, function () {
-                    console.log(filePath + '\tread success!\n');
+                    log.log(filePath + '\tread success!\n');
                 });
             }
         })
@@ -68,9 +69,9 @@ export const fileExistAndWrite = (folderPath: string, fileName: string, data?) =
             //不存在
             if (e) {
                 if (e.code === 'ENOENT') {
-                    console.info(fileName + ' does not exist, was created')
+                    log.info(fileName + ' does not exist, was created')
                     fs.mkdir(folderPath, {recursive: true}, (err) => {
-                        if (err) console.error(e)
+                        if (err) log.error(e)
                     })
                     //写入
                     fs.writeFileSync(path.join(folderPath, fileName), data)
@@ -87,8 +88,8 @@ export const fileExistAndWrite = (folderPath: string, fileName: string, data?) =
  */
 export const deleteFileFs = (filePath: string) => {
     fs.unlink(filePath, (e) => {
-        if (e) console.error(e)
-        else console.log(filePath + '\twas deleted!\n')
+        if (e) log.error(e)
+        else log.log(filePath + '\twas deleted!\n')
     })
 }
 
