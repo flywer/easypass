@@ -5,7 +5,7 @@
   "description": "easy⚡password",
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "rimraf dist && vite",
+    "dev": "chcp 65001 && rimraf dist && vite",
     "build": "rimraf dist && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
