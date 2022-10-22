@@ -15,7 +15,7 @@ export const writeFs = (filePath: string, data) => {
                 if (e) log.error(e)
             })
             fs.close(fd, function () {
-                log.log(filePath + '\twrite success!\n');
+                log.log(filePath + '\twrite success!');
             });
         }
     })
@@ -35,7 +35,7 @@ export const readFs = (filePath: string) => {
                     resolve(buffer)
                 })
                 fs.close(fd, function () {
-                    log.log(filePath + '\tread success!\n');
+                    log.log(filePath + '\tread success!');
                 });
             }
         })
@@ -89,7 +89,7 @@ export const fileExistAndWrite = (folderPath: string, fileName: string, data?) =
 export const deleteFileFs = (filePath: string) => {
     fs.unlink(filePath, (e) => {
         if (e) log.error(e)
-        else log.log(filePath + '\twas deleted!\n')
+        else log.log(filePath + '\twas deleted!')
     })
 }
 
