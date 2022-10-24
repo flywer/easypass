@@ -3,7 +3,7 @@ import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
-import {getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppSettings, getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
 import {fileExistAndWrite, writeFs} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
@@ -24,7 +24,7 @@ export class AppController {
      * @param setup
      */
     @IpcHandle(channel.app.setWindow)
-    public async handleSetWindow(setup: string) {
+    public async HandleSetWindow(setup: string) {
         if (setup === 'window-min') {
             this.mainWindow.minimize()
         } else if (setup === 'window-max') {
@@ -33,7 +33,10 @@ export class AppController {
             else
                 this.mainWindow.maximize()
         } else if (setup === 'window-close') {
-            this.mainWindow.close()
+            const appSettings = await getAppSettings()
+            if (appSettings.closeAsHidden) {
+                this.mainWindow.hide()
+            } else this.mainWindow.close()
         }
     }
 
@@ -42,55 +45,54 @@ export class AppController {
      * @param setup
      */
     @IpcHandle(channel.app.setOpenAtLogin)
-    public async handleSetOpenAtLogin(setup: boolean) {
-        const exeName = path.basename(process.execPath);
+    public async HandleSetOpenAtLogin(setup) {
         //mac系统
         if (process.platform === "darwin") {
             app.setLoginItemSettings({
-                openAtLogin: setup,
-                openAsHidden: setup
+                openAtLogin: setup.openAtLogin,
+                openAsHidden: setup.openAsHidden
             });
         } else {
             app.setLoginItemSettings({
-                openAtLogin: setup,
-                openAsHidden: setup,
-                path: process.execPath,
-                args: [
-                    "--processStart", `"${exeName}"`,
-                    "--process-start-args", `"--hidden"`
-                ]
+                openAtLogin: true
             });
         }
+
+        //获取本地设置文件
+        const appSettings = await getAppSettings()
+        appSettings.openAtLogin = setup.openAtLogin
+        appSettings.openAsHidden = setup.openAsHidden
+        writeFs(path.join(getResourcePath(), '/config/settings.json'), JSON.stringify(appSettings))
     }
 
     /**
-     * 获取开机自启状态
+     * 设置关闭时隐藏到托盘
+     * @param setup
      */
-    @IpcHandle(channel.app.getOpenAtLogin)
-    public handleGetOpenAtLogin() {
-        const exeName = path.basename(process.execPath);
+    @IpcHandle(channel.app.setCloseAsHidden)
+    public async HandleSetCloseAsHidden(setup) {
+        //获取本地设置文件
+        const appSettings = await getAppSettings()
+        appSettings.closeAsHidden = setup
+        writeFs(path.join(getResourcePath(), '/config/settings.json'), JSON.stringify(appSettings))
+    }
 
-        let settings: Electron.LoginItemSettings
-
-        if (process.platform === "darwin") {
-            settings = app.getLoginItemSettings();
-        } else {
-            settings = app.getLoginItemSettings({
-                path: process.execPath,
-                args: [
-                    "--processStart", `"${exeName}"`,
-                    "--process-start-args", `"--hidden"`
-                ]
-            });
-        }
-        return settings.openAtLogin
+    /**
+     * 获取应用设置
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppSettings)
+    public async HandleGetAppSettings() {
+        let result = success()
+        result.result = await getAppSettings()
+        return result
     }
 
     /**
      * 获取应用主题
      */
     @IpcHandle(channel.app.getAppTheme)
-    public async handleGetAppTheme() {
+    public async HandleGetAppTheme() {
         let result
         try {
             let defaultTheme = config.defaultTheme
@@ -111,7 +113,7 @@ export class AppController {
      * @param data
      */
     @IpcHandle(channel.app.setAppTheme)
-    public async handleSetAppTheme(data) {
+    public async HandleSetAppTheme(data) {
         let result
         try {
             writeFs(path.join(getUserAppDataFolder(), 'theme.json'), data)
@@ -128,7 +130,7 @@ export class AppController {
      * 获取应用版本信息
      */
     @IpcHandle(channel.app.getAppVersion)
-    public handleGetAppVersion() {
+    public HandleGetAppVersion() {
         let result
         try {
             result = success()

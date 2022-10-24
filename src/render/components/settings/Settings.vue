@@ -2,10 +2,10 @@
 import {createVNode, onMounted, reactive, ref, watch} from "vue";
 import {
   checkForUpdate,
-  downloadUpdate,
+  downloadUpdate, getAppSettings,
   getAppVersion,
   getOpenAtLogin,
-  setAppTheme,
+  setAppTheme, setCloseAsHidden, setEnableTray,
   setOpenAtLogin
 } from "@render/api/app.api";
 import {ConfigProvider, message, Modal, notification} from "ant-design-vue";
@@ -37,15 +37,60 @@ import {copyText} from "@render/utils/clipboard";
 
 const tabActiveKey = ref('1')
 
+//region 开机自启动
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
-/*设置开机自启*/
-const setOpenAtLoginChecked = () => {
-  setOpenAtLogin(openAtLoginChecked.value)
+
+//endregion
+
+//region 托盘
+/*是否启用托盘图标*/
+const enableTrayChecked = ref<boolean>(true);
+/*启动时最小化到托盘*/
+const openAsHidden = reactive({
+  checked: false,
+  disabled: false
+});
+/*关闭时隐藏到托盘*/
+const closeAsHidden = reactive({
+  checked: false,
+  disabled: false
+});
+
+/*开机设置， 包括自启和是否隐藏到托盘*/
+const onOpenAtLogin = () => {
+  setOpenAtLogin({openAtLogin: openAtLoginChecked.value, openAsHidden: openAsHidden.checked})
 }
 
-/*是否启用托盘图标*/
-const checked2 = ref<boolean>(false);
+/*是否启用托盘*/
+const onEnableTray = () => {
+  setEnableTray(enableTrayChecked.value)
+  if (enableTrayChecked.value) {
+    openAsHidden.checked = false
+    openAsHidden.disabled = true
+    closeAsHidden.checked = false
+    closeAsHidden.disabled = true
+  } else {
+    openAsHidden.disabled = false
+    closeAsHidden.disabled = false
+  }
+  onOpenAtLogin()
+  onCloseAsHidden()
+}
+
+/*关闭时是否隐藏到托盘*/
+const onCloseAsHidden = () => {
+  setCloseAsHidden(closeAsHidden.checked)
+}
+
+onMounted(async () => {
+  const appSettings = (await getAppSettings()).data.result
+  openAtLoginChecked.value = appSettings.openAtLogin
+  openAsHidden.checked = appSettings.openAsHidden
+  closeAsHidden.checked = appSettings.closeAsHidden
+})
+
+//endregion
 
 //region 应用更新设置
 /*当前版本号*/
@@ -98,6 +143,14 @@ watch(() => store.isDownloaded, () => {
   if (store.isDownloaded) {
     progressInfo.value.percent = 100
   }
+})
+
+onMounted(async () => {
+  appVersion.value = (await getAppVersion()).data.result
+  //接收下载信息
+  ipcInstance.on(channel.app.sendDownloadProgress, (res) => {
+    progressInfo.value = res.result
+  })
 })
 
 //endregion
@@ -325,15 +378,6 @@ const onAccountCancellation = () => {
 }
 //endregion
 
-onMounted(async () => {
-  openAtLoginChecked.value = (await getOpenAtLogin()).data
-  appVersion.value = (await getAppVersion()).data.result
-  //接收下载信息
-  ipcInstance.on(channel.app.sendDownloadProgress, (res) => {
-    progressInfo.value = res.result
-  })
-})
-
 </script>
 
 <template>
@@ -489,26 +533,35 @@ onMounted(async () => {
         <RowCard>
           <template #left>开机自启动</template>
           <template #right>
-            <a-switch v-model:checked="openAtLoginChecked" @click="setOpenAtLoginChecked"/>
-          </template>
-        </RowCard>
-        <!--启动时最小化到托盘-->
-        <RowCard>
-          <template #left>启动时最小化到托盘</template>
-          <template #right>
-            <a-switch v-model:checked="checked2"/>
+            <a-switch v-model:checked="openAtLoginChecked"/>
           </template>
         </RowCard>
         <!--启用托盘-->
         <RowCard>
           <template #left>
             启用托盘
+          </template>
+          <template #right>
+            <a-switch v-model:checked="enableTrayChecked" @click="onEnableTray"/>
+          </template>
+        </RowCard>
+        <!--启动时最小化到托盘-->
+        <RowCard>
+          <template #left>启动时最小化到托盘</template>
+          <template #right>
+            <a-switch v-model:checked="openAsHidden.checked" :disabled="openAsHidden.disabled" @click="onOpenAtLogin"/>
+          </template>
+        </RowCard>
+        <!--关闭到托盘-->
+        <RowCard>
+          <template #left>
+            关闭时隐藏到托盘
             <SecondaryText>
-              <template #text>禁用此选项后关闭主窗口将直接退出程序</template>
+              <template #text>禁用此选项后时关闭主窗口将直接退出程序</template>
             </SecondaryText>
           </template>
           <template #right>
-            <a-switch v-model:checked="checked2"/>
+            <a-switch v-model:checked="closeAsHidden.checked" :disabled="closeAsHidden.disabled" @click="onCloseAsHidden"/>
           </template>
         </RowCard>
 

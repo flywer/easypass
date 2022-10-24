@@ -44,9 +44,6 @@ async function electronAppInit() {
                 app.exit()
             })
         }
-    } else {
-        //开机自启功能
-        //app.isReady() ? launchAtStartup() : app.on("ready", launchAtStartup);
     }
 
     ///应用启动后的操作
@@ -99,26 +96,6 @@ async function bootstrap() {
 }
 
 bootstrap()
-
-function launchAtStartup() {
-    const exeName = path.basename(process.execPath);
-    if (process.platform === "darwin") {
-        app.setLoginItemSettings({
-            openAtLogin: true,
-            openAsHidden: true
-        });
-    } else {
-        app.setLoginItemSettings({
-            openAtLogin: true,
-            openAsHidden: true,
-            path: process.execPath,
-            args: [
-                "--processStart", `"${exeName}"`,
-                "--process-start-args", `"--hidden"`
-            ]
-        });
-    }
-}
 
 /**
  * 安装vue开发者工具

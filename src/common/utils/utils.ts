@@ -1,6 +1,10 @@
 import path from "path";
 import os from "os";
 import moment from "moment/moment";
+import {readFsSync} from "@common/utils/fsUtils";
+import {isEmpty} from "lodash";
+import config from "@common/config/appConfig.json";
+import parseJson from 'parse-json'
 
 //region 字符串
 
@@ -82,6 +86,18 @@ export const getNetworkInfo = () => {
         console.error(e)
     }
     return result
+}
+
+/**
+ * 获取应用设置
+ */
+export const getAppSettings = async () => {
+    const defaultSettings = config.defaultSettings
+    const buffer = await readFsSync(path.join(getResourcePath(), '/config/settings.json'))
+    if (buffer == null || isEmpty(buffer.toString()))
+        return defaultSettings
+    else
+        return parseJson(buffer.toString())
 }
 
 //endregion

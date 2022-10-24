@@ -14,7 +14,7 @@ export function setWindow(setup: string) {
  * 设置开机自启
  * @param setup
  */
-export function setOpenAtLogin(setup: boolean) {
+export function setOpenAtLogin(setup) {
     return ipcInstance.send<string>(channel.app.setOpenAtLogin, setup)
 }
 
@@ -22,7 +22,7 @@ export function setOpenAtLogin(setup: boolean) {
  * 获取开机自启配置
  */
 export function getOpenAtLogin() {
-    return ipcInstance.send<boolean>(channel.app.getOpenAtLogin)
+    return ipcInstance.send<Result>(channel.app.getOpenAtLogin)
 }
 
 /**
@@ -80,5 +80,27 @@ export function getNetworkInterfaces() {
  */
 export function getAppInfo() {
     return ipcInstance.send<Result>(channel.app.getAppInfo)
+}
+
+/**
+ * 关闭时是否隐藏到托盘
+ */
+export function setCloseAsHidden(setup) {
+    return ipcInstance.send<Result>(channel.app.setCloseAsHidden, setup)
+}
+
+/**
+ * 获取应用设置
+ */
+export function getAppSettings() {
+    return ipcInstance.send<Result>(channel.app.getAppSettings)
+}
+
+/**
+ * 设置是否启用托盘
+ * @param setup
+ */
+export function setEnableTray(setup) {
+    return ipcInstance.send<Result>(channel.app.setEnableTray, setup)
 }
 

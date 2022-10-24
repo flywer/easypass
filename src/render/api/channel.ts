@@ -19,6 +19,9 @@ export const channel = reactive({
         getNetworkInterfaces: 'app/getNetworkInterfaces',
         sendNetworkInfo: 'app/sendNetworkInfo',
         getAppInfo: 'app/getAppInfo',
+        setCloseAsHidden: 'app/setCloseAsHidden',
+        getAppSettings: 'app/getAppSettings',
+        setEnableTray: 'app/setEnableTray',
     },
     pwdGroup: {
         getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',
@@ -40,7 +43,7 @@ export const channel = reactive({
         login: 'user/login',
         checkLogin: 'user/checkLogin',
         logout: 'user/logout',
-        cancellation:  'user/cancellation',
+        cancellation: 'user/cancellation',
         updateUserInfoByUserId: 'user/updateUserInfoByUserId',
         checkPassword: 'user/checkPassword',
     }

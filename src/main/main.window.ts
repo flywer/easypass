@@ -2,9 +2,11 @@ import {join} from 'path'
 import {BrowserWindow, app} from 'electron'
 import {handleUpdate} from "@main/app/autoUpdater";
 import {channel} from "@render/api/channel";
-import {getNetworkInfo} from "@common/utils/utils";
+import {getAppSettings, getNetworkInfo} from "@common/utils/utils";
 
 const isDev = !app.isPackaged
+
+export let mainWindow
 
 export async function createWindow() {
     const win = new BrowserWindow({
@@ -20,7 +22,9 @@ export async function createWindow() {
             webSecurity: false, // 取消跨域限制
         },
         autoHideMenuBar: !isDev,
+        show:false
     })
+
     //渲染进程URL
     const URL = isDev
         ? process.env.DS_RENDERER_URL
@@ -38,7 +42,19 @@ export async function createWindow() {
     win.on('closed', () => {
         win.destroy()
     })
+    //准备完毕，将要显示
+    win.on("ready-to-show", async () => {
+        console.log('========================ready-to-show start========================')
+        const appSettings = await getAppSettings()
+        //判断此时是否为开机自启，且是否需要隐藏
+        if (appSettings.openAsHidden)
+            win.hide()
+        else
+            win.show()
+        console.log('========================ready-to-show end==========================')
+    });
 
+    mainWindow = win
     return win
 }
 

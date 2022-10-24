@@ -6,5 +6,12 @@
     "successColor": "#52c41a",
     "infoColor": "#1890ff"
   },
+  "defaultSettings": {
+    "openAtLogin": false,
+    "enableTray": true,
+    "loginInTray": false,
+    "closeInTray": false,
+    "closeAsHidden": false
+  },
   "versionType": "02"
 }
