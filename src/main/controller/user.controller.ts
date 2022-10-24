@@ -2,24 +2,13 @@ import {Controller, IpcHandle, Window} from "einf";
 import {BrowserWindow} from "electron";
 import {UserService} from "@main/service/user.service";
 import {channel} from "@render/api/channel";
-import {
-    getDateString,
-    getNetworkInfo,
-    getUserAppDataFolder,
-} from "@common/utils/utils";
-import {
-    deleteFileFs,
-    fileExistAndWrite,
-    readFs,
-    readFsSync,
-    writeFs
-} from '@common/utils/fsUtils'
+import {getDateString, getNetworkInfo, getUserAppDataFolder,} from "@common/utils/utils";
+import {deleteFileFs, readFsSync, writeFs} from '@common/utils/fsUtils'
 import {failure, success} from "@main/vo/resultVo";
 import path from "path";
 import {PwdGroupService} from "@main/service/pwdGroup.service";
 import parseJson from 'parse-json'
 import {GroupItemService} from "@main/service/groupItem.service";
-import {SnowflakeIdGenerate} from "@common/utils/snowflake";
 import log from 'electron-log'
 
 @Controller()
@@ -32,7 +21,13 @@ export class UserController {
     ) {
     }
 
-    static userConfig = path.join(getUserAppDataFolder(), 'userConfig.json')
+    private readonly userConfigFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'userConfig.json',
+        getFullPath: () => {
+            return path.join(this.userConfigFile.folderPath, this.userConfigFile.fileName)
+        }
+    }
 
     /**
      * 检查Mac地址是否已注册
@@ -46,8 +41,7 @@ export class UserController {
             result = success()
             let res = await this.userService.getUserByMac(mac)
             if (res != null && res.length > 0) {
-                const user = res.at(0).dataValues
-                result.result = user
+                result.result = res.at(0).dataValues
             } else {
                 result.result = {
                     id: null,
@@ -102,7 +96,7 @@ export class UserController {
             } else {
                 const data = result.result.dataValues
                 data.lastLoginTime = getDateString()
-                writeFs(UserController.userConfig, JSON.stringify(data))
+                writeFs(this.userConfigFile, JSON.stringify(data))
                 result.tag = 2
                 result.message = '登录成功！'
             }
@@ -122,7 +116,7 @@ export class UserController {
         let result
         try {
             result = success()
-            let buffer = await readFsSync(UserController.userConfig)
+            let buffer = await readFsSync(this.userConfigFile.getFullPath())
             if (buffer != null) {
                 let userInfo = parseJson(buffer.toString())
                 let res = await this.userService.login(userInfo)
@@ -133,7 +127,7 @@ export class UserController {
                     let data = res.dataValues
                     data.lastLoginTime = getDateString()
                     result.result = data
-                    writeFs(UserController.userConfig, JSON.stringify(data))
+                    writeFs(this.userConfigFile, JSON.stringify(data))
                 }
             } else {
                 //不存在本地记录
@@ -156,7 +150,7 @@ export class UserController {
         try {
             result = success()
             //删除本地账号记录
-            deleteFileFs(UserController.userConfig)
+            deleteFileFs(this.userConfigFile.getFullPath())
         } catch (e) {
             log.error(e)
             result = failure()
@@ -174,7 +168,7 @@ export class UserController {
         let result
         try {
             //删除本地账号记录
-            deleteFileFs(UserController.userConfig)
+            deleteFileFs(this.userConfigFile.getFullPath())
             //查询密码组信息
             const pwdGroupIdList = (await this.pwdGroupService.getPwdGroupListByUserInfo(user)).map(item => item.dataValues.id)
             //删除账号组项
@@ -206,7 +200,7 @@ export class UserController {
                 await this.userService.updateUserInfoByUserId(vo)
                 let user = await this.userService.getUserById(vo.id)
                 //更新本地文件
-                writeFs(UserController.userConfig, JSON.stringify(user))
+                writeFs(this.userConfigFile, JSON.stringify(user))
                 result = success("更新成功！")
             }
         } catch (error) {

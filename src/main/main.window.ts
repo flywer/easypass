@@ -44,14 +44,12 @@ export async function createWindow() {
     })
     //准备完毕，将要显示
     win.on("ready-to-show", async () => {
-        console.log('========================ready-to-show start========================')
         const appSettings = await getAppSettings()
         //判断此时是否为开机自启，且是否需要隐藏
         if (appSettings.openAsHidden)
             win.hide()
         else
             win.show()
-        console.log('========================ready-to-show end==========================')
     });
 
     mainWindow = win

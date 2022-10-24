@@ -4,27 +4,49 @@ import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
 import {getAppSettings, getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
-import {fileExistAndWrite, writeFs} from "@common/utils/fsUtils";
+import {readFsSync, writeFs} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
 import * as os from "os";
 import log from "electron-log";
+import {isEmpty} from "lodash";
 
 @Controller()
 export class AppController {
     constructor(
         private appService: AppService,
-        @Window() private readonly mainWindow: BrowserWindow // 主窗口实例
+        @Window() private readonly mainWindow: BrowserWindow, // 主窗口实例
     ) {
+    }
+
+    /*应用设置文件*/
+    private readonly appSettingsFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'settings.json',
+        fullPath: '',
+        constructor() {
+            this.fullPath = path.join(this.folderPath, this.fileName)
+        }
+    }
+
+    /*应用主题文件*/
+    private readonly appThemeFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'theme.json',
+        fullPath:'',
+        constructor() {
+            this.fullPath = path.join(this.folderPath, this.fileName)
+        }
     }
 
     /**
      * 设置主窗体 最大化、最小化、关闭
      * @param setup
+     * @constructor
      */
-    @IpcHandle(channel.app.setWindow)
-    public async HandleSetWindow(setup: string) {
+     @IpcHandle(channel.app.setWindow)
+     public async HandleSetWindow(setup: string) {
         if (setup === 'window-min') {
             this.mainWindow.minimize()
         } else if (setup === 'window-max') {
@@ -40,7 +62,7 @@ export class AppController {
         }
     }
 
-    /**
+     /**
      * 设置开机自启
      * @param setup
      */
@@ -62,7 +84,7 @@ export class AppController {
         const appSettings = await getAppSettings()
         appSettings.openAtLogin = setup.openAtLogin
         appSettings.openAsHidden = setup.openAsHidden
-        writeFs(path.join(getResourcePath(), '/config/settings.json'), JSON.stringify(appSettings))
+        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
     }
 
     /**
@@ -74,7 +96,7 @@ export class AppController {
         //获取本地设置文件
         const appSettings = await getAppSettings()
         appSettings.closeAsHidden = setup
-        writeFs(path.join(getResourcePath(), '/config/settings.json'), JSON.stringify(appSettings))
+        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
     }
 
     /**
@@ -98,8 +120,13 @@ export class AppController {
             let defaultTheme = config.defaultTheme
             result = success()
             //判断主题文件是否存在，不存在则创建，并返回实际数据
-            const themeBuffer = await fileExistAndWrite(getUserAppDataFolder(), 'theme.json', JSON.stringify(defaultTheme))
-            result.result = JSON.parse(themeBuffer.toString())
+            let buffer = await readFsSync(this.appThemeFile.fullPath)
+            if (buffer == null || isEmpty(buffer.toString())) {
+                writeFs(this.appThemeFile, JSON.stringify(defaultTheme))
+                result.result = defaultTheme
+            } else {
+                result.result = JSON.parse(buffer.toString())
+            }
         } catch (e) {
             log.error(e)
             result = failure()
@@ -116,7 +143,7 @@ export class AppController {
     public async HandleSetAppTheme(data) {
         let result
         try {
-            writeFs(path.join(getUserAppDataFolder(), 'theme.json'), data)
+            writeFs(this.appThemeFile, data)
             result = success()
         } catch (e) {
             log.error(e)

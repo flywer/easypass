@@ -4,18 +4,33 @@ import log from 'electron-log'
 
 /**
  * 异步写入本地文件，没有则创建
- * @param path
+ * @param folderPath
+ * @param fileName
  * @param data
  */
-export const writeFs = (filePath: string, data) => {
-    fs.open(filePath, 'w+', (e, fd) => {
-        if (e) log.error(e)
-        else {
-            fs.write(fd, data, () => {
-                if (e) log.error(e)
+export const writeFs = ({folderPath, fileName}, data) => {
+    fs.open(path.join(folderPath, fileName), 'w+', (e, fd) => {
+        if (e) {
+            //不存在文件或路径时
+            if (e.code === 'ENOENT') {
+                fs.mkdir(folderPath, {recursive: true}, (error) => {
+                    if (error) log.error(error)
+                    else{
+                        fs.writeFile(path.join(folderPath, fileName), data, (err) => {
+                            if (err) log.error(err)
+                        })
+                    }
+                })
+                log.log(path.join(folderPath, fileName) + '\twrite success!');
+            } else {
+                log.error('writeFs:' + e)
+            }
+        } else {
+            fs.write(fd, data, (err) => {
+                if (err) log.error(err)
             })
             fs.close(fd, function () {
-                log.log(filePath + '\twrite success!');
+                log.log(path.join(folderPath, fileName) + '\twrite success!');
             });
         }
     })
@@ -58,6 +73,17 @@ export const readFsSync = (filePath: string) => {
 }
 
 /**
+ * 删除文件，文件不存在则提示
+ * @param filePath
+ */
+export const deleteFileFs = (filePath: string) => {
+    fs.unlink(filePath, (e) => {
+        if (e) log.error(e)
+        else log.log(filePath + '\twas deleted!')
+    })
+}
+
+/**
  * 判断此路径、文件是否存在，存在则读取，不存在则创建并写入
  * @param folderPath
  * @param fileName
@@ -79,17 +105,6 @@ export const fileExistAndWrite = (folderPath: string, fileName: string, data?) =
             }
             resolve(fs.readFileSync(path.join(folderPath, fileName)))
         })
-    })
-}
-
-/**
- * 删除文件，文件不存在则提示
- * @param filePath
- */
-export const deleteFileFs = (filePath: string) => {
-    fs.unlink(filePath, (e) => {
-        if (e) log.error(e)
-        else log.log(filePath + '\twas deleted!')
     })
 }
 

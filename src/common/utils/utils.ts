@@ -56,6 +56,7 @@ export const getUserAppDataFolder = () => {
     }
 }
 
+
 /**
  * 获取应用资源位置
  * 开发环境：项目根目录
@@ -93,7 +94,11 @@ export const getNetworkInfo = () => {
  */
 export const getAppSettings = async () => {
     const defaultSettings = config.defaultSettings
-    const buffer = await readFsSync(path.join(getResourcePath(), '/config/settings.json'))
+    const appSettingsFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'settings.json'
+    }
+    const buffer = await readFsSync(path.join(appSettingsFile.folderPath, appSettingsFile.fileName))
     if (buffer == null || isEmpty(buffer.toString()))
         return defaultSettings
     else

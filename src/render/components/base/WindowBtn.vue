@@ -29,10 +29,10 @@ async function closeWindowBtn() {
         <a-button type="text" class="windowBtn" @click="minWindowBtn">
           <MinusOutlined/>
         </a-button>
-<!--        <a-button type="text" class="windowBtn" @click="maxWindowBtn">
-          <BorderOutlined/>
-        </a-button>-->
-        <a-button type="text" class="windowBtn" @click="closeWindowBtn">
+        <!--        <a-button type="text" class="windowBtn" @click="maxWindowBtn">
+                  <BorderOutlined/>
+                </a-button>-->
+        <a-button type="text" class="closeWindowBtn" @click="closeWindowBtn">
           <CloseOutlined/>
         </a-button>
       </section>
@@ -43,7 +43,7 @@ async function closeWindowBtn() {
 <style scoped lang="less">
 
 #topBar {
-  -webkit-app-region: drag;
+  -webkit-app-region: drag;/*头部可拖动*/
   background-color: white;
   position: fixed;
   top: 0;
@@ -72,7 +72,11 @@ a {
 
 @import "ant-design-vue/dist/antd.variable.less";
 
-.windowBtn:hover{
+.windowBtn:hover {
   background-color: @primary-3;
+}
+
+.closeWindowBtn:hover {
+  background-color: @error-color-active;
 }
 </style>
