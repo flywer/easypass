@@ -20,6 +20,7 @@ export function trayInit() {
         role: "quit"
     })
     let privacyPolicyMenuItem = new MenuItem({
+        icon: nativeImage.createFromPath(join(appTrayIconPath, 'privacyPolicy.png')),
         label: '隐私协议',
         click: () => {
             dialog.showMessageBox({
@@ -40,9 +41,17 @@ export function trayInit() {
             })
         }
     })
-
+    let appRelaunchMenuItem = new MenuItem({
+        icon: nativeImage.createFromPath(join(appTrayIconPath, 'relaunch.png')),
+        label: '重启应用',
+        click: () => {
+            app.relaunch()
+            app.exit(0)
+        }
+    })
     const contextMenu = Menu.buildFromTemplate([
         privacyPolicyMenuItem,
+        appRelaunchMenuItem,
         quitMenuItem
     ])
     tray.setContextMenu(contextMenu)

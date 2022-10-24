@@ -10,9 +10,6 @@ const config = {
   },
   // 将源代码中的资源进行拷贝打包
   extraResources: [{
-    from: './config/',
-    to: 'config',
-  }, {
     from: './assets/',
     to: 'assets',
   }],
