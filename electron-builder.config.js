@@ -8,10 +8,14 @@ const config = {
   directories: {
     output: 'dist/electron', // 构建后保存的位置
   },
-  extraResources: {
-    from: './config/', // 将源代码中的资源进行拷贝打包
+  // 将源代码中的资源进行拷贝打包
+  extraResources: [{
+    from: './config/',
     to: 'config',
-  },
+  }, {
+    from: './assets/',
+    to: 'assets',
+  }],
   win: {
     // icon: "./build/icons/earth.ico", //windows下应用的图标
     target: [

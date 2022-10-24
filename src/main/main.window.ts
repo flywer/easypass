@@ -1,8 +1,7 @@
 import {join} from 'path'
-import {BrowserWindow, app} from 'electron'
+import {BrowserWindow, app,nativeImage } from 'electron'
 import {handleUpdate} from "@main/app/autoUpdater";
-import {channel} from "@render/api/channel";
-import {getAppSettings, getNetworkInfo} from "@common/utils/utils";
+import {getAppSettings, getNetworkInfo, getResourcePath} from "@common/utils/utils";
 
 const isDev = !app.isPackaged
 
@@ -22,7 +21,8 @@ export async function createWindow() {
             webSecurity: false, // 取消跨域限制
         },
         autoHideMenuBar: !isDev,
-        show:false
+        show:false,
+        icon:nativeImage.createFromPath(join(getResourcePath(),'/assets/logo.png'))
     })
 
     //渲染进程URL

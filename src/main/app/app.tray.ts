@@ -1,21 +1,21 @@
-import {BrowserWindow, Menu, nativeImage, Tray, MenuItem, dialog} from "electron";
-import {join} from "path";
-
-// 注意:contextMenu, Tooltip 和 Title 代码需要写在这里!
+import {BrowserWindow, Menu, nativeImage, Tray, MenuItem, dialog, app} from "electron";
+import {getResourcePath} from "@common/utils/utils";
+import path, {join} from "path";
 
 export let tray
 
-const assertsPath = 'src/render/assets/img/appTray/'
+const logoPath = path.join(getResourcePath(), '/assets', 'logo.png')
+const appTrayIconPath = path.join(getResourcePath(), '/assets/appTray')
 
 /**
  * 启用系统托盘
  */
 export function trayInit() {
-    const icon = nativeImage.createFromPath('src/render/public/favicon.ico')
+    const icon = nativeImage.createFromPath(logoPath)
     tray = new Tray(icon)
 
     let quitMenuItem = new MenuItem({
-        icon: nativeImage.createFromPath(join(assertsPath, 'quit.png')),
+        icon: nativeImage.createFromPath(join(appTrayIconPath, 'quit.png')),
         label: '退出',
         role: "quit"
     })
