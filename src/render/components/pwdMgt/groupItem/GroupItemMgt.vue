@@ -107,6 +107,7 @@ const refreshSpinning = () => {
 //分页搜索
 const searchItemsByPage = async (init: boolean, search?: true) => {
   spinning.value = true
+  showEmpty.value = false
   refreshSpinning()
 
   modelRef.value.pageSize = pageSize.value
