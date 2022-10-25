@@ -41,7 +41,8 @@ export async function createWindow() {
     })
     //窗口关闭时触发
     win.on('closed', () => {
-        tray.destroy()
+        if (tray != null && !tray.isDestroyed())
+            tray.destroy()
         win.destroy()
     })
     //准备完毕，将要显示
