@@ -21,7 +21,7 @@ export const handleUpdate = (window) => {
     //当没有可用更新的时候触发
     autoUpdater.on('update-not-available', function (info) {
         let result = success()
-        result.message = '当前为最新版本，无需更新'
+        result.message = '当前为最新版本，无需更新~'
         result.tag = 2
         window.webContents.send(channel.app.sendUpdateInfo, result)
     });
@@ -52,9 +52,9 @@ export const handleUpdate = (window) => {
     });
 
     autoUpdater.on('error', function (error) {
-        let result = failure()
         log.error(error)
-        result.result = error
+        let result = failure()
+        result.message = error.message
         result.tag = 6
         window.webContents.send(channel.app.sendUpdateInfo, result)
     });

@@ -103,12 +103,17 @@ let progressInfo = ref({
 const onCheckForUpdate = async () => {
   ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
     switch (res.tag) {
-        //检测更新、为最新版本、报错
-      case 1 || 2 || 6:
-        if (res.success)
-          message.info({content: res.message, key: updateKey});
-        else
-          message.error({content: res.message, key: updateKey});
+        //检测更新时
+      case 1:
+        message.info({content: res.message, key: updateKey});
+        break;
+        //为最新版本时
+      case 2:
+        message.success({content: res.message, key: updateKey});
+        break;
+        //报错
+      case 6:
+        message.error({content: res.message, key: updateKey});
         break;
         //有可用更新
       case 3:
