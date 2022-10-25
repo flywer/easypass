@@ -74,6 +74,7 @@ const onEnableTray = () => {
     openAsHidden.disabled = false
     closeAsHidden.disabled = false
   }
+
   onOpenAtLogin()
   onCloseAsHidden()
 }
@@ -88,6 +89,7 @@ onMounted(async () => {
   openAtLoginChecked.value = appSettings.openAtLogin
   openAsHidden.checked = appSettings.openAsHidden
   closeAsHidden.checked = appSettings.closeAsHidden
+  enableTrayChecked.value = appSettings.enableTray
 })
 
 //endregion

@@ -5,11 +5,11 @@ import {createWindow} from './main.window'
 import {sequelize} from "@main/sequelize.init";
 import {PwdGroupController} from "@main/controller/pwdGroup.controller";
 import path from "path";
-import {trayInit} from "@main/app/app.tray";
+import {tray, trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getNetworkInfo, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppSettings, getNetworkInfo, getUserAppDataFolder} from "@common/utils/utils";
 import log from 'electron-log'
 import * as Path from "path";
 import crypto from 'crypto'
@@ -49,7 +49,9 @@ async function electronAppInit() {
 
     ///应用启动后的操作
     app.whenReady().then(async () => {
-        trayInit()
+        const appSettings = await getAppSettings()
+        if (appSettings.enableTray)
+            trayInit()
         if (isDev) {
             //安装vue开发者工具
             await installVueDevtools()

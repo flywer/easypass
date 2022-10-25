@@ -2,7 +2,7 @@ import {BrowserWindow, Menu, nativeImage, Tray, MenuItem, dialog, app} from "ele
 import {getResourcePath} from "@common/utils/utils";
 import path, {join} from "path";
 
-export let tray
+export let tray = null
 
 const logoPath = path.join(getResourcePath(), '/assets', 'logo.png')
 const appTrayIconPath = path.join(getResourcePath(), '/assets/appTray')
@@ -49,6 +49,7 @@ export function trayInit() {
             app.exit(0)
         }
     })
+
     const contextMenu = Menu.buildFromTemplate([
         privacyPolicyMenuItem,
         appRelaunchMenuItem,

@@ -11,6 +11,8 @@ import {autoUpdater} from "electron-updater";
 import * as os from "os";
 import log from "electron-log";
 import {isEmpty} from "lodash";
+import {tray, trayInit} from "@main/app/app.tray";
+
 
 @Controller()
 export class AppController {
@@ -34,7 +36,7 @@ export class AppController {
     private readonly appThemeFile = {
         folderPath: path.join(getUserAppDataFolder(), '/config'),
         fileName: 'theme.json',
-        fullPath:'',
+        fullPath: '',
         constructor() {
             this.fullPath = path.join(this.folderPath, this.fileName)
         }
@@ -45,8 +47,8 @@ export class AppController {
      * @param setup
      * @constructor
      */
-     @IpcHandle(channel.app.setWindow)
-     public async HandleSetWindow(setup: string) {
+    @IpcHandle(channel.app.setWindow)
+    public async HandleSetWindow(setup: string) {
         if (setup === 'window-min') {
             this.mainWindow.minimize()
         } else if (setup === 'window-max') {
@@ -62,7 +64,7 @@ export class AppController {
         }
     }
 
-     /**
+    /**
      * 设置开机自启
      * @param setup
      */
@@ -97,6 +99,26 @@ export class AppController {
         const appSettings = await getAppSettings()
         appSettings.closeAsHidden = setup
         writeFs(this.appSettingsFile, JSON.stringify(appSettings))
+    }
+
+    /**
+     * 设置是否启用托盘
+     * @param setup
+     * @constructor
+     */
+    @IpcHandle(channel.app.setEnableTray)
+    public async HandleSetEnableTray(setup) {
+        //获取本地设置文件
+        const appSettings = await getAppSettings()
+        appSettings.enableTray = setup
+        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
+        if (setup) {
+            trayInit()
+        } else {
+            if (!tray.isDestroyed()) {
+                tray.destroy()
+            }
+        }
     }
 
     /**
@@ -269,4 +291,5 @@ export class AppController {
         }
         return result
     }
+
 }
