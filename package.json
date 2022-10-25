@@ -1,6 +1,6 @@
 {
   "name": "easy-pass",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "packageManager": "pnpm@7.12.1",
   "description": "easy⚡password",
   "main": "dist/main/index.js",
