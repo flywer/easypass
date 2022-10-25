@@ -4,7 +4,7 @@ import {DataTypes, INTEGER} from "sequelize";
 /**
  * 账号组项model：每个密码组有多个组项，每个组项若itemId相同代表为同一组（不是指密码组）
  */
-export const GroupItem = sequelize.define('groupItem', {
+export let GroupItem = sequelize.define('groupItem', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -17,7 +17,7 @@ export const GroupItem = sequelize.define('groupItem', {
         comment: '名称'
     },
     value: {
-        type: DataTypes.STRING(256),
+        type: DataTypes.STRING(512),
         notNull: true,
         comment: '组项对应值'
     },

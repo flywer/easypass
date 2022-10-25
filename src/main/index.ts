@@ -12,6 +12,7 @@ import {UserController} from "@main/controller/user.controller";
 import {getNetworkInfo, getUserAppDataFolder} from "@common/utils/utils";
 import log from 'electron-log'
 import * as Path from "path";
+import crypto from 'crypto'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 //设置日志存储位置

@@ -21,7 +21,7 @@ const router = useRouter()
 const route = useRoute()
 
 /*数据*/
-const formDataRef= ref(<any>[]);
+const formDataRef = ref(<any>[]);
 /*起始数据*/
 let originData = [
   {name: '标题', value: '', isTitle: true, isShow: true, key: uuid.v1(), deleteTag: false},
@@ -39,7 +39,8 @@ const rulesRef = ref({
     {min: 1, max: 10, message: '名称最大长度为10', trigger: 'change',}
   ],
   value: [
-    {required: true, message: '内容不能为空', trigger: 'change'}
+    {required: true, message: '内容不能为空', trigger: 'change'},
+    {max: 64, message: '值最大长度为64', trigger: 'change'}
   ]
 })
 //是否为更新操作
@@ -52,7 +53,7 @@ onMounted(async () => {
     let result = (await getItemsListByItemId(itemId)).data.result
     originData = []
     result.forEach(res => {
-      let item = res.dataValues
+      let item = res
       item.key = uuid.v1()
       item.deleteTag = false
       originData.push(item)
@@ -68,7 +69,7 @@ const handleAddItem = () => {
     name: '',
     value: '',
     isShow: false,
-    deleteTag:false,
+    deleteTag: false,
     key: uuid.v1()
   };
   formDataRef.value.push(newData);

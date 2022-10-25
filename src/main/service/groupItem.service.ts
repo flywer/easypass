@@ -2,13 +2,14 @@ import {Injectable} from "einf";
 import {GroupItemMapper} from "@main/mapper/group-item-mapper.service";
 import {GroupItem} from "@main/model/groupItem";
 import {uuid} from "vue3-uuid";
+import {decrypt, encrypt} from "@common/utils/cryptoUtils";
 
 @Injectable()
 export class GroupItemService {
     constructor(private groupItemMapper: GroupItemMapper) {
     }
 
-    public saveGroupItems(groupItems: typeof GroupItem[], groupId: string, isUpdate: boolean) {
+    public saveOrUpdateGroupItems(groupItems: typeof GroupItem[], groupId: string, isUpdate: boolean) {
         //相同账号组有同一个组ID
         let itemId
         if (isUpdate)
@@ -18,6 +19,8 @@ export class GroupItemService {
         groupItems.forEach((item) => {
             item.itemId = itemId
             item.pwdGroupId = groupId
+            const encryptData = encrypt(item.value)
+            item.value = encryptData.iv + encryptData.content
         })
         return this.groupItemMapper.saveOrUpdateGroupItems(groupItems)
     }
@@ -31,7 +34,15 @@ export class GroupItemService {
     }
 
     public async getItemsListByItemId(itemId: string) {
-        return await this.groupItemMapper.getItemsListByItemId(itemId)
+        let list = []
+        //解密
+        for (const item of (await this.groupItemMapper.getItemsListByItemId(itemId))) {
+            let dataValues = item.dataValues
+            let value = dataValues.value
+            dataValues.value = decrypt({iv: value.substring(0, 32), content: value.substring(32, value.length)})
+            list.push(dataValues)
+        }
+        return list
     }
 
     public async deleteGroupItemByItemId(itemId: string) {

@@ -22,7 +22,7 @@ export class GroupItemController {
                     await this.groupItemService.deleteItemById(item.id)
                 }
             }
-            await this.groupItemService.saveGroupItems(groupItems.filter(item =>item.deleteTag == false), groupId, isUpdate);
+            await this.groupItemService.saveOrUpdateGroupItems(groupItems.filter(item => item.deleteTag == false), groupId, isUpdate);
             result = success()
         } catch (e) {
             log.error(e)
@@ -39,6 +39,7 @@ export class GroupItemController {
     @IpcHandle(channel.groupItem.getGroupItemsListByPage)
     public async handleGetGroupItemsListByPage(vo) {
         let result
+        let items;
         try {
             //获取账号组项ID列表
             let {rows, count} = await this.groupItemService.getItemsIdListByPage(vo)
@@ -50,9 +51,37 @@ export class GroupItemController {
             result = success()
             result.result = {rows: itemGroupList, count: count}
         } catch (e) {
-            log.error(e)
-            result = failure("系统异常")
-            result.result = e
+            if (e.code === 'ERR_CRYPTO_INVALID_IV') {
+                log.error(e.code, "数据IV值异常！")
+                result = failure("数据IV值异常")
+            } else {
+                log.error("系统异常")
+                result = failure("系统异常")
+            }
+            result.result = null
+        }
+        return result
+    }
+
+    /**
+     * 通过itemId获取组项信息
+     * @param itemId
+     */
+    @IpcHandle(channel.groupItem.getItemsListByItemId)
+    public async handleGetItemsListByItemId(itemId: string) {
+        let result
+        try {
+            result = success()
+            result.result = await this.groupItemService.getItemsListByItemId(itemId)
+        } catch (e) {
+            if (e.code === 'ERR_CRYPTO_INVALID_IV') {
+                log.error(e.code, "数据IV值异常！")
+                result = failure("数据IV值异常")
+            } else {
+                log.error("系统异常")
+                result = failure("系统异常")
+            }
+            result.result = null
         }
         return result
     }
@@ -75,21 +104,4 @@ export class GroupItemController {
         return result
     }
 
-    /**
-     * 通过itemId获取组项信息
-     * @param itemId
-     */
-    @IpcHandle(channel.groupItem.getItemsListByItemId)
-    public async handleGetItemsListByItemId(itemId: string) {
-        let result
-        try {
-            result = success()
-            result.result = await this.groupItemService.getItemsListByItemId(itemId)
-        } catch (e) {
-            log.error(e)
-            result = failure("系统异常")
-            result.result = e
-        }
-        return result
-    }
 }

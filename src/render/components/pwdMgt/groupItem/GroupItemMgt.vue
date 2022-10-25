@@ -124,30 +124,29 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
     }
     modelRef.value.pageIndex = pageIndex.value
   }
-  //
-  let itemsRows
+
   getGroupItemsListByPage(modelRef.value).then(res => {
     if (res.data.success) {
-      itemsRows = res.data.result.rows
+      let itemsRows = res.data.result.rows
       groupItemsCount.value = res.data.result.count.length
       groupItemsList.value = []
-      if (res.data.result.rows.length > 0)
-        res.data.result.rows.forEach(arr => {
+      if (itemsRows.length > 0)
+        itemsRows.forEach(arr => {
           let itemObj = {itemId: null, title: '暂无', account: '', showItems: []}
-          //每个组里有多个项，提取每个的dataValues
+          //每个组里有多个项，提取每个
           arr.forEach(row => {
-            if (row.dataValues.isTitle) {
-              itemObj.itemId = row.dataValues.itemId
-              itemObj.title = row.dataValues.value
+            if (row.isTitle) {
+              itemObj.itemId = row.itemId
+              itemObj.title = row.value
             }
-            if (row.dataValues.isAccount) {
-              itemObj.account = row.dataValues.value
+            if (row.isAccount) {
+              itemObj.account = row.value
             }
             /*展示出来的组项*/
-            if (row.dataValues.isShow && !row.dataValues.isTitle) {
+            if (row.isShow && !row.isTitle) {
               let showItem = {title: null, value: null}
-              showItem.title = row.dataValues.name
-              showItem.value = row.dataValues.value
+              showItem.title = row.name
+              showItem.value = row.value
               itemObj.showItems.push(showItem)
             }
           })
@@ -184,7 +183,7 @@ const showAccountItems = async (itemId: string) => {
     if (res.data.success) {
       let model = []
       res.data.result.forEach(item => {
-        model.push(item.dataValues)
+        model.push(item)
       })
       itemInfoModelRef.value = model
       itemInfoModalVisible.value = true
