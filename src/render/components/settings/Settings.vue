@@ -2,11 +2,11 @@
 import {createVNode, onMounted, reactive, ref, watch} from "vue";
 import {
   checkForUpdate,
-  downloadUpdate, getAppSettings,
+  downloadUpdate,
+  getAppSettings,
   getAppVersion,
-  getOpenAtLogin,
-  setAppTheme, setCloseAsHidden, setEnableTray,
-  setOpenAtLogin
+  setAppSettings,
+  setAppTheme,
 } from "@render/api/app.api";
 import {ConfigProvider, message, Modal, notification} from "ant-design-vue";
 import {store} from "@render/store";
@@ -30,9 +30,7 @@ import {
   register,
   updateUserInfoByUserId
 } from "@render/api/user.api";
-import {useRouter} from "vue-router";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
-import * as Assert from "assert";
 import {copyText} from "@render/utils/clipboard";
 
 const tabActiveKey = ref('1')
@@ -40,7 +38,6 @@ const tabActiveKey = ref('1')
 //region 开机自启动
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
-
 //endregion
 
 //region 托盘
@@ -57,31 +54,28 @@ const closeAsHidden = reactive({
   disabled: false
 });
 
-/*开机设置， 包括自启和是否隐藏到托盘*/
-const onOpenAtLogin = () => {
-  setOpenAtLogin({openAtLogin: openAtLoginChecked.value, openAsHidden: openAsHidden.checked})
-}
-
 /*是否启用托盘*/
 const onEnableTray = () => {
-  setEnableTray(enableTrayChecked.value)
-  if (enableTrayChecked.value) {
+  if (!enableTrayChecked.value) {
     openAsHidden.checked = false
-    openAsHidden.disabled = true
     closeAsHidden.checked = false
+    openAsHidden.disabled = true
     closeAsHidden.disabled = true
   } else {
     openAsHidden.disabled = false
     closeAsHidden.disabled = false
   }
-
-  onOpenAtLogin()
-  onCloseAsHidden()
+  onSetAppSettings()
 }
 
-/*关闭时是否隐藏到托盘*/
-const onCloseAsHidden = () => {
-  setCloseAsHidden(closeAsHidden.checked)
+/*应用设置*/
+const onSetAppSettings = () => {
+  setAppSettings({
+    openAtLogin: openAtLoginChecked.value,/*开机自启动*/
+    enableTray: enableTrayChecked.value,/*是否启用托盘图标*/
+    openAsHidden: openAsHidden.checked,/*启动是否隐藏到托盘*/
+    closeAsHidden: closeAsHidden.checked/*关闭时是否隐藏到托盘*/
+  })
 }
 
 onMounted(async () => {
@@ -535,7 +529,7 @@ const onAccountCancellation = () => {
         <RowCard>
           <template #left>开机自启动</template>
           <template #right>
-            <a-switch v-model:checked="openAtLoginChecked"/>
+            <a-switch v-model:checked="openAtLoginChecked" @click="onSetAppSettings"/>
           </template>
         </RowCard>
         <!--启用托盘-->
@@ -551,7 +545,8 @@ const onAccountCancellation = () => {
         <RowCard>
           <template #left>启动时最小化到托盘</template>
           <template #right>
-            <a-switch v-model:checked="openAsHidden.checked" :disabled="openAsHidden.disabled" @click="onOpenAtLogin"/>
+            <a-switch v-model:checked="openAsHidden.checked" :disabled="openAsHidden.disabled"
+                      @click="onSetAppSettings"/>
           </template>
         </RowCard>
         <!--关闭到托盘-->
@@ -563,7 +558,8 @@ const onAccountCancellation = () => {
             </SecondaryText>
           </template>
           <template #right>
-            <a-switch v-model:checked="closeAsHidden.checked" :disabled="closeAsHidden.disabled" @click="onCloseAsHidden"/>
+            <a-switch v-model:checked="closeAsHidden.checked" :disabled="closeAsHidden.disabled"
+                      @click="onSetAppSettings"/>
           </template>
         </RowCard>
 

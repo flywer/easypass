@@ -65,11 +65,16 @@ export class AppController {
     }
 
     /**
-     * 设置开机自启
+     * 写入应用设置
      * @param setup
+     * @constructor
      */
-    @IpcHandle(channel.app.setOpenAtLogin)
-    public async HandleSetOpenAtLogin(setup) {
+    @IpcHandle(channel.app.setAppSettings)
+    public async HandleSetAppSettings(setup) {
+        //获取本地设置文件
+        const appSettings = await getAppSettings()
+
+        /*设置开机自启*/
         //mac系统
         if (process.platform === "darwin") {
             app.setLoginItemSettings({
@@ -78,47 +83,23 @@ export class AppController {
             });
         } else {
             app.setLoginItemSettings({
-                openAtLogin: true
+                openAtLogin: setup.openAtLogin
             });
         }
-
-        //获取本地设置文件
-        const appSettings = await getAppSettings()
         appSettings.openAtLogin = setup.openAtLogin
         appSettings.openAsHidden = setup.openAsHidden
-        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
-    }
 
-    /**
-     * 设置关闭时隐藏到托盘
-     * @param setup
-     */
-    @IpcHandle(channel.app.setCloseAsHidden)
-    public async HandleSetCloseAsHidden(setup) {
-        //获取本地设置文件
-        const appSettings = await getAppSettings()
-        appSettings.closeAsHidden = setup
-        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
-    }
+        /*设置关闭时隐藏到托盘*/
+        appSettings.closeAsHidden = setup.closeAsHidden
 
-    /**
-     * 设置是否启用托盘
-     * @param setup
-     * @constructor
-     */
-    @IpcHandle(channel.app.setEnableTray)
-    public async HandleSetEnableTray(setup) {
-        //获取本地设置文件
-        const appSettings = await getAppSettings()
-        appSettings.enableTray = setup
-        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
-        if (setup) {
+        /*设置是否启用托盘*/
+        if (setup.enableTray)
             trayInit()
-        } else {
-            if (!tray.isDestroyed()) {
-                tray.destroy()
-            }
-        }
+        else
+            tray.destroy()
+        appSettings.enableTray = setup.enableTray
+
+        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
     }
 
     /**

@@ -1,7 +1,8 @@
 import {join} from 'path'
-import {BrowserWindow, app,nativeImage } from 'electron'
+import {BrowserWindow, app, nativeImage} from 'electron'
 import {handleUpdate} from "@main/app/autoUpdater";
 import {getAppSettings, getNetworkInfo, getResourcePath} from "@common/utils/utils";
+import {tray} from "@main/app/app.tray";
 
 const isDev = !app.isPackaged
 
@@ -21,8 +22,8 @@ export async function createWindow() {
             webSecurity: false, // 取消跨域限制
         },
         autoHideMenuBar: !isDev,
-        show:false,
-        icon:nativeImage.createFromPath(join(getResourcePath(),'/assets/logo.png'))
+        show: false,
+        icon: nativeImage.createFromPath(join(getResourcePath(), '/assets/logo.png'))
     })
 
     //渲染进程URL
@@ -40,6 +41,7 @@ export async function createWindow() {
     })
     //窗口关闭时触发
     win.on('closed', () => {
+        tray.destroy()
         win.destroy()
     })
     //准备完毕，将要显示

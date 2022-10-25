@@ -4,8 +4,6 @@ import {reactive} from "vue";
 export const channel = reactive({
     app: {
         setWindow: 'app/setWindow',
-        setOpenAtLogin: 'app/setOpenAtLogin',
-        getOpenAtLogin: 'app/getOpenAtLogin',
         getAppTheme: 'app/getAppTheme',
         setAppTheme: 'app/setAppTheme',
         getAppVersion: 'app/getAppVersion',
@@ -19,9 +17,8 @@ export const channel = reactive({
         getNetworkInterfaces: 'app/getNetworkInterfaces',
         sendNetworkInfo: 'app/sendNetworkInfo',
         getAppInfo: 'app/getAppInfo',
-        setCloseAsHidden: 'app/setCloseAsHidden',
         getAppSettings: 'app/getAppSettings',
-        setEnableTray: 'app/setEnableTray',
+        setAppSettings:  'app/setAppSettings',
     },
     pwdGroup: {
         getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',
