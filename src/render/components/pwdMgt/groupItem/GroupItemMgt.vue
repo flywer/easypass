@@ -19,6 +19,7 @@ import {copyText} from "@render/utils/clipboard";
 import {message, Modal} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/pwdMgt/groupItem/ItemsInfoModal.vue";
 import ItemCardExtra from "@render/components/pwdMgt/groupItem/ItemCardExtra.vue";
+import SearchInput from "@render/components/base/SearchInput.vue";
 
 const router = useRouter()
 //从后端传过来的分组数据
@@ -185,6 +186,12 @@ const backToPwdMgt = () => {
   router.back()
 }
 
+/*查询*/
+const onSearch = (value)=>{
+  modelRef.value.value=value
+  searchItemsByPage(false,true)
+}
+
 </script>
 
 <template>
@@ -203,26 +210,8 @@ const backToPwdMgt = () => {
       <a-button class="tool-btn" type="text" size="large" @click="showAddItemModal">
         <PlusOutlined class="icon"/>
       </a-button>
-      <!--搜索-->
-      <a-button id="search-btn" class="tool-btn" type="text" size="large" @click="showSearchInput">
-        <search-outlined class="icon"/>
-      </a-button>
-      <!--搜索框动画-->
-      <transition name="search">
-        <div
-            v-if="searchInputVisible"
-            style="width: 120px;border-bottom:1px solid #cbcbcb;">
-          <a-input
-              v-model:value="modelRef.value"
-              id="search-input"
-              :bordered="false"
-              allow-clear
-              :onblur="searchInputBlur"
-              @keyup.enter="searchItemsByPage(false,true)"
-              placeholder="回车搜索标题↵"
-          />
-        </div>
-      </transition>
+      <!--搜索框-->
+      <SearchInput @onSearch="onSearch"/>
     </a-space>
     <!--右侧-->
     <a-space style="float: right">
@@ -282,25 +271,11 @@ const backToPwdMgt = () => {
 </template>
 
 <style scoped lang="less">
-@keyframes searchWidth {
-  from {
-    width: 0;
+@import "ant-design-vue/dist/antd.variable.less";
+
+#tool-header {
+  :deep(.tool-btn):hover {
+    background-color: @primary-1;
   }
-  to {
-    width: 120px;
-  }
 }
-
-.search-enter-active {
-  animation: searchWidth 0.5s;
-}
-
-.search-leave-active {
-  animation: searchWidth 0.5s reverse;
-}
-
-.card-extra-btn-icon {
-  font-size: 15px
-}
-
 </style>
