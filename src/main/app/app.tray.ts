@@ -4,7 +4,7 @@ import path, {join} from "path";
 
 export let tray = null
 
-const logoPath = path.join(getResourcePath(), '/assets', 'logo.png')
+const logoPath = path.join(getResourcePath(), '/assets', 'logo_32.ico')
 const appTrayIconPath = path.join(getResourcePath(), '/assets/appTray')
 
 /**
