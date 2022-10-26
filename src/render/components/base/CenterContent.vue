@@ -18,12 +18,9 @@ const menuKeyValue = ref('')
 watch(() => props.menuKey, () => {
   menuKeyValue.value = props.menuKey
   if (props.menuKey === '100') {
-    router.push({name: 'pwdMgt',params: {key: props.menuKey}})
+    router.push({name: 'pwdMgt', params: {key: props.menuKey}})
   } else if (props.menuKey === '200') {
-    /* router.push(
-         {
-           name: 'commonPassword',
-         })*/
+    router.push({name: 'commonAccount'})
   } else if (props.menuKey === '500') {
     router.push({name: 'settings'})
   }
@@ -33,7 +30,7 @@ watch(() => props.menuKey, () => {
 
 <template>
   <a-layout id="layout">
-      <router-view/>
+    <router-view/>
   </a-layout>
 </template>
 
@@ -63,10 +60,6 @@ watch(() => props.menuKey, () => {
     padding-left: 0;
     padding-right: 0;
     text-align: center;
-  }
-
-  .ant-space-item:hover {
-    background-color: @primary-1;
   }
 
   .icon {

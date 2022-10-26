@@ -17,6 +17,8 @@ import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModa
 import {Button, message, Modal, notification} from "ant-design-vue";
 import empty from '@render/assets/img/empty.png'
 import LoginModal from "@render/components/pwdMgt/pwdGroup/LoginModal.vue";
+import SearchInput from "@render/components/base/SearchInput.vue";
+import {cloneDeep} from "lodash-es";
 
 //路由
 const route = useRoute()
@@ -29,7 +31,15 @@ watch(() => route.params.key, (newValue) => {
 //是否显示新增弹窗
 const saveModalVisible = ref<boolean>(false)
 //是否显示更新弹窗
-const updateModalVisible = ref<boolean>(false)
+const updateModal = reactive({
+  /*传入更新弹出框的model*/
+  model: {
+    id: '',
+    name: '',
+    description: ''
+  },
+  visible: false
+})
 //当前页数
 let pageIndex = ref<number>(1)
 //每页总数
@@ -51,12 +61,6 @@ let searchModelRef = reactive({
 })
 //加载效果是否显示
 let spinning = ref(false)
-/*传入更新弹出框的model*/
-let modelRef = ref({
-  id: '',
-  name: '',
-  description: ''
-})
 //空状态显示
 let showEmpty = ref<boolean>(false)
 //登录弹框显示
@@ -68,7 +72,7 @@ const setSaveModalVisible = (value) => {
 }
 //emit:是否显示更新弹出框
 const setUpdateModalVisible = (value) => {
-  updateModalVisible.value = value
+  updateModal.visible = value
 }
 
 const setLoginModalVisible = (value) => {
@@ -87,8 +91,8 @@ const showSaveModal = () => {
 
 //click: 显示编辑密码组弹出框
 const showUpdateModal = (group) => {
-  modelRef.value = group
-  updateModalVisible.value = true
+  updateModal.model = cloneDeep(group)
+  updateModal.visible = true
 }
 
 // click:搜索框显示
@@ -226,6 +230,12 @@ onUnmounted(() => {
   notification.close(notificationKey)
 })
 
+/*查询*/
+const onSearch = (value) => {
+  searchModelRef.name = value
+  searchGroupByPage(false, true)
+}
+
 </script>
 
 <template>
@@ -236,26 +246,8 @@ onUnmounted(() => {
       <a-button class="tool-btn" type="text" size="large" @click="showSaveModal">
         <PlusOutlined class="icon"/>
       </a-button>
-      <!--搜索-->
-      <a-button id="search-btn" class="tool-btn" type="text" size="large" @click="showSearchInput">
-        <search-outlined class="icon"/>
-      </a-button>
-      <!--搜索框动画-->
-      <transition name="search">
-        <div
-            v-if="searchInputVisible"
-            style="width: 120px;border-bottom:1px solid #cbcbcb;">
-          <a-input
-              v-model:value="searchModelRef.name"
-              id="search-input"
-              :bordered="false"
-              allow-clear
-              :onblur="searchInputBlur"
-              @keyup.enter="searchGroupByPage(false,true)"
-              placeholder="回车搜索↵"
-          />
-        </div>
-      </transition>
+      <!--搜索框-->
+      <SearchInput @onSearch="onSearch"/>
     </a-space>
     <!--右侧-->
     <a-space style="float: right">
@@ -300,35 +292,19 @@ onUnmounted(() => {
   <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
                   @updateTable="searchGroupByPage(true)"/>
   <!--  更新密码组弹框-->
-  <UpdateGroupModal :visible="updateModalVisible" :modalRef="modelRef" @setVisible="setUpdateModalVisible"
+  <UpdateGroupModal :visible="updateModal.visible" :model="updateModal.model" @setVisible="setUpdateModalVisible"
                     @updateTable="searchGroupByPage(true)"/>
   <!--登录弹框-->
   <LoginModal :visible="loginModalVisible" @setVisible="setLoginModalVisible" @updateTable="searchGroupByPage(true)"/>
 </template>
 
 <style scoped lang="less">
-@keyframes searchWidth {
-  from {
-    width: 0;
+@import "ant-design-vue/dist/antd.variable.less";
+
+#tool-header {
+  :deep(.tool-btn):hover {
+    background-color: @primary-1;
   }
-  to {
-    width: 120px;
-  }
-}
-
-.search-enter-active {
-  animation: searchWidth 0.5s;
-}
-
-.search-leave-active {
-  animation: searchWidth 0.5s reverse;
-}
-
-</style>
-
-<style>
-.card-extra-btn {
-  padding-right: 0;
 }
 
 </style>

@@ -18,7 +18,7 @@ export const channel = reactive({
         sendNetworkInfo: 'app/sendNetworkInfo',
         getAppInfo: 'app/getAppInfo',
         getAppSettings: 'app/getAppSettings',
-        setAppSettings:  'app/setAppSettings',
+        setAppSettings: 'app/setAppSettings',
     },
     pwdGroup: {
         getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',
@@ -33,6 +33,8 @@ export const channel = reactive({
         getGroupItemsListByPage: "groupItem/getGroupItemsListByPage",
         deleteGroupItemByItemId: "groupItem/deleteGroupItemByItemId",
         getItemsListByItemId: "groupItem/getItemsListByItemId",
+        setGroupItemCommon: "groupItem/setGroupItemCommon",
+        getCommonGroupItemsListByPage: "groupItem/getCommonGroupItemsListByPage",
     },
     user: {
         getUserByMac: 'user/getUserByMac',

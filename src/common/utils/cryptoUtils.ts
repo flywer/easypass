@@ -34,3 +34,11 @@ export const decrypt = (hash: { iv, content }) => {
 
     return decrypted.toString();
 };
+
+/**
+ * 账号组解密
+ * @param value
+ */
+export const groupItemDecrypt = (value) => {
+    return  decrypt({iv: value.substring(0, 32), content: value.substring(32, value.length)})
+}

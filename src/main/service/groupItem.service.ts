@@ -2,7 +2,7 @@ import {Injectable} from "einf";
 import {GroupItemMapper} from "@main/mapper/group-item-mapper.service";
 import {GroupItem} from "@main/model/groupItem";
 import {uuid} from "vue3-uuid";
-import {decrypt, encrypt} from "@common/utils/cryptoUtils";
+import {decrypt, encrypt, groupItemDecrypt} from "@common/utils/cryptoUtils";
 
 @Injectable()
 export class GroupItemService {
@@ -25,12 +25,32 @@ export class GroupItemService {
         return this.groupItemMapper.saveOrUpdateGroupItems(groupItems)
     }
 
-    public getItemsTitleList(vo) {
-        return this.groupItemMapper.getItemsTitleList(vo)
-    }
+    /*    public getItemsTitleList(vo) {
+            return this.groupItemMapper.getItemsTitleList(vo)
+        }*/
 
     public async getItemsIdListByPage(vo) {
         return await this.groupItemMapper.getItemsIdListByPage(vo)
+    }
+
+    public async getCommonGroupItemsListByPage(vo) {
+        return await this.groupItemMapper.getCommonGroupItemsListByPage(vo)
+    }
+
+    public async getAllItemsTitleListByPage(vo) {
+        //全量搜索所有常用账号组标题
+        let allItemTitleList = await this.groupItemMapper.getAllItemsTitleList(true)
+        let searchedList = []
+        for (const item of allItemTitleList) {
+            const decryptData = groupItemDecrypt(item.value)
+            if (decryptData.includes(vo.value)) {
+                searchedList.push(item)
+            }
+        }
+        return {
+            rows: searchedList.slice((vo.pageIndex - 1) * vo.pageSize, vo.pageSize),
+            count: searchedList.length
+        }
     }
 
     public async getItemsListByItemId(itemId: string) {
@@ -38,8 +58,7 @@ export class GroupItemService {
         //解密
         for (const item of (await this.groupItemMapper.getItemsListByItemId(itemId))) {
             let dataValues = item.dataValues
-            let value = dataValues.value
-            dataValues.value = decrypt({iv: value.substring(0, 32), content: value.substring(32, value.length)})
+            dataValues.value = groupItemDecrypt(dataValues.value)
             list.push(dataValues)
         }
         return list
@@ -56,4 +75,9 @@ export class GroupItemService {
     public async deleteItemById(id) {
         await this.groupItemMapper.deleteItemById(id)
     }
+
+    public async setGroupItemCommon(itemId: string, isCommon: string) {
+        await this.groupItemMapper.setGroupItemCommon(itemId, isCommon)
+    }
+
 }

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {computed, reactive, ref, createVNode, onMounted} from 'vue';
-import type {Ref} from 'vue';
 import {
   CheckOutlined,
   MoreOutlined,
@@ -45,9 +44,12 @@ const rulesRef = ref({
 })
 //是否为更新操作
 const isUpdate = ref(false)
+//密码组ID
+let groupId = null
 
 onMounted(async () => {
   let itemId = route.query.itemId as string
+  groupId = route.query.groupId as string
   if (itemId != null) {
     isUpdate.value = true
     let result = (await getItemsListByItemId(itemId)).data.result
@@ -114,7 +116,7 @@ const handleSubmit = () => {
     message.loading({
       content: '保存中...', key: loadingKey
     });
-    saveOrUpdateGroupItems(formDataRef.value, store.currentGroupId, isUpdate.value).then((res) => {
+    saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
       if (res.data.success) {
         message.success({content: res.data.message, key: loadingKey, duration: 2})
         router.back()

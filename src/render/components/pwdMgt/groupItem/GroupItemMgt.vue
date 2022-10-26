@@ -2,23 +2,23 @@
 <script setup lang="ts">
 import {store} from "@render/store";
 import {useRouter} from "vue-router";
-import {createVNode, nextTick, onMounted, ref} from "vue";
+import {nextTick, onMounted, reactive, ref} from "vue";
 import {
-  EditOutlined,
   MoreOutlined,
   PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
   ArrowLeftOutlined,
-  TableOutlined,
   CopyOutlined,
-  DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons-vue'
-import {deleteGroupItemByItemId, getGroupItemsListByPage, getItemsListByItemId} from "@render/api/groupItem.api";
+import {
+  getGroupItemsListByPage,
+} from "@render/api/groupItem.api";
 import empty from '@render/assets/img/empty.png'
 import {copyText} from "@render/utils/clipboard";
 import {message, Modal} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/pwdMgt/groupItem/ItemsInfoModal.vue";
+import ItemCardExtra from "@render/components/pwdMgt/groupItem/ItemCardExtra.vue";
 
 const router = useRouter()
 //从后端传过来的分组数据
@@ -53,10 +53,16 @@ let spinning = ref(true)
 let showEmpty = ref<boolean>(false)
 //刷新动画
 let refreshSpin = ref(false)
-//是否显示组详情
-const itemInfoModalVisible = ref(false)
-//详情页信息
-const itemInfoModelRef = ref([])
+
+const itemInfoModalRef = reactive({
+  model: null,/*详情页信息*/
+  visible: null/*是否显示组详情*/
+})
+const updateItemInfo = (value) => {
+  itemInfoModalRef.model = value.model
+  itemInfoModalRef.visible = value.visible
+}
+
 onMounted(async () => {
   await searchItemsByPage(true)
   setInterval(() => {
@@ -115,7 +121,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
-    modelRef.value.value = ''
+    modelRef.value.value = null
     modelRef.value.pageIndex = 1
   } else {
     //是否是搜索框搜索（需回到第一页）
@@ -133,13 +139,17 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
-          let itemObj = {itemId: null, title: '暂无', account: '', showItems: []}
+          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false,groupId: null}
           //每个组里有多个项，提取每个
           arr.forEach(row => {
+            /*标题*/
             if (row.isTitle) {
               itemObj.itemId = row.itemId
               itemObj.title = row.value
+              itemObj.isCommon = row.isCommon == 1
+              itemObj.groupId = row.pwdGroupId
             }
+            /*主账号*/
             if (row.isAccount) {
               itemObj.account = row.value
             }
@@ -169,61 +179,9 @@ const backToPwdMgt = () => {
   router.back()
 }
 
-const showUpdateModal = (itemId: string) => {
-  router.push(
-      {
-        name: 'groupItemTableForm',
-        query: {itemId: itemId}
-      }
-  )
-}
-
-//查看
-const showAccountItems = async (itemId: string) => {
-  await getItemsListByItemId(itemId).then(res => {
-    if (res.data.success) {
-      let model = []
-      res.data.result.forEach(item => {
-        model.push(item)
-      })
-      itemInfoModelRef.value = model
-      itemInfoModalVisible.value = true
-    } else {
-      message.error(res.data.message)
-    }
-  }).catch(e => {
-    console.error(e)
-  })
-}
-
-const handleDelete = (itemId: string) => {
-  Modal.confirm({
-    title: '提示',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: '确认删除当前组？',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      deleteGroupItem(itemId)
-    },
-  });
-}
-
-//删除账号组
-const deleteGroupItem = (itemId: string) => {
-  deleteGroupItemByItemId(itemId).then(res => {
-    if (res.data.success) {
-      message.success("删除成功！")
-      searchItemsByPage(true)
-    } else
-      message.error(res.data.message)
-  })
-}
-
 </script>
 
 <template>
-
   <!--  顶部按钮栏 -->
   <a-layout-header id="tool-header">
     <a-space style="gap: 4px">
@@ -255,7 +213,7 @@ const deleteGroupItem = (itemId: string) => {
               allow-clear
               :onblur="searchInputBlur"
               @keyup.enter="searchItemsByPage(false,true)"
-              placeholder="回车搜索↵"
+              placeholder="回车搜索标题↵"
           />
         </div>
       </transition>
@@ -279,7 +237,9 @@ const deleteGroupItem = (itemId: string) => {
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
         <a-col v-for="(item) in groupItemsList" :span="24" style="margin-bottom: 15px">
-          <a-card :data-id="item.itemId" :bordered="false" :hoverable="true"
+          <a-card :data-id="item.itemId"
+                  :bordered="false"
+                  :hoverable="true"
                   size="small"
           >
             <template #title>
@@ -294,20 +254,11 @@ const deleteGroupItem = (itemId: string) => {
             </template>
 
             <template #extra>
-              <a-space :size="10">
-                <a-divider type="vertical" style="background-color: #f0f0f0"/>
-                <a-button type="text" class="card-extra-btn" title="详情">
-                  <table-outlined @click="showAccountItems(item.itemId)"/>
-                </a-button>
-
-                <a-button type="text" class="card-extra-btn" title="编辑">
-                  <edit-outlined @click="showUpdateModal(item.itemId)"/>
-                </a-button>
-
-                <a-button type="text" class="card-extra-btn" title="删除">
-                  <delete-outlined @click="handleDelete(item.itemId)"/>
-                </a-button>
-              </a-space>
+              <ItemCardExtra :item="item"
+                             :group-items-list="groupItemsList"
+                             @showItemInfo="updateItemInfo"
+                             @updateList="searchItemsByPage(true)"
+              />
             </template>
           </a-card>
         </a-col>
@@ -322,7 +273,7 @@ const deleteGroupItem = (itemId: string) => {
       </a-empty>
 
     </a-spin>
-    <ItemsInfoModal :visible="itemInfoModalVisible" :model="itemInfoModelRef"/>
+    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model"/>
   </a-layout-content>
 
 </template>
@@ -345,10 +296,8 @@ const deleteGroupItem = (itemId: string) => {
   animation: searchWidth 0.5s reverse;
 }
 
-</style>
-
-<style>
-.card-extra-btn {
-  padding: 0;
+.card-extra-btn-icon {
+  font-size: 15px
 }
+
 </style>

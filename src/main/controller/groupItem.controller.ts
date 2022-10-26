@@ -14,7 +14,7 @@ export class GroupItemController {
      * @param groupItems
      */
     @IpcHandle(channel.groupItem.saveOrUpdateGroupItems)
-    public async handleSaveOrUpdateGroupItems(groupItems: any[], groupId: string, isUpdate: boolean) {
+    public async HandleSaveOrUpdateGroupItems(groupItems: any[], groupId: string, isUpdate: boolean) {
         let result
         try {
             for (const item of groupItems) {
@@ -37,12 +37,23 @@ export class GroupItemController {
      * @param vo
      */
     @IpcHandle(channel.groupItem.getGroupItemsListByPage)
-    public async handleGetGroupItemsListByPage(vo) {
+    public async HandleGetGroupItemsListByPage(vo) {
         let result
         let items;
         try {
             //获取账号组项ID列表
-            let {rows, count} = await this.groupItemService.getItemsIdListByPage(vo)
+            let rows: any[]
+            let count: number
+            if (vo.value != null) {
+                //模糊搜索
+                let data = await this.groupItemService.getAllItemsTitleListByPage(vo)
+                rows = data.rows
+                count = data.count
+            } else {
+                let data = await this.groupItemService.getItemsIdListByPage(vo)
+                rows = data.rows
+                count = data.count
+            }
             let itemGroupList = []
             for (const row of rows) {
                 let itemGroup = await this.groupItemService.getItemsListByItemId(row.dataValues.itemId)
@@ -64,11 +75,56 @@ export class GroupItemController {
     }
 
     /**
+     * 获取常用账号列表
+     * @param vo
+     * @constructor
+     */
+    @IpcHandle(channel.groupItem.getCommonGroupItemsListByPage)
+    public async HandleGetCommonGroupItemsListByPage(vo) {
+        let result
+        let items;
+        try {
+            //获取常用账号标题项
+            let rows: any[]
+            let count: number
+            if (vo.value != null) {
+                //模糊搜索
+                let data = await this.groupItemService.getAllItemsTitleListByPage(vo)
+                rows = data.rows
+                count = data.count
+            } else {
+                let data = await this.groupItemService.getCommonGroupItemsListByPage(vo)
+                rows = data.rows
+                count = data.count
+            }
+            console.log(rows)
+            let itemGroupList = []
+            for (const row of rows) {
+                let itemGroup = await this.groupItemService.getItemsListByItemId(row.dataValues.itemId)
+                itemGroupList.push(itemGroup)
+            }
+            result = success()
+            result.result = {rows: itemGroupList, count: count}
+        } catch (e) {
+            if (e.code === 'ERR_CRYPTO_INVALID_IV') {
+                log.error(e.code, "数据IV值异常！")
+                result = failure("数据IV值异常")
+            } else {
+                log.error("系统异常")
+                result = failure("系统异常")
+            }
+            result.result = null
+        }
+        return result
+    }
+
+
+    /**
      * 通过itemId获取组项信息
      * @param itemId
      */
     @IpcHandle(channel.groupItem.getItemsListByItemId)
-    public async handleGetItemsListByItemId(itemId: string) {
+    public async HandleGetItemsListByItemId(itemId: string) {
         let result
         try {
             result = success()
@@ -91,7 +147,7 @@ export class GroupItemController {
      * @param itemId
      */
     @IpcHandle(channel.groupItem.deleteGroupItemByItemId)
-    public async handleDeleteGroupItemByItemId(itemId: string) {
+    public async HandleDeleteGroupItemByItemId(itemId: string) {
         let result
         try {
             await this.groupItemService.deleteGroupItemByItemId(itemId)
@@ -99,6 +155,26 @@ export class GroupItemController {
         } catch (e) {
             log.error(e)
             result = failure("删除失败！系统异常")
+            result.result = e
+        }
+        return result
+    }
+
+    /**
+     * 设置是否为常用账号
+     * @param itemId
+     * @param isCommon
+     * @constructor
+     */
+    @IpcHandle(channel.groupItem.setGroupItemCommon)
+    public async HandleSetGroupItemCommon(itemId: string, isCommon: string) {
+        let result
+        try {
+            await this.groupItemService.setGroupItemCommon(itemId, isCommon)
+            result = success()
+        } catch (e) {
+            log.error(e)
+            result = failure("系统异常")
             result.result = e
         }
         return result
