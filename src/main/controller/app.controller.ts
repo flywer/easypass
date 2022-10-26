@@ -13,7 +13,6 @@ import log from "electron-log";
 import {isEmpty} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
 
-
 @Controller()
 export class AppController {
     constructor(
@@ -156,6 +155,8 @@ export class AppController {
         return result
     }
 
+    //region autoUpdater
+
     /**
      * 获取应用版本信息
      */
@@ -229,6 +230,8 @@ export class AppController {
         }
         return result
     }
+
+    //endregion
 
     /**
      * 获取网络接口、MAC地址等信息

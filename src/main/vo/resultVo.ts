@@ -7,7 +7,6 @@ export class Result {
     message: string
     /*返回数据对象*/
     result: any
-
 }
 
 export function success(message?: string) {

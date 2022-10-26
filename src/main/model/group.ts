@@ -1,15 +1,22 @@
 import {sequelize} from "@main/sequelize.init";
 import {DataTypes} from "sequelize";
-import {PageVo} from "@main/vo/pageVo";
+import {IPageVo} from "@main/vo/pageVo";
+
+export interface IGroupVo extends IPageVo {
+    id?: string,
+    name?: string,
+    description?: string,
+    groupIndex?: number,
+    userId?: string
+}
 
 /**
  * 密码组信息model
  */
-export const PwdGroup = sequelize.define('group', {
+export const Group = sequelize.define('group', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
         primaryKey: true,
         comment: '主键ID'
     },
@@ -32,13 +39,6 @@ export const PwdGroup = sequelize.define('group', {
         comment: '所属用户ID'
     }
 }, {
-    tableName: 'pwd_group',
+    tableName: 'group',
     comment: '密码组信息表'
 })
-
-export class PwdGroupVo extends PageVo {
-    id: string
-    name: string
-    groupIndex: number
-    userId: string
-}

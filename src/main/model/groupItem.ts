@@ -1,5 +1,21 @@
 import {sequelize} from "@main/sequelize.init";
 import {DataTypes} from "sequelize";
+import {IPageVo} from "@main/vo/pageVo";
+
+export interface IGroupItemVo extends IPageVo {
+    id?: string,
+    name?: string,
+    value?: string,
+    itemId?: string,
+    isTitle?: boolean,
+    isCommon?: boolean,
+    isAccount?: boolean,
+    isPassword?: boolean,
+    isShow?: boolean,
+    itemIndex?: number,
+    groupId?: string,
+    userId?: string
+}
 
 /**
  * 账号组项model：每个密码组有多个组项，每个组项若itemId相同代表为同一组（不是指密码组）

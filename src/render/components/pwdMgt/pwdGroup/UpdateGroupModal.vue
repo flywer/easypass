@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import {reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
-import {updatePwdGroup} from "@render/api/pwdMgt.api";
+import {updateGroup} from "@render/api/pwdMgt.api";
 import {cloneDeep} from "lodash-es";
 
 // 父组件传过来的值，是否显示
@@ -61,7 +61,7 @@ const handleOk = (e) => {
     //空值则为null
     if (Object.is(modelRef.value.description, ''))
       modelRef.value.description = null
-    updatePwdGroup(modelRef.value).then(res => {
+    updateGroup(modelRef.value).then(res => {
       if (res.data.success) {
         message.success(res.data.message)
       } else {

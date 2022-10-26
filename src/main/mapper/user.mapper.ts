@@ -1,60 +1,58 @@
 import {Injectable} from "einf";
-import {SysUser} from "@main/model/sysUser";
-import {sequelize} from "@main/sequelize.init";
-import {PwdGroup} from "@main/model/pwdGroup";
+import {IUserVo, User} from "@main/model/user";
 
 @Injectable()
 export class UserMapper {
     constructor() {
     }
 
-    public async getUserByMac(mac: any) {
-        return await SysUser.findAll({
+    public async getUserByMac(mac: string) {
+        return await User.findAll({
             where: {
                 mac: mac
             }
         })
     }
 
-    public async register(userVo: typeof SysUser) {
-        return await SysUser.create({
-            name: userVo.name,
-            password: userVo.password,
-            account: userVo.account,
-            mac: userVo.mac,
-            mode: userVo.mode
+    public async register(user: IUserVo) {
+        return await User.create({
+            name: user.name,
+            password: user.password,
+            account: user.account,
+            mac: user.mac,
+            mode: user.mode
         })
     }
 
-    public async getUserByAccountLogin(user) {
-        return Promise.resolve(SysUser.findOne({
+    public async getUserByAccountLogin(user: IUserVo) {
+        return await User.findOne({
             where: {
                 account: user.account,
                 password: user.password
             }
-        }));
+        })
     }
 
-    public async deleteUserById(id) {
-        await SysUser.destroy({
+    public async deleteUserById(userId: string) {
+        await User.destroy({
             where: {
-                id: id
+                id: userId
             }
         })
     }
 
-    public async updateUserInfoByUserId(vo) {
-        await SysUser.update(vo, {
+    public async updateUserInfoByUserId(user: IUserVo) {
+        await User.update(user, {
             where: {
-                id: vo.id
+                id: user.id
             }
         })
     }
 
-    public async getUserById(id) {
-        return await SysUser.findOne({
+    public async getUserById(userId: string) {
+        return await User.findOne({
             where: {
-                id: id
+                id: userId
             }
         })
     }

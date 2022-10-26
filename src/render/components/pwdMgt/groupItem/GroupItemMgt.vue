@@ -2,12 +2,11 @@
 <script setup lang="ts">
 import {store} from "@render/store";
 import {useRouter} from "vue-router";
-import {nextTick, onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {
   MoreOutlined,
   PlusOutlined,
   ReloadOutlined,
-  SearchOutlined,
   ArrowLeftOutlined,
   CopyOutlined,
 } from '@ant-design/icons-vue'
@@ -67,19 +66,7 @@ const updateItemInfo = (value) => {
 
 onMounted(async () => {
   await searchItemsByPage(true)
-  setInterval(() => {
-    if (blur && searchInputVisible.value)
-      searchInputVisible.value = false
-  }, 600)
 })
-
-//region emit
-//emit:是否显示弹出框，一般用于弹出框关闭时回调
-const setVisible = (value) => {
-  addItemModalVisible.value = value
-}
-
-//endregion
 
 // click:显示添加账号项
 const showAddItemModal = () => {
@@ -89,24 +76,6 @@ const showAddItemModal = () => {
       groupId: store.currentGroupId
     }
   })
-}
-
-// click:搜索框显示
-const showSearchInput = () => {
-  if (!searchInputVisible.value) {
-    searchInputVisible.value = true
-    blur = false
-    nextTick(() => {
-      document.getElementById("search-input").focus()
-    })
-  } else {
-    blur = true
-  }
-}
-
-// blur:搜索框失去焦点时触发
-const searchInputBlur = () => {
-  blur = true
 }
 
 //刷新动画
@@ -142,7 +111,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   getGroupItemsListByPage(modelRef.value).then(res => {
     if (res.data.success) {
       let itemsRows = res.data.result.rows
-      groupItemsCount.value = res.data.result.count.length
+      groupItemsCount.value = res.data.result.count
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {

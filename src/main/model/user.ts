@@ -1,10 +1,21 @@
 import {sequelize} from "@main/sequelize.init";
 import {DataTypes} from "sequelize";
+import {IPageVo} from "@main/vo/pageVo";
+
+export interface IUserVo extends IPageVo {
+    id?: string,
+    name?: string,
+    account?: string,
+    password?: string,
+    token?: string,
+    mac?: string,
+    mode?: string
+}
 
 /**
  * 系统用户model
  */
-export const SysUser = sequelize.define('sysUser', {
+export const User = sequelize.define('user', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -15,12 +26,12 @@ export const SysUser = sequelize.define('sysUser', {
         type: DataTypes.STRING(36),
         comment: '昵称'
     },
-    account:{
+    account: {
         type: DataTypes.STRING(36),
         comment: '账号'
     },
     password: {
-        type: DataTypes.STRING(36),
+        type: DataTypes.STRING(256),
         comment: '密码'
     },
     token: {
@@ -38,6 +49,6 @@ export const SysUser = sequelize.define('sysUser', {
         comment: '账号登录模式'
     }
 }, {
-    tableName: 'sys_user',
+    tableName: 'user',
     comment: '用户信息表'
 })

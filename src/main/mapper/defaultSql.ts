@@ -1,7 +1,7 @@
-import {PwdGroup} from "@main/model/pwdGroup"
+import {Group} from "@main/model/group"
 import {sequelize} from "@main/sequelize.init";
 import {GroupItem} from "@main/model/groupItem";
-import {SysUser} from "@main/model/sysUser";
+import {User} from "@main/model/user";
 import log from 'electron-log'
 
 /**
@@ -12,21 +12,21 @@ export const databaseInit = async () => {
         await sequelize.transaction(async (t) => {
 
             //密码组信息表结构初始化
-            await PwdGroup.sync({force: true})
+            await Group.sync({force: true})
 
             //用户信息表结构初始化
-            await SysUser.sync({force: true})
+            await User.sync({force: true})
 
             //用户与密码组是一对多的关系
-            SysUser.hasMany(PwdGroup)
-            PwdGroup.belongsTo(SysUser)
-            await PwdGroup.sync({alter: true})//添加外键
+            User.hasMany(Group)
+            Group.belongsTo(User)
+            await Group.sync({alter: true})//添加外键
 
             //默认值
-            const user = await SysUser.create({
+            const user = await User.create({
                 name: '小白'
             })
-            await PwdGroup.create({
+            await Group.create({
                 name: '默认',
                 userId: user.get('id')
             })
@@ -34,8 +34,8 @@ export const databaseInit = async () => {
 
             await GroupItem.sync({force: true})
             //密码组与组项是一对多的关系
-            PwdGroup.hasMany(GroupItem)
-            GroupItem.belongsTo(PwdGroup)
+            Group.hasMany(GroupItem)
+            GroupItem.belongsTo(Group)
             await GroupItem.sync({alter: true})//添加外键
 
             log.log("database init succeeded :)")

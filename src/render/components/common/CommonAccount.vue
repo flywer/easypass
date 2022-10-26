@@ -34,14 +34,15 @@ let modelRef = ref({
   value: '',
   pageIndex: pageRef.pageIndex,
   pageSize: pageRef.pageSize,
-  userId:store.user.id
+  userId: store.user.id
 });
-//
+//具体信息
 const itemInfoModalRef = reactive({
   model: null,/*详情页信息*/
   visible: null/*是否显示组详情*/
 })
 
+//显示具体信息
 const updateItemInfo = (value) => {
   itemInfoModalRef.model = value.model
   itemInfoModalRef.visible = value.visible
@@ -80,7 +81,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   getCommonGroupItemsListByPage(modelRef.value).then(res => {
     if (res.data.success) {
       let itemsRows = res.data.result.rows
-      pageRef.groupItemsCount = res.data.result.count.length
+      pageRef.groupItemsCount = res.data.result.count
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
@@ -118,9 +119,9 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
 }
 
 /*查询*/
-const onSearch = (value)=>{
-  modelRef.value.value=value
-  searchItemsByPage(false,true)
+const onSearch = (value) => {
+  modelRef.value.value = value
+  searchItemsByPage(false, true)
 }
 
 onMounted(async () => {

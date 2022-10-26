@@ -3,8 +3,7 @@ import {createEinf, IpcSend} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
 import {sequelize} from "@main/sequelize.init";
-import {PwdGroupController} from "@main/controller/pwdGroup.controller";
-import path from "path";
+import {GroupController} from "@main/controller/group.controller";
 import {tray, trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
@@ -12,7 +11,6 @@ import {UserController} from "@main/controller/user.controller";
 import {getAppSettings, getNetworkInfo, getUserAppDataFolder} from "@common/utils/utils";
 import log from 'electron-log'
 import * as Path from "path";
-import crypto from 'crypto'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 //设置日志存储位置
@@ -68,7 +66,7 @@ async function bootstrap() {
 
         await createEinf({
             window: createWindow,
-            controllers: [AppController, PwdGroupController, GroupItemController, UserController],
+            controllers: [AppController, GroupController, GroupItemController, UserController],
             injects: [{
                 name: 'IS_DEV',
                 inject: !app.isPackaged,
@@ -86,7 +84,7 @@ async function bootstrap() {
              GroupItem.belongsTo(PwdGroup)
              await GroupItem.sync({alter: true})//添加外键*/
 
-            /*            const user =  await SysUser.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
+            /*            const user =  await User.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
                         log.log(user.id)*/
         }).catch(err => {
             log.error('=================Database connection failed :( ===================', err);

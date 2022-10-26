@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
-import {savePwdGroup} from "@render/api/pwdMgt.api";
+import {saveGroup} from "@render/api/pwdMgt.api";
 import {store} from "@render/store";
 
 // 父组件传过来的值，是否显示
@@ -56,7 +56,7 @@ const handleOk = (e) => {
     //空值则为null
     if (Object.is(modelRef.description, ''))
       modelRef.description = null
-    savePwdGroup(modelRef).then(res => {
+    saveGroup(modelRef).then(res => {
       if (res.data.success) {
         message.success(res.data.message)
       } else {

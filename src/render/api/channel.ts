@@ -20,13 +20,13 @@ export const channel = reactive({
         getAppSettings: 'app/getAppSettings',
         setAppSettings: 'app/setAppSettings',
     },
-    pwdGroup: {
-        getPwdGroupListByUserInfo: 'pwdGroup/getPwdGroupListByUserInfo',
-        getPwdGroupListByUserInfoByPage: 'pwdGroup/getPwdGroupListByUserInfoByPage',
-        getPwdGroupById: 'pwdGroup/getPwdGroupById',
-        savePwdGroup: 'pwdGroup/savePwdGroup',
-        updatePwdGroup: "pwdGroup/updatePwdGroup",
-        deleteGroupById: "groupItem/deleteGroupById",
+    group: {
+        getGroupListByUserInfo: 'group/getGroupListByUserInfo',
+        getGroupListByUserInfoByPage: 'group/getGroupListByUserInfoByPage',
+        getGroupById: 'group/getGroupById',
+        saveGroup: 'group/saveGroup',
+        updateGroup: "group/updateGroup",
+        deleteGroupById: "group/deleteGroupById",
     },
     groupItem: {
         saveOrUpdateGroupItems: 'groupItem/saveGroupItems',

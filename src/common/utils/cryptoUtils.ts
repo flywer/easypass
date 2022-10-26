@@ -44,11 +44,11 @@ export const accountEnCrypt = (text) => {
 
 /**
  * 账号解密
- * @param hash
+ * @param content
  */
-export const accountDecrypt = (hash: { content }) => {
+export const accountDecrypt = (content) => {
     const decipher = crypto.createDecipheriv(algorithm, secretKey, accountIv)
-    const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(content, 'hex')), decipher.final()]);
     return decrypted.toString();
 }
 

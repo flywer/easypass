@@ -3,19 +3,23 @@ import {GroupItemService} from "@main/service/groupItem.service";
 import {channel} from "@render/api/channel";
 import {failure, Result, success} from "@main/vo/resultVo";
 import log, {error} from 'electron-log'
-import {PwdGroupService} from "@main/service/pwdGroup.service";
+import {GroupService} from "@main/service/group.service";
+import {IGroupItemVo} from "@main/model/groupItem";
 
 @Controller()
 export class GroupItemController {
     constructor(
         private groupItemService: GroupItemService,
-        private pwdGroupService: PwdGroupService
+        private groupService: GroupService
     ) {
     }
 
     /**
      * 新增保存组项信息
      * @param groupItems
+     * @param groupId
+     * @param isUpdate
+     * @constructor
      */
     @IpcHandle(channel.groupItem.saveOrUpdateGroupItems)
     public async HandleSaveOrUpdateGroupItems(groupItems: any[], groupId: string, isUpdate: boolean) {
@@ -38,33 +42,34 @@ export class GroupItemController {
 
     /**
      * 获取标题信息列表
-     * @param vo
+     * @param groupItemVo
      */
     @IpcHandle(channel.groupItem.getGroupItemsListByPage)
-    public async HandleGetGroupItemsListByPage(vo) {
+    public async HandleGetGroupItemsListByPage(groupItemVo) {
+        groupItemVo = groupItemVo as IGroupItemVo
         let result
         try {
-            if (vo.userId == null)
+            if (groupItemVo.userId == null)
                 throw new Error('NO_USER')
 
-            const groupIdList = await this.pwdGroupService.getPwdGroupIdByUserId(vo.userId)
+            const groupIdList = await this.groupService.getGroupIdByUserId(groupItemVo.userId)
 
             //获取账号组项ID列表
             let rows: any[]
             let count: number
-            if (vo.value != null) {
+            if (groupItemVo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(vo, groupIdList)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList)
                 rows = data.rows
                 count = data.count
             } else {
-                let data = await this.groupItemService.getItemsIdListByPage(vo)
+                let data = await this.groupItemService.getItemsIdListByPage(groupItemVo)
                 rows = data.rows
                 count = data.count
             }
             let itemGroupList = []
             for (const row of rows) {
-                let itemGroup = await this.groupItemService.getItemsListByItemId(row.dataValues.itemId)
+                let itemGroup = await this.groupItemService.getItemsListByItemId(row.itemId)
                 itemGroupList.push(itemGroup)
             }
             result = success()
@@ -88,34 +93,35 @@ export class GroupItemController {
 
     /**
      * 获取常用账号列表
-     * @param vo
+     * @param groupItemVo
      * @constructor
      */
     @IpcHandle(channel.groupItem.getCommonGroupItemsListByPage)
-    public async HandleGetCommonGroupItemsListByPage(vo) {
+    public async HandleGetCommonGroupItemsListByPage(groupItemVo) {
+        groupItemVo = groupItemVo as IGroupItemVo
         let result
         try {
-            if (vo.userId == null)
+            if (groupItemVo.userId == null)
                 throw error('NO_USER')
 
-            const groupIdList = await this.pwdGroupService.getPwdGroupIdByUserId(vo.userId)
+            const groupIdList = await this.groupService.getGroupIdByUserId(groupItemVo.userId)
 
             //获取常用账号标题项
             let rows: any[]
             let count: number
-            if (vo.value != null) {
+            if (groupItemVo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(vo, groupIdList)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList)
                 rows = data.rows
                 count = data.count
             } else {
-                let data = await this.groupItemService.getCommonGroupItemsListByPage(vo, groupIdList)
+                let data = await this.groupItemService.getCommonGroupItemsListByPage(groupItemVo, groupIdList)
                 rows = data.rows
                 count = data.count
             }
             let itemGroupList = []
             for (const row of rows) {
-                let itemGroup = await this.groupItemService.getItemsListByItemId(row.dataValues.itemId)
+                let itemGroup = await this.groupItemService.getItemsListByItemId(row.itemId)
                 itemGroupList.push(itemGroup)
             }
             result = success()

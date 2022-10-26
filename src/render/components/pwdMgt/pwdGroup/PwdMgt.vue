@@ -5,11 +5,11 @@ import {
   MoreOutlined,
   PlusOutlined,
   ReloadOutlined,
-  SearchOutlined,
   DeleteOutlined,
-  EditOutlined, ExclamationCircleOutlined
+  EditOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons-vue'
-import {deleteGroupById, getPwdGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
+import {deleteGroupById, getGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
 import {useRouter} from "vue-router";
 import {store} from "@render/store";
 import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
@@ -25,6 +25,7 @@ const route = useRoute()
 const router = useRouter()
 // 菜单key
 const menuKey = ref<string>('100')
+
 watch(() => route.params.key, (newValue) => {
   menuKey.value = (newValue as string) // 断言推断，类型选择
 })
@@ -48,10 +49,6 @@ let pageSize = ref<number>(9)
 let groupTotal = ref<number>()
 //从后端传过来的分组数据
 let pwdGroupList = ref([])
-//搜索框显示
-let searchInputVisible = ref<boolean>(false)
-//搜索框是否失去焦点
-let blur = true
 //搜索提交表单
 let searchModelRef = reactive({
   userId: null,
@@ -74,14 +71,11 @@ const setSaveModalVisible = (value) => {
 const setUpdateModalVisible = (value) => {
   updateModal.visible = value
 }
-
+//emit:是否显示登录弹出框
 const setLoginModalVisible = (value) => {
   loginModalVisible.value = value
 }
-
 //endregion
-
-//region click
 
 // click:显示新增密码组弹出框
 const showSaveModal = () => {
@@ -95,27 +89,7 @@ const showUpdateModal = (group) => {
   updateModal.visible = true
 }
 
-// click:搜索框显示
-const showSearchInput = () => {
-  if (!searchInputVisible.value) {
-    searchInputVisible.value = true
-    blur = false
-    nextTick(() => {
-      document.getElementById("search-input").focus()
-    })
-  } else {
-    blur = true
-  }
-}
-
-//endregion
-
-// blur:搜索框失去焦点时触发
-const searchInputBlur = () => {
-  blur = true
-}
-
-//enter:搜索
+//enter:查询
 const searchGroupByPage = async (init: boolean, search?: true) => {
   if (!store.isLogin) {
     spinning.value = false
@@ -124,8 +98,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   }
 
   spinning.value = true
-  searchModelRef.pageSize = pageSize.value
-  let pageVo: { count: number; rows: any[] }
+
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
@@ -140,26 +113,19 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
     searchModelRef.pageIndex = pageIndex.value
   }
 
+  searchModelRef.pageSize = pageSize.value
   searchModelRef.userId = store.user.id
-  let result = await getPwdGroupListByUserInfoByPage(searchModelRef).then((res) => {
+  getGroupListByUserInfoByPage(searchModelRef).then((res) => {
+    if (res.data.success) {
+      groupTotal.value = res.data.result.count
+      pwdGroupList.value = res.data.result.rows
+      showEmpty.value = pwdGroupList.value.length <= 0;
+    } else {
+      message.error(res.data.message)
+    }
+  }).then(() => {
     spinning.value = false
-    return res
-  }).catch((err) => {
-    spinning.value = false
-    console.log('错误' + err)
-    return null
   })
-
-  pageVo = result.data
-  groupTotal.value = pageVo.count
-  pwdGroupList.value = []
-  if (pageVo.rows.length > 0) {
-    pageVo.rows.forEach(item => {
-      pwdGroupList.value.push(item.dataValues)
-    })
-    showEmpty.value = false
-  } else
-    showEmpty.value = true
 }
 
 //router: 跳转到组项页面
@@ -169,6 +135,7 @@ const showGroupItem = (id: string, name: string) => {
   router.push({name: 'groupItems'})
 }
 
+//删除
 const onDelete = (id: string) => {
   Modal.confirm({
     title: '提示',
@@ -220,10 +187,6 @@ onMounted(async () => {
   if (!store.isLogin)
     openUnLoginNotification()
   await searchGroupByPage(true)
-  setInterval(() => {
-    if (blur && searchInputVisible.value)
-      searchInputVisible.value = false
-  }, 600)
 })
 
 onUnmounted(() => {

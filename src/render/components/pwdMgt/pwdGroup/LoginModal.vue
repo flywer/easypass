@@ -42,7 +42,7 @@ const onLoginFinish = async (values: any) => {
   if (result.data.tag == 2) {
     message.success(result.data.message)
     store.isLogin = true
-    store.user = cloneDeep(result.data.result.dataValues)
+    store.user = cloneDeep(result.data.result)
     // 关闭弹窗
     emit('setVisible', false)
     // 刷新界面
@@ -73,7 +73,7 @@ const onRegisterFinish = (values: any) => {
       })
       if (result.data.tag == 2) {
         store.isLogin = true
-        store.user = cloneDeep(result.data.result.dataValues)
+        store.user = cloneDeep(result.data.result)
       } else {
         message.warn(result.data.message)
       }

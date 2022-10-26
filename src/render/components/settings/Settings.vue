@@ -223,7 +223,7 @@ const onRegister = async () => {
       })
       if (result.data.tag == 2) {
         store.isLogin = true
-        store.user = cloneDeep(result.data.result.dataValues)
+        store.user = cloneDeep(result.data.result)
       } else {
         message.warn(result.data.message)
       }
@@ -249,7 +249,7 @@ const onLogin = async () => {
   if (result.data.tag == 2) {
     message.success(result.data.message)
     store.isLogin = true
-    store.user = cloneDeep(result.data.result.dataValues)
+    store.user = cloneDeep(result.data.result)
     store.user.mode = '02'
   } else {
     message.warn(result.data.message)

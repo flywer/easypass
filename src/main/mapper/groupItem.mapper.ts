@@ -1,8 +1,7 @@
 import {Injectable} from "einf";
 import {sequelize} from "@main/sequelize.init";
-import {GroupItem} from "@main/model/groupItem";
+import {GroupItem, IGroupItemVo} from "@main/model/groupItem";
 import {Op} from "sequelize";
-import {sqlLikePack} from "@common/utils/utils";
 
 @Injectable()
 export class GroupItemMapper {
@@ -18,23 +17,23 @@ export class GroupItemMapper {
         })
     }
 
-    public async getItemsIdListByPage(vo) {
+    public async getItemsIdListByPage(groupItem) {
         const {count, rows} = await GroupItem.findAndCountAll({
             attributes: ['itemId'],
             where: {
                 [Op.and]: {
-                    groupId: vo.groupId,
+                    groupId: groupItem.groupId,
                     isTitle: 1
                 }
             },
             group: 'itemId',
-            offset: (vo.pageIndex - 1) * vo.pageSize,
-            limit: vo.pageSize
+            offset: (groupItem.pageIndex - 1) * groupItem.pageSize,
+            limit: groupItem.pageSize
         })
         return {rows, count}
     }
 
-    public async getCommonGroupItemsListByPage(vo, groupIdList) {
+    public async getCommonGroupItemsListByPage(groupItem:IGroupItemVo, groupIdList) {
         const {count, rows} = await GroupItem.findAndCountAll({
             attributes: ['itemId'],
             where: {
@@ -45,8 +44,8 @@ export class GroupItemMapper {
                 }
             },
             group: 'itemId',
-            offset: (vo.pageIndex - 1) * vo.pageSize,
-            limit: vo.pageSize
+            offset: (groupItem.pageIndex - 1) * groupItem.pageSize,
+            limit: groupItem.pageSize
         })
         return {rows, count}
     }
@@ -61,26 +60,6 @@ export class GroupItemMapper {
             }
         })
     }
-
-
-    /*    public async getItemsTitleList(vo) {
-            const {count, rows} = await GroupItem.findAndCountAll({
-                attributes: ['itemId', 'value'],
-                where: {
-                    [Op.and]: {
-                        value: {
-                            [Op.like]: sqlLikePack(vo.value, true, true)
-                        },
-                        isTitle: 1,
-                        isCommon: 1
-                    }
-                },
-                offset: (vo.pageIndex - 1) * vo.pageSize,
-                limit: vo.pageSize
-            })
-            return {rows, count}
-        }*/
-
 
     public async getItemsListByItemId(itemId: string) {
         return await GroupItem.findAll({
@@ -99,7 +78,7 @@ export class GroupItemMapper {
         })
     }
 
-    public async deleteGroupItemByGroupId(id) {
+    public async deleteGroupItemsByGroupId(id) {
         await GroupItem.destroy({
             where: {
                 groupId: id
