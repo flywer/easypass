@@ -1,32 +1,32 @@
 <!-- 添加分组弹窗 -->
 <script setup lang="ts">
-import {onMounted, reactive, ref, watch} from 'vue'
+import {reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
-import {savePwdGroup, updatePwdGroup} from "@render/api/pwdMgt.api";
+import {updatePwdGroup} from "@render/api/pwdMgt.api";
 import {cloneDeep} from "lodash-es";
-import {store} from "@render/store";
 
 // 父组件传过来的值，是否显示
 const props = defineProps({
   visible: Boolean,
-  modalRef: {default: {id: null, name: '', description: '', userId: store.user.id}}
-})
-
-watch(() => props.modalRef.id, () => {
-  modelRef.value = cloneDeep(props.modalRef)
+  model: null
 })
 
 // 定义事件
 const emit = defineEmits(['setVisible', 'updateTable'])
 
-// region 校验表单、提交表单
 // 表单属性
-const modelRef = ref({
-  id: props.modalRef.id,
-  name: props.modalRef.name,
-  description: props.modalRef.description
+let modelRef = ref({
+  id: null,
+  name: null,
+  description: null
 })
 
+watch(() => props.model.id, () => {
+  modelRef.value = cloneDeep(props.model)
+})
+
+
+// region 校验表单、提交表单
 // 校验规则
 const rulesRef = reactive({
   name: [
@@ -52,7 +52,7 @@ const rulesRef = reactive({
 
 // 提取检验方法
 const useForm = Form.useForm
-const {resetFields, validate, validateInfos} = useForm(modelRef, rulesRef)
+const {validate, validateInfos} = useForm(modelRef, rulesRef)
 
 // 点击确定
 const handleOk = (e) => {
@@ -83,7 +83,6 @@ const handleOk = (e) => {
 const handleCancel = () => {
   emit('setVisible', false)
 }
-
 const modalWrap = ref()
 
 </script>
@@ -145,5 +144,4 @@ const modalWrap = ref()
     border-radius: 12px;
   }
 }
-
 </style>
