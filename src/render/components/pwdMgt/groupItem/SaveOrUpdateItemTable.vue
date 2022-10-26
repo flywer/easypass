@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import {computed, reactive, ref, createVNode, onMounted} from 'vue';
+import {ref, createVNode, onMounted} from 'vue';
 import {
-  CheckOutlined,
   MoreOutlined,
   PlusOutlined,
   ArrowLeftOutlined,
@@ -9,7 +8,6 @@ import {
   MinusCircleOutlined
 } from '@ant-design/icons-vue';
 import {useRoute, useRouter} from "vue-router";
-import {GroupItem} from "@main/model/groupItem";
 import {uuid} from 'vue3-uuid';
 import {Form, FormInstance, Modal, message} from "ant-design-vue";
 import {cloneDeep, isEqual} from "lodash-es";

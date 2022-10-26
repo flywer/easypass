@@ -56,9 +56,8 @@ export let GroupItem = sequelize.define('groupItem', {
         defaultValue: 1000,
         comment: '排序号'
     },
-    pwdGroupId: {
+    groupId: {
         type: DataTypes.STRING,
-        defaultValue: false,
         comment: '所属密码组ID'
     }
 }, {

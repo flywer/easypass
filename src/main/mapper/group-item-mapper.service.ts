@@ -23,7 +23,7 @@ export class GroupItemMapper {
             attributes: ['itemId'],
             where: {
                 [Op.and]: {
-                    pwdGroupId: vo.groupId,
+                    groupId: vo.groupId,
                     isTitle: 1
                 }
             },
@@ -34,13 +34,14 @@ export class GroupItemMapper {
         return {rows, count}
     }
 
-    public async getCommonGroupItemsListByPage(vo) {
+    public async getCommonGroupItemsListByPage(vo, groupIdList) {
         const {count, rows} = await GroupItem.findAndCountAll({
             attributes: ['itemId'],
             where: {
                 [Op.and]: {
                     isTitle: 1,
-                    isCommon: 1
+                    isCommon: 1,
+                    groupId: groupIdList
                 }
             },
             group: 'itemId',
@@ -50,12 +51,13 @@ export class GroupItemMapper {
         return {rows, count}
     }
 
-    public async getAllItemsTitleList(isCommon: boolean) {
+    public async getAllItemsTitleList(isCommon: boolean, groupIdList) {
         return await GroupItem.findAll({
             attributes: ['itemId', 'value'],
             where: {
                 isTitle: 1,
-                isCommon: isCommon ? 1 : 0
+                isCommon: isCommon ? 1 : 0,
+                groupId: groupIdList
             }
         })
     }
@@ -100,7 +102,7 @@ export class GroupItemMapper {
     public async deleteGroupItemByGroupId(id) {
         await GroupItem.destroy({
             where: {
-                pwdGroupId: id
+                groupId: id
             }
         })
     }

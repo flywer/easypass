@@ -38,7 +38,8 @@ let modelRef = ref({
   value: '',
   groupId: store.currentGroupId,
   pageIndex: pageIndex.value,
-  pageSize: pageSize.value
+  pageSize: pageSize.value,
+  userId: store.user.id
 });
 //组信息model
 let groupModelRef = ref({
@@ -81,7 +82,12 @@ const setVisible = (value) => {
 
 // click:显示添加账号项
 const showAddItemModal = () => {
-  router.push({name: 'groupItemTableForm'})
+  router.push({
+    name: 'groupItemTableForm',
+    query: {
+      groupId: store.currentGroupId
+    }
+  })
 }
 
 // click:搜索框显示
@@ -139,7 +145,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
-          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false,groupId: null}
+          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false, groupId: null}
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/
@@ -218,9 +224,6 @@ const backToPwdMgt = () => {
         </div>
       </transition>
     </a-space>
-    <!--新增-->
-    <AddItemModal :addItemModalVisible="addItemModalVisible" @getVisible="setVisible"
-                  @createGroup="searchItemsByPage(true)"/>
     <!--右侧-->
     <a-space style="float: right">
       <!--刷新-->

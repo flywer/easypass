@@ -6,7 +6,6 @@ import empty from '@render/assets/img/empty.png'
 import {
   MoreOutlined,
   ReloadOutlined,
-  SearchOutlined,
   CopyOutlined,
 } from '@ant-design/icons-vue'
 import {getCommonGroupItemsListByPage} from "@render/api/groupItem.api";
@@ -14,6 +13,7 @@ import {message} from "ant-design-vue";
 import ItemCardExtra from "@render/components/pwdMgt/groupItem/ItemCardExtra.vue";
 import ItemsInfoModal from "@render/components/pwdMgt/groupItem/ItemsInfoModal.vue";
 import SearchInput from "@render/components/base/SearchInput.vue";
+import {store} from "@render/store";
 
 //加载效果是否显示
 const spinning = ref(false)
@@ -33,7 +33,8 @@ let refreshSpin = ref(false)
 let modelRef = ref({
   value: '',
   pageIndex: pageRef.pageIndex,
-  pageSize: pageRef.pageSize
+  pageSize: pageRef.pageSize,
+  userId:store.user.id
 });
 //
 const itemInfoModalRef = reactive({

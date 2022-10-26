@@ -18,7 +18,7 @@ export class GroupItemService {
             itemId = uuid.v4()
         groupItems.forEach((item) => {
             item.itemId = itemId
-            item.pwdGroupId = groupId
+            item.groupId = groupId
             const encryptData = encrypt(item.value)
             item.value = encryptData.iv + encryptData.content
         })
@@ -33,13 +33,13 @@ export class GroupItemService {
         return await this.groupItemMapper.getItemsIdListByPage(vo)
     }
 
-    public async getCommonGroupItemsListByPage(vo) {
-        return await this.groupItemMapper.getCommonGroupItemsListByPage(vo)
+    public async getCommonGroupItemsListByPage(vo,groupIdList) {
+        return await this.groupItemMapper.getCommonGroupItemsListByPage(vo,groupIdList)
     }
 
-    public async getAllItemsTitleListByPage(vo) {
+    public async getAllItemsTitleListByPage(vo,groupIdList) {
         //全量搜索所有常用账号组标题
-        let allItemTitleList = await this.groupItemMapper.getAllItemsTitleList(true)
+        let allItemTitleList = await this.groupItemMapper.getAllItemsTitleList(true,groupIdList)
         let searchedList = []
         for (const item of allItemTitleList) {
             const decryptData = groupItemDecrypt(item.value)

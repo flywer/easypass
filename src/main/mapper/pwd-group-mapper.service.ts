@@ -75,4 +75,13 @@ export class PwdGroupMapper {
             }
         })
     }
+
+    public async getPwdGroupIdByUserId(userId) {
+        return PwdGroup.findAll({
+            attributes: ['id'],
+            where: {
+                userId: userId
+            }
+        })
+    }
 }

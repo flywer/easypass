@@ -2,11 +2,15 @@ import {Controller, IpcHandle} from "einf";
 import {GroupItemService} from "@main/service/groupItem.service";
 import {channel} from "@render/api/channel";
 import {failure, Result, success} from "@main/vo/resultVo";
-import log from 'electron-log'
+import log, {error} from 'electron-log'
+import {PwdGroupService} from "@main/service/pwdGroup.service";
 
 @Controller()
 export class GroupItemController {
-    constructor(private groupItemService: GroupItemService) {
+    constructor(
+        private groupItemService: GroupItemService,
+        private pwdGroupService: PwdGroupService
+    ) {
     }
 
     /**
@@ -39,14 +43,18 @@ export class GroupItemController {
     @IpcHandle(channel.groupItem.getGroupItemsListByPage)
     public async HandleGetGroupItemsListByPage(vo) {
         let result
-        let items;
         try {
+            if (vo.userId == null)
+                throw new Error('NO_USER')
+
+            const groupIdList = await this.pwdGroupService.getPwdGroupIdByUserId(vo.userId)
+
             //获取账号组项ID列表
             let rows: any[]
             let count: number
             if (vo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(vo)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(vo, groupIdList)
                 rows = data.rows
                 count = data.count
             } else {
@@ -62,9 +70,13 @@ export class GroupItemController {
             result = success()
             result.result = {rows: itemGroupList, count: count}
         } catch (e) {
+            console.log(e.message)
             if (e.code === 'ERR_CRYPTO_INVALID_IV') {
                 log.error(e.code, "数据IV值异常！")
                 result = failure("数据IV值异常")
+            } else if (e.message === 'NO_USER') {
+                log.error(e.code, "登录状态异常！")
+                result = failure("登录状态异常！")
             } else {
                 log.error("系统异常")
                 result = failure("系统异常")
@@ -82,22 +94,25 @@ export class GroupItemController {
     @IpcHandle(channel.groupItem.getCommonGroupItemsListByPage)
     public async HandleGetCommonGroupItemsListByPage(vo) {
         let result
-        let items;
         try {
+            if (vo.userId == null)
+                throw error('NO_USER')
+
+            const groupIdList = await this.pwdGroupService.getPwdGroupIdByUserId(vo.userId)
+
             //获取常用账号标题项
             let rows: any[]
             let count: number
             if (vo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(vo)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(vo, groupIdList)
                 rows = data.rows
                 count = data.count
             } else {
-                let data = await this.groupItemService.getCommonGroupItemsListByPage(vo)
+                let data = await this.groupItemService.getCommonGroupItemsListByPage(vo, groupIdList)
                 rows = data.rows
                 count = data.count
             }
-            console.log(rows)
             let itemGroupList = []
             for (const row of rows) {
                 let itemGroup = await this.groupItemService.getItemsListByItemId(row.dataValues.itemId)

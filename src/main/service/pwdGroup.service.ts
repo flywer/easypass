@@ -7,8 +7,20 @@ export class PwdGroupService {
     constructor(private pwdGroupMapper: PwdGroupMapper) {
     }
 
+    /**
+     * 通过人员信息查询全部信息
+     * @param user
+     */
     public getPwdGroupListByUserInfo(user) {
         return this.pwdGroupMapper.getPwdGroupListByUserInfo(user);
+    }
+
+    /**
+     * 通过人员ID查询组ID
+     * @param userId
+     */
+    public async getPwdGroupIdByUserId(userId) {
+        return (await this.pwdGroupMapper.getPwdGroupIdByUserId(userId)).map(item=>item.dataValues.id)
     }
 
     public getPwdGroupListByUserInfoByPage(vo) {
@@ -30,4 +42,6 @@ export class PwdGroupService {
     public async deleteGroupById(id) {
         await this.pwdGroupMapper.deleteGroupById(id)
     }
+
+
 }
