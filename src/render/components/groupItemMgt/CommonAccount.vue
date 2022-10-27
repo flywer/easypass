@@ -157,6 +157,7 @@ onMounted(async () => {
                   :bordered="false"
                   :hoverable="true"
                   size="small"
+                  class="animate__animated animate__flipInX"
           >
             <template #title>
               <a-space>

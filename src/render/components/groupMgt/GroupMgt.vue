@@ -143,10 +143,12 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
 }
 
 //router: 跳转到组项页面
-const showGroupItem = (id: string, name: string) => {
-  store.currentGroupId = id
-  store.currentGroupName = name
-  router.push({name: 'groupItems'})
+const showGroupItem = (id: string, name: string,isEdit:boolean) => {
+  if(!isEdit){
+    store.currentGroupId = id
+    store.currentGroupName = name
+    router.push({name: 'groupItems'})
+  }
 }
 
 //删除
@@ -313,7 +315,7 @@ const onAddGroup = () => {
         <a-col v-for="(item) in groupList" :span="8"
                style="margin-bottom: 15px;max-height: 119.141px">
           <a-card :bordered="false" :hoverable="true" size="small" class="animate__animated animate__flipInX">
-            <a-card-meta :data-id="item.id" :data-name="item.name"><!--@click="showGroupItem(item.id,item.name)"-->
+            <a-card-meta :data-id="item.id" :data-name="item.name" @click="showGroupItem(item.id,item.name,item.isEdit)">
               <template #title>
                 <div class="card-title-space" v-show="!item.isEdit">
                   <span>{{ item.name }}</span>
