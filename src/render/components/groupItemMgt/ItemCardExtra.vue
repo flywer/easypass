@@ -1,9 +1,13 @@
 <template>
   <a-space :size="10">
     <a-divider type="vertical" style="background-color: #f0f0f0"/>
-    <a-button type="text" class="card-extra-btn" title="设为常用"
-              @click="onSetCommonAccount(item.isCommon,item.itemId,$event)">
-      <star-two-tone v-show="item.isCommon" two-tone-color="#fadb14" class="card-extra-btn-icon"/>
+    <a-button type="text"
+              class="card-extra-btn"
+              title="设为常用"
+              @click="onSetCommonAccount(item.isCommon,item.itemId,$event)"
+    >
+      <star-two-tone v-show="item.isCommon" two-tone-color="#fadb14"
+                     class="card-extra-btn-icon animate__animated animate__tada"/>
       <star-outlined v-show="!item.isCommon" style="margin: 0" class="card-extra-btn-icon"/>
     </a-button>
 
@@ -62,7 +66,7 @@ const showAccountItems = async (itemId: string) => {
         model.push(item)
       })
       // 关闭弹窗
-      emit('showItemInfo', {model:model,visible:true})
+      emit('showItemInfo', {model: model, visible: true})
     } else {
       message.error(res.data.message)
     }
@@ -77,7 +81,7 @@ const showUpdateModal = (itemId: string) => {
         name: 'groupItemTableForm',
         query: {
           itemId: itemId,
-          groupId:props.item.groupId
+          groupId: props.item.groupId
         }
       }
   )
@@ -94,12 +98,16 @@ const onDelete = (itemId: string) => {
       deleteGroupItemByItemId(itemId).then(res => {
         if (res.data.success) {
           message.success("删除成功！")
-          emit('updateList',true)
+          emit('updateList', true)
         } else
           message.error(res.data.message)
       })
     },
   });
+}
+
+const onHover = () => {
+
 }
 
 </script>

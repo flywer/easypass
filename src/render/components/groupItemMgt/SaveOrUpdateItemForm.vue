@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import {ref, createVNode, onMounted} from 'vue';
+import {ref, createVNode, onMounted, reactive} from 'vue';
 import {
   MoreOutlined,
   PlusOutlined,
   ArrowLeftOutlined,
   ExclamationCircleOutlined,
-  MinusCircleOutlined
+  MinusCircleOutlined,
+  VerticalAlignMiddleOutlined,
+  CheckOutlined, DragOutlined
 } from '@ant-design/icons-vue';
 import {useRoute, useRouter} from "vue-router";
 import {uuid} from 'vue3-uuid';
 import {Form, FormInstance, Modal, message} from "ant-design-vue";
 import {cloneDeep, isEqual} from "lodash-es";
 import {getItemsListByItemId, saveOrUpdateGroupItems} from "@render/api/groupItem.api";
-import {store} from "@render/store";
+import draggable from 'vuedraggable'
 
 const router = useRouter()
 const route = useRoute()
@@ -61,6 +63,7 @@ onMounted(async () => {
   } else
     isUpdate.value = false
   formDataRef.value = cloneDeep(originData)
+  console.log(formDataRef.value)
 })
 
 /*添加组项*/
@@ -130,6 +133,23 @@ const handleSubmit = () => {
   })
 }
 
+const draggableRef = reactive({
+  enabled: false,
+  list: [
+    {name: "John", id: 0},
+    {name: "Joao", id: 1},
+    {name: "Jean", id: 2}
+  ],
+  dragging: false
+})
+
+const onDragSort = () => {
+  draggableRef.enabled = !draggableRef.enabled
+  if (draggableRef.enabled) {
+
+  }
+}
+
 </script>
 
 <template>
@@ -149,10 +169,21 @@ const handleSubmit = () => {
     </a-space>
     <!--右侧-->
     <a-space style="float: right">
-      <!--保存-->
-      <a-button class="tool-btn" size="large" @click="handleSubmit" style="padding: 0 12px;">
+      <a-button @click="onDragSort">
+        <template #icon>
+          <vertical-align-middle-outlined v-if="!draggableRef.enabled" class="animate__animated animate__flipInX"/>
+          <check-outlined v-if="draggableRef.enabled" class="animate__animated animate__flipInX"/>
+        </template>
+        <span v-if="!draggableRef.enabled" class="animate__animated animate__flipInX">排序</span>
+        <span v-if="draggableRef.enabled" class="animate__animated animate__flipInX">确认</span>
+      </a-button>
+      <a-button class="tool-btn" @click="handleSubmit" style="padding: 0 12px;">
+        <template #icon>
+          <check-outlined/>
+        </template>
         保存
       </a-button>
+
       <a-button class="tool-btn" type="text" size="large">
         <MoreOutlined class="icon"/>
       </a-button>
@@ -160,37 +191,56 @@ const handleSubmit = () => {
   </a-layout-header>
   <a-layout-content id="content-view" style="background-color: white">
     <a-form :model="formDataRef" ref="formRef" autocomplete="off">
-      <a-space :size="0" v-for="(item,index) in formDataRef" v-show="!item.deleteTag">
-        <a-form-item class="form-item" :name="[index,'name']"
-                     :rules="rulesRef.name">
-          <a-input placeholder="名称" :bordered="false" v-model:value.trim="item.name"
-                   :readonly="item.isAccount||item.isTitle"/>
-          <a-divider class="my-form-divider"/>
-        </a-form-item>
-        <a-divider type="vertical" class="my-form-divider-vertical"/>
-        <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value" s>
-          <a-input placeholder="内容" :bordered="false" v-model:value="item.value" style="width: 250px;"/>
-          <a-divider class="my-form-divider"/>
-        </a-form-item>
-        <template v-if="!item.isTitle">
-          <a-divider type="vertical" class="my-form-divider-vertical"/>
-          <a-form-item class="form-item">
-            <a-checkbox v-model:checked="item.isShow">是否显示</a-checkbox>
-          </a-form-item>
+      <draggable :list="formDataRef"
+                 :disabled="!draggableRef.enabled"
+                 item-key="key"
+                 @start="draggableRef.dragging = true"
+                 @end="draggableRef.dragging = false"
+      >
+        <template #item="{ element,index }">
+
+            <a-space class="form-space animate__animated animate__flipInX" :size="0" v-show="!element.deleteTag">
+              <a-form-item class="form-item" :name="[index,'name']"
+                           :rules="rulesRef.name">
+                <a-input placeholder="名称" :bordered="false" v-model:value.trim="element.name"
+                         :readonly="element.isAccount||element.isTitle"/>
+                <a-divider class="my-form-divider"/>
+              </a-form-item>
+              <a-divider type="vertical" class="my-form-divider-vertical"/>
+              <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value" s>
+                <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"/>
+                <a-divider class="my-form-divider"/>
+              </a-form-item>
+              <template v-if="!element.isTitle">
+                <a-divider type="vertical" class="my-form-divider-vertical"/>
+                <a-form-item class="form-item">
+                  <a-checkbox v-model:checked="element.isShow">是否显示</a-checkbox>
+                </a-form-item>
+              </template>
+              <template v-if="!element.isAccount && !element.isTitle">
+                <a-divider type="vertical" class="my-form-divider-vertical"/>
+                <MinusCircleOutlined @click="handleDelete(element.id,element.key)"
+                                     style="margin-left: 4px;margin-bottom: 17px"/>
+              </template>
+              <div style="position: absolute;right: 3%;top: 30%;">
+                <drag-outlined class="animate__animated animate__fadeInRight"  v-show="draggableRef.enabled" style="float: right;font-size: 24px;color: #cbcbcb;cursor: pointer"/>
+              </div>
+            </a-space>
+
+
         </template>
-        <template v-if="!item.isAccount && !item.isTitle">
-          <a-divider type="vertical" class="my-form-divider-vertical"/>
-          <MinusCircleOutlined @click="handleDelete(item.id,item.key)" style="margin-left: 4px;margin-bottom: 17px"/>
-        </template>
-      </a-space>
+        <!-- --><!--v-for="(item,index) in formDataRef"-->
+      </draggable>
+
     </a-form>
   </a-layout-content>
 </template>
 
 <style scoped lang="less">
+@import "ant-design-vue/dist/antd.variable.less";
 
-.form-item {
-  //margin-bottom: 12px
+#content-view {
+  overflow-x: hidden;
 }
 
 .my-form-divider {
@@ -201,6 +251,13 @@ const handleSubmit = () => {
 .my-form-divider-vertical {
   margin-bottom: 12px;
   border-left: 1px solid rgb(114 114 114 / 47%);
+}
+
+.form-space {
+  width: 100%;
+  padding: 10px 10px 0 10px;
+  margin-bottom: 5px;
+  background-color: #f6f6f6;
 }
 
 </style>
