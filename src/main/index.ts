@@ -80,12 +80,10 @@ async function bootstrap() {
 
             /* await GroupItem.sync({force:true})
              //密码组与组项是一对多的关系
-             PwdGroup.hasMany(GroupItem)
-             GroupItem.belongsTo(PwdGroup)
+             Group.hasMany(GroupItem)
+             GroupItem.belongsTo(Group)
              await GroupItem.sync({alter: true})//添加外键*/
 
-            /*            const user =  await User.findByPk('42b081f4-65d6-478f-b35e-3b31d72644d3')
-                        log.log(user.id)*/
         }).catch(err => {
             log.error('=================Database connection failed :( ===================', err);
         });

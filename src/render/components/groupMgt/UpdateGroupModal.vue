@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import {reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
-import {updateGroup} from "@render/api/pwdMgt.api";
+import {updateGroup} from "@render/api/group.api";
 import {cloneDeep} from "lodash-es";
 
 // 父组件传过来的值，是否显示

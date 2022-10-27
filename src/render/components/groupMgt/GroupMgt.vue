@@ -9,15 +9,15 @@ import {
   EditOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons-vue'
-import {deleteGroupById, getGroupListByUserInfoByPage} from "@render/api/pwdMgt.api";
+import {deleteGroupById, getGroupListByUserInfoByPage} from "@render/api/group.api";
 import {useRouter} from "vue-router";
 import {store} from "@render/store";
-import SaveGroupModal from "@render/components/pwdMgt/pwdGroup/SaveGroupModal.vue";
-import UpdateGroupModal from "@render/components/pwdMgt/pwdGroup/UpdateGroupModal.vue";
+import SaveGroupModal from "@render/components/groupMgt/SaveGroupModal.vue";
+import UpdateGroupModal from "@render/components/groupMgt/UpdateGroupModal.vue";
 import {Button, message, Modal, notification} from "ant-design-vue";
 import empty from '@render/assets/img/empty.png'
-import LoginModal from "@render/components/pwdMgt/pwdGroup/LoginModal.vue";
-import SearchInput from "@render/components/base/SearchInput.vue";
+import LoginModal from "@render/components/common/LoginModal.vue";
+import SearchInput from "@render/components/common/SearchInput.vue";
 import {cloneDeep} from "lodash-es";
 
 //路由
@@ -48,7 +48,7 @@ let pageSize = ref<number>(9)
 //分组总数
 let groupTotal = ref<number>()
 //从后端传过来的分组数据
-let pwdGroupList = ref([])
+let groupList = ref([])
 //搜索提交表单
 let searchModelRef = reactive({
   userId: null,
@@ -118,8 +118,8 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   getGroupListByUserInfoByPage(searchModelRef).then((res) => {
     if (res.data.success) {
       groupTotal.value = res.data.result.count
-      pwdGroupList.value = res.data.result.rows
-      showEmpty.value = pwdGroupList.value.length <= 0;
+      groupList.value = res.data.result.rows
+      showEmpty.value = groupList.value.length <= 0;
     } else {
       message.error(res.data.message)
     }
@@ -226,7 +226,7 @@ const onSearch = (value) => {
   <a-layout-content id="content-view">
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
-        <a-col v-for="(item) in pwdGroupList" :span="8" style="margin-bottom: 15px">
+        <a-col v-for="(item) in groupList" :span="8" style="margin-bottom: 15px">
           <a-card :bordered="false" :hoverable="true" size="small">
             <a-card-meta :title="item.name" :description="item.description!=null?item.description:'暂无'"
                          :data-id="item.id"

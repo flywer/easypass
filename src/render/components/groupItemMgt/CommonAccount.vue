@@ -1,81 +1,51 @@
-<!--组项列表-->
+<!--常用账号-->
 <script setup lang="ts">
-import {store} from "@render/store";
-import {useRouter} from "vue-router";
 import {onMounted, reactive, ref} from "vue";
+import {copyText} from "@render/utils/clipboard";
+import empty from '@render/assets/img/empty.png'
 import {
   MoreOutlined,
-  PlusOutlined,
   ReloadOutlined,
-  ArrowLeftOutlined,
   CopyOutlined,
 } from '@ant-design/icons-vue'
-import {
-  getGroupItemsListByPage,
-} from "@render/api/groupItem.api";
-import empty from '@render/assets/img/empty.png'
-import {copyText} from "@render/utils/clipboard";
-import {message, Modal} from "ant-design-vue";
-import ItemsInfoModal from "@render/components/pwdMgt/groupItem/ItemsInfoModal.vue";
-import ItemCardExtra from "@render/components/pwdMgt/groupItem/ItemCardExtra.vue";
-import SearchInput from "@render/components/base/SearchInput.vue";
+import {getCommonGroupItemsListByPage} from "@render/api/groupItem.api";
+import {message} from "ant-design-vue";
+import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
+import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
+import SearchInput from "@render/components/common/SearchInput.vue";
+import {store} from "@render/store";
 
-const router = useRouter()
+//加载效果是否显示
+const spinning = ref(false)
 //从后端传过来的分组数据
-let groupItemsList = ref([])
-//当前页数
-let pageIndex = ref<number>(1)
-//每页总数
-let pageSize = ref<number>(6)
-//分组总数
-let groupItemsCount = ref<number>()
-//搜索框显示
-let searchInputVisible = ref<boolean>(false)
-//搜索框是否失去焦点
-let blur = true
+const groupItemsList = ref([])
+//分页数据
+const pageRef = reactive({
+  pageIndex: 1,
+  pageSize: 6,
+  groupItemsCount: 0,
+})
+//空状态显示
+let showEmpty = ref<boolean>(true)
+//刷新动画
+let refreshSpin = ref(false)
 //查询model
 let modelRef = ref({
   value: '',
-  groupId: store.currentGroupId,
-  pageIndex: pageIndex.value,
-  pageSize: pageSize.value,
+  pageIndex: pageRef.pageIndex,
+  pageSize: pageRef.pageSize,
   userId: store.user.id
 });
-//组信息model
-let groupModelRef = ref({
-  name: store.currentGroupName,
-  id: store.currentGroupId
-})
-//是否显示新增弹窗
-let addItemModalVisible = ref<boolean>(false)
-//加载效果是否显示
-let spinning = ref(true)
-//空状态显示
-let showEmpty = ref<boolean>(false)
-//刷新动画
-let refreshSpin = ref(false)
-
+//具体信息
 const itemInfoModalRef = reactive({
   model: null,/*详情页信息*/
   visible: null/*是否显示组详情*/
 })
+
+//显示具体信息
 const updateItemInfo = (value) => {
   itemInfoModalRef.model = value.model
   itemInfoModalRef.visible = value.visible
-}
-
-onMounted(async () => {
-  await searchItemsByPage(true)
-})
-
-// click:显示添加账号项
-const showAddItemModal = () => {
-  router.push({
-    name: 'groupItemTableForm',
-    query: {
-      groupId: store.currentGroupId
-    }
-  })
 }
 
 //刷新动画
@@ -92,26 +62,26 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   showEmpty.value = false
   refreshSpinning()
 
-  modelRef.value.pageSize = pageSize.value
+  modelRef.value.pageSize = pageRef.pageSize
 
   //是否是全量搜索（初始化、刷新）
   if (init) {
-    pageIndex.value = 1
+    pageRef.pageIndex = 1
     modelRef.value.value = null
     modelRef.value.pageIndex = 1
   } else {
     //是否是搜索框搜索（需回到第一页）
     if (search) {
-      pageIndex.value = 1
+      pageRef.pageIndex = 1
       modelRef.value.pageIndex = 1
     }
-    modelRef.value.pageIndex = pageIndex.value
+    modelRef.value.pageIndex = pageRef.pageIndex
   }
 
-  getGroupItemsListByPage(modelRef.value).then(res => {
+  getCommonGroupItemsListByPage(modelRef.value).then(res => {
     if (res.data.success) {
       let itemsRows = res.data.result.rows
-      groupItemsCount.value = res.data.result.count
+      pageRef.groupItemsCount = res.data.result.count
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
@@ -122,8 +92,8 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
             if (row.isTitle) {
               itemObj.itemId = row.itemId
               itemObj.title = row.value
-              itemObj.isCommon = row.isCommon == 1
-              itemObj.groupId = row.pwdGroupId
+              itemObj.isCommon = row.isCommon != null
+              itemObj.groupId = row.groupId
             }
             /*主账号*/
             if (row.isAccount) {
@@ -148,18 +118,15 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   })
 }
 
-//router:返回密码组管理页面
-const backToPwdMgt = () => {
-  store.currentGroupId = null
-  store.currentGroupName = null
-  router.back()
+/*查询*/
+const onSearch = (value) => {
+  modelRef.value.value = value
+  searchItemsByPage(false, true)
 }
 
-/*查询*/
-const onSearch = (value)=>{
-  modelRef.value.value=value
-  searchItemsByPage(false,true)
-}
+onMounted(async () => {
+  await searchItemsByPage(true)
+})
 
 </script>
 
@@ -167,18 +134,6 @@ const onSearch = (value)=>{
   <!--  顶部按钮栏 -->
   <a-layout-header id="tool-header">
     <a-space style="gap: 4px">
-      <a-space>
-        <!--返回-->
-        <a-button class="tool-btn" type="text" size="large" @click="backToPwdMgt">
-          <arrow-left-outlined class="icon"/>
-        </a-button>
-        <a-typography-title :level="5" style="margin-bottom: 2px">{{ groupModelRef.name }}</a-typography-title>
-        <a-divider type="vertical" class="divider"/>
-      </a-space>
-      <!--新增-->
-      <a-button class="tool-btn" type="text" size="large" @click="showAddItemModal">
-        <PlusOutlined class="icon"/>
-      </a-button>
       <!--搜索框-->
       <SearchInput @onSearch="onSearch"/>
     </a-space>
@@ -224,13 +179,13 @@ const onSearch = (value)=>{
           </a-card>
         </a-col>
       </a-row>
-      <a-pagination v-if="groupItemsList.length>0" class="pagination" v-model:current="pageIndex"
-                    :default-page-size="pageSize" :total="groupItemsCount"
+      <a-pagination v-if="groupItemsList.length>0" class="pagination" v-model:current="pageRef.pageIndex"
+                    :default-page-size="pageRef.pageSize" :total="pageRef.groupItemsCount"
                     show-less-items @change="searchItemsByPage(false)"/>
       <a-empty v-show="showEmpty" :image="empty" :image-style="{height: '60px'}">
         <template #description>
+          <p style="color:rgb(145 145 145);">这里什么都没有...</p>
         </template>
-        <a-button type="primary" @click="showAddItemModal">创建</a-button>
       </a-empty>
 
     </a-spin>

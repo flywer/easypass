@@ -172,12 +172,12 @@ export class UserController {
         try {
             //删除本地账号记录
             deleteFileFs(this.userConfigFile.getFullPath())
-            //查询密码组信息
-            const pwdGroupIdList = await this.groupService.getGroupIdByUserId(user.id)
+            //查询组信息
+            const groupIdList = await this.groupService.getGroupIdByUserId(user.id)
             //删除账号组项
-            await this.groupItemService.deleteGroupItemsByGroupId(pwdGroupIdList)
+            await this.groupItemService.deleteGroupItemsByGroupId(groupIdList)
             //删除密码组
-            await this.groupService.deleteGroupById(pwdGroupIdList)
+            await this.groupService.deleteGroupById(groupIdList)
             //删除账号
             await this.userService.deleteUserById(user.id)
             result = success('注销成功！')
