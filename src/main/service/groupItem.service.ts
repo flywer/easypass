@@ -59,9 +59,11 @@ export class GroupItemService {
             itemId = groupItems.filter(item => item.isTitle == true).at(0).itemId
         else
             itemId = uuid.v4()
-        groupItems.forEach((item) => {
+
+        groupItems.forEach((item, index) => {
             item.itemId = itemId
             item.groupId = groupId
+            item.itemIndex = index + 1
             const encryptData = encrypt(item.value)
             item.value = encryptData.iv + encryptData.content
         })
