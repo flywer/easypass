@@ -31,7 +31,7 @@ const rulesRef = reactive({
     }, {
       min: 1,
       max: 10,
-      message: '组名长度范围为1-10',
+      message: '组名过长',
       trigger: 'change',
     },
   ],
@@ -39,7 +39,7 @@ const rulesRef = reactive({
     {
       required: false
     }, {
-      max: 13,
+      max: 10,
       message: '描述过长',
     }
   ]

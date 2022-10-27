@@ -27,6 +27,8 @@ export const channel = reactive({
         saveGroup: 'group/saveGroup',
         updateGroup: "group/updateGroup",
         deleteGroupById: "group/deleteGroupById",
+        saveOrUpdateGroup: "group/saveOrUpdateGroup",
+
     },
     groupItem: {
         saveOrUpdateGroupItems: 'groupItem/saveGroupItems',

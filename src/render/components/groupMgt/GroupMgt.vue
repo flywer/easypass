@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
-import {createVNode, h, nextTick, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
+import {createVNode, h, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import {
   MoreOutlined,
   PlusOutlined,
   ReloadOutlined,
   DeleteOutlined,
   EditOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
+  SettingOutlined,
+  CheckOutlined,
+  LoadingOutlined
 } from '@ant-design/icons-vue'
-import {deleteGroupById, getGroupListByUserInfoByPage} from "@render/api/group.api";
+import {
+  deleteGroupById,
+  getGroupListByUserInfoByPage,
+  saveGroup,
+  saveOrUpdateGroup,
+  updateGroup
+} from "@render/api/group.api";
 import {useRouter} from "vue-router";
 import {store} from "@render/store";
 import SaveGroupModal from "@render/components/groupMgt/SaveGroupModal.vue";
@@ -18,7 +27,8 @@ import {Button, message, Modal, notification} from "ant-design-vue";
 import empty from '@render/assets/img/empty.png'
 import LoginModal from "@render/components/common/LoginModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
-import {cloneDeep} from "lodash-es";
+import {cloneDeep, isEqual, isNull} from "lodash-es";
+import {isEmpty} from "lodash";
 
 //路由
 const route = useRoute()
@@ -118,6 +128,10 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   getGroupListByUserInfoByPage(searchModelRef).then((res) => {
     if (res.data.success) {
       groupTotal.value = res.data.result.count
+      res.data.result.rows.forEach(item => {
+        item.isEdit = false
+        item.isSubmit = false
+      })
       groupList.value = res.data.result.rows
       showEmpty.value = groupList.value.length <= 0;
     } else {
@@ -137,23 +151,27 @@ const showGroupItem = (id: string, name: string) => {
 
 //删除
 const onDelete = (id: string) => {
-  Modal.confirm({
-    title: '提示',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: '确认删除当前密码组？',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      //删除密码组
-      deleteGroupById(id).then(res => {
-        if (res.data.success) {
-          message.success("删除成功！")
-          searchGroupByPage(true)
-        } else
-          message.error(res.data.message)
-      })
-    },
-  });
+  if (isNull(id)) {
+    searchGroupByPage(true)
+  } else {
+    Modal.confirm({
+      title: '提示',
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '确认删除当前密码组？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        //删除密码组
+        deleteGroupById(id).then(res => {
+          if (res.data.success) {
+            message.success("删除成功！")
+            searchGroupByPage(true)
+          } else
+            message.error(res.data.message)
+        })
+      },
+    });
+  }
 }
 
 /*注册提醒*/
@@ -199,6 +217,72 @@ const onSearch = (value) => {
   searchGroupByPage(false, true)
 }
 
+/*编辑*/
+const onGroupEdit = (groupId: string) => {
+  let group = groupList.value.filter(item => item.id === groupId).at(0)
+  group.isEdit = !group.isEdit
+}
+
+/*提交更新*/
+const onUpdateGroup = (groupId: string) => {
+  let group = groupList.value.filter(item => item.id === groupId).at(0)
+
+  let error = null
+  //校验
+  if (isEmpty(group.name)) {
+    error = '组名不能为空!'
+  }
+  if (error != null) {
+    message.error(error)
+  } else {
+    //loading
+    group.isSubmit = true
+    group.isEdit = !group.isEdit
+
+    if (group.isTemp) {
+      saveGroup(group).then(res => {
+        if (res.data.success) {
+          message.success(res.data.message)
+        } else {
+          message.error(res.data.message)
+        }
+      }).then(() => {
+        searchGroupByPage(true)
+      })
+    } else {
+      updateGroup(group).then(res => {
+        if (res.data.success) {
+          message.success(res.data.message)
+        } else {
+          message.error(res.data.message)
+        }
+
+      })
+    }
+    group.isSubmit = false
+  }
+}
+
+/*新增*/
+const onAddGroup = () => {
+  //有临时表单卡片不可再次新增
+  if (groupList.value.filter(item => item.isTemp == true).length > 0) {
+    message.warn('每次只可添加一个')
+  } else {
+    const emptyGroup = {
+      id: null,
+      name: '',
+      description: '',
+      userId: store.user.id,
+      isEdit: true,
+      isSubmit: false,
+      isTemp: true
+    }
+    groupList.value.unshift(emptyGroup)
+    groupList.value = cloneDeep(groupList.value.slice(0, pageSize.value))
+  }
+}
+
 </script>
 
 <template>
@@ -206,7 +290,7 @@ const onSearch = (value) => {
   <a-layout-header id="tool-header">
     <a-space style="gap: 4px">
       <!--新增弹出框 -->
-      <a-button class="tool-btn" type="text" size="large" @click="showSaveModal">
+      <a-button class="tool-btn" type="text" size="large" @click="onAddGroup"><!--showSaveModal-->
         <PlusOutlined class="icon"/>
       </a-button>
       <!--搜索框-->
@@ -226,15 +310,37 @@ const onSearch = (value) => {
   <a-layout-content id="content-view">
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
-        <a-col v-for="(item) in groupList" :span="8" style="margin-bottom: 15px">
-          <a-card :bordered="false" :hoverable="true" size="small">
-            <a-card-meta :title="item.name" :description="item.description!=null?item.description:'暂无'"
-                         :data-id="item.id"
-                         :data-name="item.name" @click="showGroupItem(item.id,item.name)"/>
+        <a-col v-for="(item) in groupList" :span="8"
+               style="margin-bottom: 15px;max-height: 119.141px">
+          <a-card :bordered="false" :hoverable="true" size="small" class="animate__animated animate__flipInX">
+            <a-card-meta :data-id="item.id" :data-name="item.name"><!--@click="showGroupItem(item.id,item.name)"-->
+              <template #title>
+                <div class="card-title-space" v-show="!item.isEdit">
+                  <span>{{ item.name }}</span>
+                </div>
+                <a-input v-show="item.isEdit" :bordered="true" placeholder="请输入组名..." class="card-input"
+                         maxlength="10"
+                         v-model:value="item.name"/>
+              </template>
+              <template #description>
+                <a-space class="card-desc-space" v-show="!item.isEdit">
+                  <span>{{ isEmpty(item.description) ? '暂无' : item.description }}</span>
+                </a-space>
+                <a-input v-show="item.isEdit" :bordered="true" placeholder="请输入描述..." class="card-input"
+                         maxlength="10"
+                         v-model:value="item.description"/>
+              </template>
+              <!--              <template #avatar>
+                              <a-avatar src="https://joeschmoe.io/api/v1/random" />
+                            </template>-->
+            </a-card-meta>
             <template #actions>
-              <edit-outlined @click="showUpdateModal(item)"/>
+              <loading-outlined v-if="!item.isEdit && item.isSubmit"/>
+              <check-outlined class="animate__animated animate__flipInX" v-if="item.isEdit"
+                              @click="onUpdateGroup(item.id)"/>
+              <edit-outlined v-if="!item.isEdit && !item.isSubmit" @click="onGroupEdit(item.id)"/>
               <delete-outlined @click="onDelete(item.id)"/>
-              <!--<setting-outlined/>-->
+              <setting-outlined/>
             </template>
           </a-card>
         </a-col>
@@ -255,8 +361,8 @@ const onSearch = (value) => {
   <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
                   @updateTable="searchGroupByPage(true)"/>
   <!--  更新密码组弹框-->
-  <UpdateGroupModal :visible="updateModal.visible" :model="updateModal.model" @setVisible="setUpdateModalVisible"
-                    @updateTable="searchGroupByPage(true)"/>
+  <!--  <UpdateGroupModal :visible="updateModal.visible" :model="updateModal.model" @setVisible="setUpdateModalVisible"
+                      @updateTable="searchGroupByPage(true)"/>-->
   <!--登录弹框-->
   <LoginModal :visible="loginModalVisible" @setVisible="setLoginModalVisible" @updateTable="searchGroupByPage(true)"/>
 </template>
@@ -268,6 +374,37 @@ const onSearch = (value) => {
   :deep(.tool-btn):hover {
     background-color: @primary-1;
   }
+}
+
+#content-view {
+  .card-title-space {
+    gap: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .card-title-btn {
+    float: right;
+    padding-right: 0;
+  }
+
+  .card-desc-space {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 200px;
+  }
+
+  .card-input {
+    max-width: 100%;
+    padding: 0;
+    margin-bottom: 0
+  }
+}
+
+#content-view {
+  overflow: hidden;
 }
 
 </style>

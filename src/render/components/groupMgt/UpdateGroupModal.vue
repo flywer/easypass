@@ -4,6 +4,7 @@ import {reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
 import {updateGroup} from "@render/api/group.api";
 import {cloneDeep} from "lodash-es";
+import {isEmpty} from "lodash";
 
 // 父组件传过来的值，是否显示
 const props = defineProps({
@@ -36,7 +37,7 @@ const rulesRef = reactive({
     }, {
       min: 1,
       max: 10,
-      message: '组名长度范围为1-10',
+      message: '组名过长',
       trigger: 'change',
     },
   ],
@@ -44,7 +45,7 @@ const rulesRef = reactive({
     {
       required: false
     }, {
-      max: 13,
+      max: 10,
       message: '描述过长',
     }
   ]
@@ -59,7 +60,7 @@ const handleOk = (e) => {
   // 校验表单
   validate().then(() => {
     //空值则为null
-    if (Object.is(modelRef.value.description, ''))
+    if (isEmpty(modelRef.value.description))
       modelRef.value.description = null
     updateGroup(modelRef.value).then(res => {
       if (res.data.success) {
@@ -129,7 +130,7 @@ const modalWrap = ref()
   </div>
 </template>
 
-<style lang="less" scoped>
+<style scoped lang="less">
 .my-modal {
   :deep(.ant-modal-header) {
     border-radius: 12px 12px 0 0;

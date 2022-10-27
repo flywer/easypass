@@ -76,8 +76,8 @@ watch(() => props.menuKey, () => {
   margin: 0 8px;
   background-color: #ececec;
   padding: 20px 20px 10px 20px;
-  min-height: 465px;
-  max-height: 465px;
+  min-height: 470px;
+  max-height: 470px;
   overflow-y: auto;
 
   .pagination {

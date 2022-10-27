@@ -23,6 +23,10 @@ export function updateGroup(vo) {
     return ipcInstance.send(channel.group.updateGroup, vo)
 }
 
+export function saveOrUpdateGroup(vo){
+    return ipcInstance.send(channel.group.saveOrUpdateGroup, vo)
+}
+
 export function deleteGroupById(itemId: string) {
     return ipcInstance.send<Result>(channel.group.deleteGroupById, itemId)
 }
