@@ -24,6 +24,9 @@ async function electronAppInit() {
     //应用单例运行，不可存在多个同时运行
     if (!app.requestSingleInstanceLock()) app.quit();
 
+
+    app.setAppUserModelId('EasyPass')
+
     //当应用程序关闭所有窗口时触发
     app.on('window-all-closed', () => {
         //Mac操作系统下的用户体验准则:
@@ -47,6 +50,7 @@ async function electronAppInit() {
 
     ///应用启动后的操作
     app.whenReady().then(async () => {
+
         const appSettings = await getAppSettings()
         if (appSettings.enableTray)
             trayInit()
@@ -55,6 +59,8 @@ async function electronAppInit() {
             await installVueDevtools()
         }
     })
+
+
 }
 
 /**

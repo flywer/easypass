@@ -4,7 +4,7 @@ import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
 import {ConfigProvider, message, Modal} from 'ant-design-vue';
-import {getAppInfo, getAppTheme, getNetworkInterfaces, quitAndInstall} from "@render/api/app.api";
+import {downloadUpdate, getAppInfo, getAppTheme, getNetworkInterfaces, quitAndInstall} from "@render/api/app.api";
 import {store} from "@render/store";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
@@ -68,9 +68,46 @@ onMounted(async () => {
   })
   await autoThemeConfig()
   updateDownloadedListener()
-
+  autoCheckUpdates()
   //Modal.confirm({content: JSON.stringify((await getAppInfo()).data.result)})
 })
+
+
+const autoCheckUpdates = () => {
+  const updateKey = 'updateKey'
+  ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
+    switch (res.tag) {
+        //检测更新时
+      case 1:
+        message.info({content: res.message, key: updateKey});
+        break;
+        //为最新版本时
+      case 2:
+        message.success({content: res.message, key: updateKey});
+        break;
+        //报错
+      case 6:
+        message.error({content: res.message, key: updateKey});
+        break;
+        //有可用更新
+      case 3:
+        Modal.confirm({
+          title: '提示',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '发现更新的版本 ' + res.result.version + ' ，是否下载最新版本？',
+          okText: '确认',
+          cancelText: '取消',
+          async onOk() {
+            /*下载更新*/
+            store.isUpdating = true
+            await downloadUpdate().catch(() => {
+              message.error('系统异常')
+            })
+          },
+        });
+    }
+  })
+}
 
 </script>
 

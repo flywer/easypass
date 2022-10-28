@@ -4,7 +4,7 @@ import {
   checkForUpdate,
   downloadUpdate,
   getAppSettings,
-  getAppVersion,
+  getAppVersion, quitAndInstall,
   setAppSettings,
   setAppTheme,
 } from "@render/api/app.api";
@@ -75,7 +75,7 @@ const onEnableTray = () => {
 //region 应用更新设置
 /*当前版本号*/
 const appVersion = ref()
-const updateKey = 'updateKey'
+
 let progressInfo = ref({
   total: 0,
   delta: 0,
@@ -86,9 +86,10 @@ let progressInfo = ref({
 })
 /*是否自动检查更新*/
 const autoCheckUpdatesChecked = ref(false)
-
+/*已发现可更新版本*/
+const hasUpdates = ref(false)
 const onCheckForUpdate = async () => {
-  ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
+  /*ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
     switch (res.tag) {
         //检测更新时
       case 1:
@@ -111,7 +112,7 @@ const onCheckForUpdate = async () => {
           okText: '确认',
           cancelText: '取消',
           async onOk() {
-            /*下载更新*/
+            /!*下载更新*!/
             store.isUpdating = true
             await downloadUpdate().catch(() => {
               message.error('系统异常')
@@ -119,7 +120,7 @@ const onCheckForUpdate = async () => {
           },
         });
     }
-  })
+  })*/
   await checkForUpdate()
 }
 
@@ -130,6 +131,14 @@ watch(() => store.isDownloaded, () => {
     progressInfo.value.percent = 100
   }
 })
+
+const onDownloadUpdates = async () => {
+  /*下载更新*/
+  store.isUpdating = true
+  await downloadUpdate().catch(() => {
+    message.error('系统异常')
+  })
+}
 
 onMounted(async () => {
   appVersion.value = (await getAppVersion()).data.result
@@ -159,6 +168,7 @@ onMounted(async () => {
   closeAsHidden.checked = appSettings.closeAsHidden
   enableTrayChecked.value = appSettings.enableTray
   autoCheckUpdatesChecked.value = appSettings.autoCheckUpdates
+  hasUpdates.value = appSettings.hasUpdates
 })
 //endregion
 
@@ -591,7 +601,10 @@ const onAccountCancellation = () => {
           <template #left>
             版本号
             <a-typography-text type="secondary" v-show="!store.isUpdating">
-              <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">检查更新</a-button>
+              <a-button v-if="!hasUpdates" type="link" style="font-size: 12px" @click="onCheckForUpdate()">检查更新
+              </a-button>
+              <a-button v-if="hasUpdates" type="link" style="font-size: 12px" @click="onDownloadUpdates()">发现船新版本！立即下载
+              </a-button>
             </a-typography-text>
             <a-progress v-show="store.isUpdating"
                         type="circle"

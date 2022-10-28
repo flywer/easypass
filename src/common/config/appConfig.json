@@ -12,7 +12,8 @@
     "loginInTray": false,
     "closeInTray": false,
     "closeAsHidden": false,
-    "autoCheckUpdates": false
+    "autoCheckUpdates": false,
+    "hasUpdates": false
   },
   "versionType": "02"
 }
