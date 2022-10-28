@@ -75,7 +75,7 @@ export class GroupItemController {
             result = success()
             result.result = {rows: itemGroupList, count: count}
         } catch (e) {
-            console.log(e.message)
+            log.error(e.message)
             if (e.code === 'ERR_CRYPTO_INVALID_IV') {
                 log.error(e.code, "数据IV值异常！")
                 result = failure("数据IV值异常")
