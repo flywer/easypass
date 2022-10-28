@@ -8,6 +8,6 @@ export const copyText = async (text: string, showMsg?: true) => {
         await toClipboard(text);
         if (showMsg) message.success({content: '已复制到剪贴板', duration:1});
     } catch (e) {
-        console.error(e);
+        console.error(e);//前端使用的ts工具类不可使用electron-log
     }
 }

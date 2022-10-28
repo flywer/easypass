@@ -37,7 +37,6 @@ watch(() => props.menuKey, () => {
 <style scoped lang="less">
 #layout {
   margin-left: 150px;
-  height: 500px;
 }
 </style>
 

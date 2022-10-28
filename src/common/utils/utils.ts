@@ -5,6 +5,7 @@ import {readFsSync} from "@common/utils/fsUtils";
 import {isEmpty} from "lodash";
 import config from "@common/config/appConfig.json";
 import parseJson from 'parse-json'
+import log from "electron-log";
 
 //region 字符串
 
@@ -84,7 +85,7 @@ export const getNetworkInfo = () => {
         }
         result.hostname = os.hostname()
     } catch (e) {
-        console.error(e)
+        log.error(e)
     }
     return result
 }

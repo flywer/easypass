@@ -98,6 +98,9 @@ export class AppController {
             tray.destroy()
         appSettings.enableTray = setup.enableTray
 
+        /*是否自动检查更新*/
+        appSettings.autoCheckUpdates = setup.autoCheckUpdates
+
         writeFs(this.appSettingsFile, JSON.stringify(appSettings))
     }
 

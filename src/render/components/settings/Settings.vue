@@ -35,6 +35,8 @@ import {copyText} from "@render/utils/clipboard";
 
 const tabActiveKey = ref('1')
 
+//region 通用设置
+
 //region 开机自启动
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
@@ -68,24 +70,6 @@ const onEnableTray = () => {
   onSetAppSettings()
 }
 
-/*应用设置*/
-const onSetAppSettings = () => {
-  setAppSettings({
-    openAtLogin: openAtLoginChecked.value,/*开机自启动*/
-    enableTray: enableTrayChecked.value,/*是否启用托盘图标*/
-    openAsHidden: openAsHidden.checked,/*启动是否隐藏到托盘*/
-    closeAsHidden: closeAsHidden.checked/*关闭时是否隐藏到托盘*/
-  })
-}
-
-onMounted(async () => {
-  const appSettings = (await getAppSettings()).data.result
-  openAtLoginChecked.value = appSettings.openAtLogin
-  openAsHidden.checked = appSettings.openAsHidden
-  closeAsHidden.checked = appSettings.closeAsHidden
-  enableTrayChecked.value = appSettings.enableTray
-})
-
 //endregion
 
 //region 应用更新设置
@@ -100,6 +84,9 @@ let progressInfo = ref({
   percent: 0,
   bytesPerSecond: 0
 })
+/*是否自动检查更新*/
+const autoCheckUpdatesChecked = ref(false)
+
 const onCheckForUpdate = async () => {
   ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
     switch (res.tag) {
@@ -123,21 +110,19 @@ const onCheckForUpdate = async () => {
           content: '发现更新的版本 ' + res.result.version + ' ，是否下载最新版本？',
           okText: '确认',
           cancelText: '取消',
-          onOk() {
-            onDownloadUpdate()
+          async onOk() {
+            /*下载更新*/
+            store.isUpdating = true
+            await downloadUpdate().catch(() => {
+              message.error('系统异常')
+            })
           },
         });
     }
   })
   await checkForUpdate()
 }
-/*下载更新*/
-const onDownloadUpdate = async () => {
-  store.isUpdating = true
-  await downloadUpdate().catch(() => {
-    message.error('系统异常')
-  })
-}
+
 /*设置进度条百分比*/
 watch(() => store.isDownloaded, () => {
   //已下载完毕或者已有安装包
@@ -156,6 +141,28 @@ onMounted(async () => {
 
 //endregion
 
+/*应用设置*/
+const onSetAppSettings = () => {
+  setAppSettings({
+    openAtLogin: openAtLoginChecked.value,/*开机自启动*/
+    enableTray: enableTrayChecked.value,/*是否启用托盘图标*/
+    openAsHidden: openAsHidden.checked,/*启动是否隐藏到托盘*/
+    closeAsHidden: closeAsHidden.checked,/*关闭时是否隐藏到托盘*/
+    autoCheckUpdates: autoCheckUpdatesChecked.value/*是否自动检查更新*/
+  })
+}
+
+onMounted(async () => {
+  const appSettings = (await getAppSettings()).data.result
+  openAtLoginChecked.value = appSettings.openAtLogin
+  openAsHidden.checked = appSettings.openAsHidden
+  closeAsHidden.checked = appSettings.closeAsHidden
+  enableTrayChecked.value = appSettings.enableTray
+  autoCheckUpdatesChecked.value = appSettings.autoCheckUpdates
+})
+//endregion
+
+//region 界面设置
 //region 主题色
 /*主题色*/
 const colorState = reactive(store.theme);
@@ -176,6 +183,9 @@ const handleSaveTheme = async (type: string, e: any) => {
 }
 
 //endregion
+//endregion
+
+//region 用户设置
 
 //region 用户登录、注册
 const loginCardRef = reactive({
@@ -378,11 +388,11 @@ const onAccountCancellation = () => {
   }
 }
 //endregion
-
+//endregion
 </script>
 
 <template>
-  <a-tabs v-model:activeKey="tabActiveKey" id="tabs-view" animated style="margin: 32px 8px 0 8px;">
+  <a-tabs v-model:activeKey="tabActiveKey" id="tabs-view" animated>
     <a-tab-pane key="1" tab="用户设置">
       <a-layout-content class="setting-content">
         <!--账号模式-->
@@ -569,7 +579,13 @@ const onAccountCancellation = () => {
         </RowCard>
 
         <a-divider class="setting-divider"/>
-
+        <!--自动检查更新-->
+        <RowCard>
+          <template #left>自动检查更新</template>
+          <template #right>
+            <a-switch v-model:checked="autoCheckUpdatesChecked" @click="onSetAppSettings"/>
+          </template>
+        </RowCard>
         <!--检查更新-->
         <RowCard>
           <template #left>
@@ -596,6 +612,10 @@ const onAccountCancellation = () => {
 
 <style scoped lang="less">
 #tabs-view {
+  margin: 32px 8px 0 8px;
+  height: 525px;
+  overflow-y: auto;
+
   :deep(.ant-tabs-nav) {
     margin-bottom: 2px;
   }
