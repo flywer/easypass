@@ -15,12 +15,12 @@ export function trayInit() {
     tray = new Tray(icon)
 
     let quitMenuItem = new MenuItem({
-        icon: nativeImage.createFromPath(join(appTrayIconPath, 'quit.png')),
+        //icon: nativeImage.createFromPath(join(appTrayIconPath, 'quit.png')),
         label: '退出',
         role: "quit"
     })
     let privacyPolicyMenuItem = new MenuItem({
-        icon: nativeImage.createFromPath(join(appTrayIconPath, 'privacyPolicy.png')),
+        //icon: nativeImage.createFromPath(join(appTrayIconPath, 'privacyPolicy.png')),
         label: '隐私协议',
         click: () => {
             dialog.showMessageBox({
@@ -32,7 +32,7 @@ export function trayInit() {
         }
     })
     let appRelaunchMenuItem = new MenuItem({
-        icon: nativeImage.createFromPath(join(appTrayIconPath, 'relaunch.png')),
+        //icon: nativeImage.createFromPath(join(appTrayIconPath, 'relaunch.png')),
         label: '重启应用',
         click: () => {
             app.relaunch()
@@ -42,9 +42,11 @@ export function trayInit() {
 
     const contextMenu = Menu.buildFromTemplate([
         privacyPolicyMenuItem,
+        { type: 'separator' },
         appRelaunchMenuItem,
         quitMenuItem
     ])
+
     tray.setContextMenu(contextMenu)
 
     tray.setToolTip('管理密码小工具')
@@ -56,7 +58,7 @@ export function trayInit() {
 
 }
 
-const privacyPolicyText  = '\n    本软件尊重并保护所有使用服务用户的个人隐私权。为了给您提供更准确、更优质的服务，本软件会按照本隐私权政策的规定使用和收集您的一些行为信息。您在同意本软件服务使用协议之时，即视为您已经同意本隐私权政策全部内容。本隐私权政策属于本软件服务使用协议不可分割的一部分，如果不同意将无法使用。本协议会定期更新。\n' +
+const privacyPolicyText = '\n    本软件尊重并保护所有使用服务用户的个人隐私权。为了给您提供更准确、更优质的服务，本软件会按照本隐私权政策的规定使用和收集您的一些行为信息。您在同意本软件服务使用协议之时，即视为您已经同意本隐私权政策全部内容。本隐私权政策属于本软件服务使用协议不可分割的一部分，如果不同意将无法使用。本协议会定期更新。\n' +
     '\n1.适用范围\n' +
     '\na)在您使用本软件时，本软件会记录的您对本软件的一些操作行为信息，包括但不限于您使用本软件进行文件上传的耗时、类型、数量等信息。\n' +
     '\n2.信息的使用\n' +
