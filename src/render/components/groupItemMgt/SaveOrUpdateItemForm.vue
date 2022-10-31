@@ -200,7 +200,11 @@ const onDragSort = () => {
       >
         <template #item="{ element,index }">
 
-          <a-space class="form-space animate__animated animate__flipInX" :size="0" v-show="!element.deleteTag">
+          <a-space class="form-space animate__animated animate__flipInX"
+                   :style="{backgroundColor: draggableRef.enabled?'#f6f6f6':null} "
+                   :size="0"
+                   v-show="!element.deleteTag"
+          >
             <a-form-item class="form-item" :name="[index,'name']"
                          :rules="rulesRef.name">
               <a-input placeholder="名称" :bordered="false" v-model:value.trim="element.name"
@@ -259,7 +263,6 @@ const onDragSort = () => {
   width: 100%;
   padding: 10px 10px 0 10px;
   margin-bottom: 5px;
-  background-color: #f6f6f6;
 }
 
 </style>
