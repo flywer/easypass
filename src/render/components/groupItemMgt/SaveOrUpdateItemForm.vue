@@ -6,8 +6,9 @@ import {
   ArrowLeftOutlined,
   ExclamationCircleOutlined,
   MinusCircleOutlined,
-  VerticalAlignMiddleOutlined,
-  CheckOutlined, DragOutlined
+  CheckOutlined,
+  DragOutlined,
+  SwapOutlined
 } from '@ant-design/icons-vue';
 import {useRoute, useRouter} from "vue-router";
 import {uuid} from 'vue3-uuid';
@@ -171,7 +172,7 @@ const onDragSort = () => {
     <a-space style="float: right">
       <a-button @click="onDragSort">
         <template #icon>
-          <vertical-align-middle-outlined v-if="!draggableRef.enabled" class="animate__animated animate__flipInX"/>
+          <swap-outlined :rotate="90" v-if="!draggableRef.enabled" class="animate__animated animate__flipInX"/>
           <check-outlined v-if="draggableRef.enabled" class="animate__animated animate__flipInX"/>
         </template>
         <span v-if="!draggableRef.enabled" class="animate__animated animate__flipInX">排序</span>
@@ -199,33 +200,34 @@ const onDragSort = () => {
       >
         <template #item="{ element,index }">
 
-            <a-space class="form-space animate__animated animate__flipInX" :size="0" v-show="!element.deleteTag">
-              <a-form-item class="form-item" :name="[index,'name']"
-                           :rules="rulesRef.name">
-                <a-input placeholder="名称" :bordered="false" v-model:value.trim="element.name"
-                         :readonly="element.isAccount||element.isTitle"/>
-                <a-divider class="my-form-divider"/>
-              </a-form-item>
+          <a-space class="form-space animate__animated animate__flipInX" :size="0" v-show="!element.deleteTag">
+            <a-form-item class="form-item" :name="[index,'name']"
+                         :rules="rulesRef.name">
+              <a-input placeholder="名称" :bordered="false" v-model:value.trim="element.name"
+                       :readonly="element.isAccount||element.isTitle"/>
+              <a-divider class="my-form-divider"/>
+            </a-form-item>
+            <a-divider type="vertical" class="my-form-divider-vertical"/>
+            <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value" s>
+              <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"/>
+              <a-divider class="my-form-divider"/>
+            </a-form-item>
+            <template v-if="!element.isTitle">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
-              <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value" s>
-                <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"/>
-                <a-divider class="my-form-divider"/>
+              <a-form-item class="form-item">
+                <a-checkbox v-model:checked="element.isShow">是否显示</a-checkbox>
               </a-form-item>
-              <template v-if="!element.isTitle">
-                <a-divider type="vertical" class="my-form-divider-vertical"/>
-                <a-form-item class="form-item">
-                  <a-checkbox v-model:checked="element.isShow">是否显示</a-checkbox>
-                </a-form-item>
-              </template>
-              <template v-if="!element.isAccount && !element.isTitle">
-                <a-divider type="vertical" class="my-form-divider-vertical"/>
-                <MinusCircleOutlined @click="handleDelete(element.id,element.key)"
-                                     style="margin-left: 4px;margin-bottom: 17px"/>
-              </template>
-              <div style="position: absolute;right: 3%;top: 30%;">
-                <drag-outlined class="animate__animated animate__fadeInRight"  v-show="draggableRef.enabled" style="float: right;font-size: 24px;color: #cbcbcb;cursor: pointer"/>
-              </div>
-            </a-space>
+            </template>
+            <template v-if="!element.isAccount && !element.isTitle">
+              <a-divider type="vertical" class="my-form-divider-vertical"/>
+              <MinusCircleOutlined @click="handleDelete(element.id,element.key)"
+                                   style="margin-left: 4px;margin-bottom: 17px"/>
+            </template>
+            <div style="position: absolute;right: 3%;top: 30%;">
+              <drag-outlined class="animate__animated animate__fadeInRight" v-show="draggableRef.enabled"
+                             style="float: right;font-size: 24px;color: #cbcbcb;cursor: pointer"/>
+            </div>
+          </a-space>
 
 
         </template>
