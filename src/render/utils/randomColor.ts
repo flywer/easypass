@@ -4,6 +4,5 @@ export const randomColor = () => {
     for (let i = 0; i < 3; i++) {
         color += Math.floor(Math.random()*10)
     }
-    console.log(color)
     return color;
 }
