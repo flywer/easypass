@@ -53,7 +53,7 @@ const showSearchInput = () => {
     searchInputVisible.value = true
     blur = false
     nextTick(() => {
-      document.getElementById("search-input").model()
+      document.getElementById("search-input").focus()
     })
   } else {
     blur = true
