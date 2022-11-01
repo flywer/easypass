@@ -8,15 +8,22 @@ export interface IGroupItemVo extends IPageVo {
     value?: string,
     itemId?: string,
     type?: string,
-    isTitle?: boolean,
     isCommon?: boolean,
-    isAccount?: boolean,
-    isPassword?: boolean,
     isShow?: boolean,
     itemIndex?: number,
     groupId?: string,
     userId?: string
 }
+
+//01默认，02标题，03主账号，04密码，05图标
+export enum itemTypeEnum {
+    normal = '01',
+    title = '02',
+    account = '03',
+    password = '04',
+    icon = '05'
+}
+
 
 /**
  * 账号组项model：每个密码组有多个组项，每个组项若itemId相同代表为同一组（不是指密码组）
@@ -45,28 +52,13 @@ export let GroupItem = sequelize.define('groupItem', {
     },
     type: {
         type: DataTypes.STRING(3),
-        defaultValue: '01',
+        defaultValue: itemTypeEnum.normal,
         comment: '项类型：01默认，02标题，03主账号，04密码，05图标'
-    },
-    isTitle: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        comment: '组项是否是标题项'
     },
     isCommon: {
         type: DataTypes.BOOLEAN,
         defaultValue: 0,
         comment: '组项是否是常用账号'
-    },
-    isAccount: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        comment: '组项是否是主体账号'
-    },
-    isPassword: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        comment: '是否为密码项'
     },
     isShow: {
         type: DataTypes.BOOLEAN,

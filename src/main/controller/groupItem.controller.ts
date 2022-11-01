@@ -4,7 +4,7 @@ import {channel} from "@render/api/channel";
 import {failure, Result, success} from "@main/vo/resultVo";
 import log, {error} from 'electron-log'
 import {GroupService} from "@main/service/group.service";
-import {IGroupItemVo} from "@main/model/groupItem";
+import {IGroupItemVo, itemTypeEnum} from "@main/model/groupItem";
 
 @Controller()
 export class GroupItemController {
@@ -198,6 +198,17 @@ export class GroupItemController {
             result = failure("系统异常")
             result.result = e
         }
+        return result
+    }
+
+    /**
+     * 获取组项类型枚举值
+     * @constructor
+     */
+    @IpcHandle(channel.groupItem.getItemTypeEnum)
+    public HandleGetItemTypeEnum() {
+        let result = success()
+        result.result = itemTypeEnum
         return result
     }
 

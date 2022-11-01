@@ -11,13 +11,11 @@ import {
   CopyOutlined,
 } from '@ant-design/icons-vue'
 import {
-  getGroupItemsListByPage,
+  getGroupItemsListByPage, getItemTypeEnum,
 } from "@render/api/groupItem.api";
 import empty from '@render/assets/img/empty.png'
-import {copyText} from "@render/utils/clipboard";
 import {message, Modal} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
-import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {isEqual} from "lodash-es";
 import GroupItemCard from "@render/components/groupItemMgt/GroupItemCard.vue";
@@ -56,13 +54,18 @@ const itemInfoModalRef = reactive({
   visible: null/*是否显示组详情*/
 })
 
+/*显示组项更多信息*/
 const updateItemInfo = (value) => {
   itemInfoModalRef.model = value.model
   itemInfoModalRef.visible = value.visible
 }
 
+/*组项类型*/
+const itemType = ref()
+
 onMounted(async () => {
   await searchItemsByPage(true)
+  itemType.value = (await getItemTypeEnum()).data.result
 })
 
 // click:显示添加账号项
@@ -124,21 +127,21 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/
-            if (row.isTitle) {
+            if (isEqual(row.type,itemType.value.title)) {
               itemObj.itemId = row.itemId
               itemObj.title = row.value
               itemObj.isCommon = row.isCommon == 1
               itemObj.groupId = row.groupId
             }
-            if (isEqual(row.type, '05')) {
+            if (isEqual(row.type, itemType.value.icon)) {
               itemObj.iconUrl = row.value
             }
             /*主账号*/
-            if (row.isAccount) {
+            if (isEqual(row.type, itemType.value.account)) {
               itemObj.account = row.value
             }
             /*展示出来的组项*/
-            if (row.isShow && !row.isTitle) {
+            if (row.isShow && !isEqual(row.type,itemType.value.title)) {
               let showItem = {title: null, value: null}
               showItem.title = row.name
               showItem.value = row.value

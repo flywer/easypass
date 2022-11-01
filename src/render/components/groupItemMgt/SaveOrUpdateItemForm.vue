@@ -14,7 +14,7 @@ import {useRoute, useRouter} from "vue-router";
 import {uuid} from 'vue3-uuid';
 import {Form, FormInstance, Modal, message} from "ant-design-vue";
 import {cloneDeep, isEqual} from "lodash-es";
-import {getItemsListByItemId, saveOrUpdateGroupItems} from "@render/api/groupItem.api";
+import {getItemsListByItemId, getItemTypeEnum, saveOrUpdateGroupItems} from "@render/api/groupItem.api";
 import draggable from 'vuedraggable'
 import {findImage} from "@render/api/utils.api";
 import {isEmpty} from "lodash";
@@ -24,12 +24,10 @@ const route = useRoute()
 
 /*数据*/
 const formDataRef = ref(<any>[]);
+/*组项类型*/
+const itemType = ref()
 /*起始数据*/
-let originData = [
-  {name: '标题', value: '', isTitle: true, isShow: true, key: uuid.v1(), deleteTag: false, type: ''},
-  {name: '账号', value: '', isAccount: true, isShow: true, key: uuid.v1(), deleteTag: false, type: ''},
-  {name: '密码', value: '', isPassword: true, isShow: false, key: uuid.v1(), deleteTag: false, type: ''}
-];
+let originData = [];
 /*加载消息key*/
 const loadingKey = 'save'
 /*表单响应实例*/
@@ -51,6 +49,9 @@ const isUpdate = ref(false)
 let groupId = null
 
 onMounted(async () => {
+  itemType.value = (await getItemTypeEnum()).data.result
+  originDataInit()
+
   let itemId = route.query.itemId as string
   groupId = route.query.groupId as string
   if (itemId != null) {
@@ -63,7 +64,7 @@ onMounted(async () => {
       item.deleteTag = false
       originData.push(item)
     })
-    let iconData = originData.filter(item => isEqual(item.type, '05'))
+    let iconData = originData.filter(item => isEqual(item.type, itemType.value.icon))
     iconRef.value = iconData.length > 0 ? iconData.at(0).value : null
   } else {
     isUpdate.value = false
@@ -72,11 +73,42 @@ onMounted(async () => {
   formDataRef.value = cloneDeep(originData)
 })
 
+/*初始化空表单*/
+const originDataInit = () => {
+  originData = [
+    {
+      name: '标题',
+      value: '',
+      isShow: true,
+      key: uuid.v1(),
+      deleteTag: false,
+      type: itemType.value.title
+    },
+    {
+      name: '账号',
+      value: '',
+      isShow: true,
+      key: uuid.v1(),
+      deleteTag: false,
+      type: itemType.value.account
+    },
+    {
+      name: '密码',
+      value: '',
+      isShow: false,
+      key: uuid.v1(),
+      deleteTag: false,
+      type: itemType.value.password
+    }
+  ]
+}
+
 /*添加组项*/
 const handleAddItem = () => {
   const newData = {
     name: '',
     value: '',
+    type: itemType.value.normal,
     isShow: false,
     deleteTag: false,
     key: uuid.v1()
@@ -119,36 +151,39 @@ const handleBack = () => {
 
 /*提交*/
 const handleSubmit = () => {
-  formRef.value?.validate().then(() => {
-    message.loading({
-      content: '保存中...', key: loadingKey
-    });
-
-    if (isUpdate)
+  if (!isEqual(formDataRef.value, originData))
+    formRef.value?.validate().then(() => {
+      message.loading({
+        content: '保存中...', key: loadingKey
+      });
+      if (isUpdate.value){
         /*更新*/
-      formDataRef.value.forEach(item => {
-        if (isEqual(item.type, '05')) {
-          item.value = iconRef.value
-        }
-      })
-    else {
-      formDataRef.value.push({name: '图标', type: '05', value: iconRef.value})
-    }
-
-    saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
-      if (res.data.success) {
-        message.success({content: res.data.message, key: loadingKey, duration: 2})
-        router.back()
-      } else {
-        message.error({content: res.data.message, key: loadingKey, duration: 2})
+        formDataRef.value.forEach(item => {
+          if (isEqual(item.type, itemType.value.icon)) {
+            item.value = iconRef.value
+          }
+        })
       }
+      else {
+        formDataRef.value.push({name: '图标', type: itemType.value.icon, value: iconRef.value,deleteTag: false,isShow:false})
+      }
+
+      saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
+        if (res.data.success) {
+          message.success({content: res.data.message, key: loadingKey, duration: 2})
+          router.back()
+        } else {
+          message.error({content: res.data.message, key: loadingKey, duration: 2})
+        }
+      }).catch(e => {
+        console.error(e)
+        message.error({content: '操作失败', key: loadingKey, duration: 2})
+      })
     }).catch(e => {
       console.error(e)
-      message.error({content: '操作失败', key: loadingKey, duration: 2})
     })
-  }).catch(e => {
-    console.error(e)
-  })
+  else
+    router.back()
 }
 
 const draggableRef = reactive({
@@ -244,7 +279,7 @@ const onchangeIcon = (icon) => {
           >
             <!--名称-->
             <a-form-item
-                v-if="!isEqual(element.type,'05')"
+                v-if="!isEqual(element.type,itemType.icon)"
                 class="form-item"
                 :name="[index,'name']"
                 :rules="rulesRef.name"
@@ -252,23 +287,23 @@ const onchangeIcon = (icon) => {
               <a-input placeholder="名称"
                        :bordered="false"
                        v-model:value.trim="element.name"
-                       :readonly="element.isAccount||element.isTitle"/>
+                       :readonly="isEqual(element.type,itemType.account) || isEqual(element.type,itemType.title)"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
             <!--内容-->
             <a-form-item
-                v-if="!isEqual(element.type,'05')"
+                v-if="!isEqual(element.type,itemType.icon)"
                 :name="[index,'value']"
                 class="form-item"
                 :rules="rulesRef.value"
             >
               <a-divider type="vertical" class="my-form-divider-vertical" style="height: 30px;margin-bottom: -2px;"/>
               <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"
-                       @change="element.isTitle?onFindIcon(element.value):null"/>
+                       @change="isEqual(element.type,itemType.title)?onFindIcon(element.value):null"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
             <!--标题特殊项-->
-            <template v-if="element.isTitle">
+            <template v-if="isEqual(element.type,itemType.title)">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <!--图标选择弹框-->
               <a-popover
@@ -301,20 +336,21 @@ const onchangeIcon = (icon) => {
                         style="margin: 0 0 14px 20px;" :src="iconRef.value"/>
             </template>
 
-            <template v-if="!element.isTitle && !isEqual(element.type,'05')">
+            <template v-if="!isEqual(element.type,itemType.title) && !isEqual(element.type,itemType.icon)">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <a-form-item class="form-item">
                 <a-checkbox v-model:checked="element.isShow">是否显示</a-checkbox>
               </a-form-item>
             </template>
 
-            <template v-if="!element.isAccount && !element.isTitle && !isEqual(element.type,'05')">
+            <template
+                v-if="!isEqual(element.type,itemType.account) && !isEqual(element.type,itemType.title) && !isEqual(element.type,itemType.icon)">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <MinusCircleOutlined @click="handleDelete(element.id,element.key)"
                                    style="margin-left: 4px;margin-bottom: 17px"/>
             </template>
 
-            <div v-if="!isEqual(element.type,'05')" style="position: absolute;right: 3%;top: 30%;">
+            <div v-if="!isEqual(element.type,itemType.icon)" style="position: absolute;right: 3%;top: 30%;">
               <drag-outlined class="animate__animated animate__fadeInRight" v-show="draggableRef.enabled"
                              style="float: right;font-size: 24px;color: #cbcbcb;cursor: pointer"/>
             </div>

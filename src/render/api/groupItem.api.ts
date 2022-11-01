@@ -22,6 +22,10 @@ export function setGroupItemCommon(itemId: string, isCommon: boolean) {
     return ipcInstance.send<Result>(channel.groupItem.setGroupItemCommon, itemId, isCommon)
 }
 
-export function getCommonGroupItemsListByPage(vo){
+export function getCommonGroupItemsListByPage(vo) {
     return ipcInstance.send<Result>(channel.groupItem.getCommonGroupItemsListByPage, vo)
+}
+
+export function getItemTypeEnum() {
+    return ipcInstance.send<Result>(channel.groupItem.getItemTypeEnum)
 }

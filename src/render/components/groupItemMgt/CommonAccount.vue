@@ -3,7 +3,7 @@
 import {onMounted, reactive, ref} from "vue";
 import empty from '@render/assets/img/empty.png'
 import {MoreOutlined, ReloadOutlined,} from '@ant-design/icons-vue'
-import {getCommonGroupItemsListByPage} from "@render/api/groupItem.api";
+import {getCommonGroupItemsListByPage, getItemTypeEnum} from "@render/api/groupItem.api";
 import {message} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
@@ -97,21 +97,21 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/
-            if (row.isTitle) {
+            if (isEqual(row.type, itemType.value.title)) {
               itemObj.itemId = row.itemId
               itemObj.title = row.value
               itemObj.isCommon = row.isCommon != null
               itemObj.groupId = row.groupId
             }
-            if (isEqual(row.type, '05')) {
+            if (isEqual(row.type, itemType.value.icon)) {
               itemObj.iconUrl = row.value
             }
             /*主账号*/
-            if (row.isAccount) {
+            if (isEqual(row.type, itemType.value.account)) {
               itemObj.account = row.value
             }
             /*展示出来的组项*/
-            if (row.isShow && !row.isTitle) {
+            if (row.isShow && !isEqual(row.type, itemType.value.title)) {
               let showItem = {title: null, value: null}
               showItem.title = row.name
               showItem.value = row.value
@@ -135,8 +135,13 @@ const onSearch = (value) => {
   searchItemsByPage(false, true)
 }
 
+/*组项类型*/
+const itemType = ref()
+
+
 onMounted(async () => {
   await searchItemsByPage(true)
+  itemType.value = (await getItemTypeEnum()).data.result
 })
 
 </script>

@@ -1,8 +1,9 @@
 import {Injectable} from "einf";
 import {GroupItemMapper} from "@main/mapper/groupItem.mapper";
-import {IGroupItemVo} from "@main/model/groupItem";
+import {IGroupItemVo, itemTypeEnum} from "@main/model/groupItem";
 import {uuid} from "vue3-uuid";
 import {encrypt, groupItemDecrypt} from "@common/utils/cryptoUtils";
+import {isEqual} from "lodash";
 
 @Injectable()
 export class GroupItemService {
@@ -56,7 +57,7 @@ export class GroupItemService {
         //相同账号组有同一个组ID
         let itemId
         if (isUpdate)
-            itemId = groupItems.filter(item => item.isTitle == true).at(0).itemId
+            itemId = groupItems.filter(item => isEqual(item.type,itemTypeEnum.title)).at(0).itemId
         else
             itemId = uuid.v4()
 
