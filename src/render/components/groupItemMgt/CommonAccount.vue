@@ -59,6 +59,10 @@ const refreshSpinning = () => {
 
 //分页搜索
 const searchItemsByPage = async (init: boolean, search?: true) => {
+  if (!store.isLogin){
+    message.warn('尚未登录')
+    return null
+  }
   spinning.value = true
   showEmpty.value = false
   refreshSpinning()
@@ -86,7 +90,15 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
-          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false, groupId: null,iconUrl: null}
+          let itemObj = {
+            itemId: null,
+            title: '暂无',
+            account: '',
+            showItems: [],
+            isCommon: false,
+            groupId: null,
+            iconUrl: null
+          }
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/

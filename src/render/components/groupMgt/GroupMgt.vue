@@ -268,22 +268,25 @@ const onUpdateGroup = (groupId: string) => {
 
 /*新增*/
 const onAddGroup = () => {
-  //有临时表单卡片不可再次新增
-  if (groupList.value.filter(item => item.isTemp == true).length > 0) {
-    message.warn('每次只可添加一个')
-  } else {
-    const emptyGroup = {
-      id: null,
-      name: '',
-      description: '',
-      userId: store.user.id,
-      isEdit: true,
-      isSubmit: false,
-      isTemp: true
+  if (store.isLogin)
+      //有临时表单卡片不可再次新增
+    if (groupList.value.filter(item => item.isTemp == true).length > 0) {
+      message.warn('每次只可添加一个')
+    } else {
+      const emptyGroup = {
+        id: null,
+        name: '',
+        description: '',
+        userId: store.user.id,
+        isEdit: true,
+        isSubmit: false,
+        isTemp: true
+      }
+      groupList.value.unshift(emptyGroup)
+      groupList.value = cloneDeep(groupList.value.slice(0, pageSize.value))
     }
-    groupList.value.unshift(emptyGroup)
-    groupList.value = cloneDeep(groupList.value.slice(0, pageSize.value))
-  }
+  else
+    message.warn('尚未登录')
 }
 
 </script>
@@ -430,6 +433,6 @@ const onAddGroup = () => {
 
 <style>
 .ant-popover-inner-content {
-    padding: 4px;
-  }
+  padding: 4px;
+}
 </style>
