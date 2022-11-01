@@ -14,7 +14,7 @@ export class GroupMapper {
      * 通过用户ID查询全部信息
      * @param user
      */
-    public async getGroupListByUserId(user:IUserVo) {
+    public async getGroupListByUserId(user: IUserVo) {
         return await Group.findAll({
             order: ['groupIndex'],
             where: {
@@ -61,8 +61,9 @@ export class GroupMapper {
         const {count, rows} = await Group.findAndCountAll({
             where: {
                 [Op.and]: {
-                    name: {
-                        [Op.like]: sqlLikePack(group.name, true, true)
+                    [Op.or]: {
+                        name: {[Op.like]: sqlLikePack(group.name, true, true)},
+                        description: {[Op.like]: sqlLikePack(group.name, true, true)},
                     },
                     userId: group.userId
                 }
@@ -78,7 +79,7 @@ export class GroupMapper {
      * 根据ID删除
      * @param groupId
      */
-    public async deleteGroupById(groupId:string) {
+    public async deleteGroupById(groupId: string) {
         await Group.destroy({
             where: {
                 id: groupId

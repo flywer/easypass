@@ -15,8 +15,8 @@
             :bordered="false"
             allow-clear
             :onblur="searchInputBlur"
-            @keyup.enter="onSearch"
-            placeholder="回车搜索标题↵"
+            @change="onSearch"
+            placeholder="回车搜索"
         />
       </div>
     </transition>
