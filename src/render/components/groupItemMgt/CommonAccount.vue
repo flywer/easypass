@@ -1,20 +1,15 @@
 <!--常用账号-->
 <script setup lang="ts">
 import {onMounted, reactive, ref} from "vue";
-import {copyText} from "@render/utils/clipboard";
 import empty from '@render/assets/img/empty.png'
-import {
-  MoreOutlined,
-  ReloadOutlined,
-  CopyOutlined,
-} from '@ant-design/icons-vue'
+import {MoreOutlined, ReloadOutlined,} from '@ant-design/icons-vue'
 import {getCommonGroupItemsListByPage} from "@render/api/groupItem.api";
 import {message} from "ant-design-vue";
-import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {store} from "@render/store";
 import {isEqual} from "lodash-es";
+import GroupItemCard from "@render/components/groupItemMgt/GroupItemCard.vue";
 
 //加载效果是否显示
 const spinning = ref(false)
@@ -59,7 +54,7 @@ const refreshSpinning = () => {
 
 //分页搜索
 const searchItemsByPage = async (init: boolean, search?: true) => {
-  if (!store.isLogin){
+  if (!store.isLogin) {
     message.warn('尚未登录')
     return null
   }
@@ -108,7 +103,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
               itemObj.isCommon = row.isCommon != null
               itemObj.groupId = row.groupId
             }
-            if (isEqual(row.type, 'icon')) {
+            if (isEqual(row.type, '05')) {
               itemObj.iconUrl = row.value
             }
             /*主账号*/
@@ -169,33 +164,11 @@ onMounted(async () => {
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
         <a-col v-for="(item) in groupItemsList" :span="24" style="margin-bottom: 15px">
-          <a-card :data-id="item.itemId"
-                  :bordered="false"
-                  :hoverable="true"
-                  size="small"
-                  class="animate__animated animate__flipInX"
-          >
-            <template #title>
-              <a-space>
-                <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
-                <a-avatar v-else shape="square">{{ item.title }}</a-avatar>
-                {{ item.title }}
-                <a-space v-for="(showItem) in item.showItems">
-                  <a-divider type="vertical" style="background-color: #f0f0f0"/>
-                  <span>{{ showItem.title }}：{{ showItem.value }}</span>
-                  <copy-outlined @click="copyText(showItem.value,true)"/>
-                </a-space>
-              </a-space>
-            </template>
-
-            <template #extra>
-              <ItemCardExtra :item="item"
-                             :group-items-list="groupItemsList"
-                             @showItemInfo="updateItemInfo"
-                             @updateList="searchItemsByPage(true)"
-              />
-            </template>
-          </a-card>
+          <GroupItemCard
+              :item="item"
+              :group-items-list="groupItemsList"
+              @showItemInfo="updateItemInfo"
+              @updateList="searchItemsByPage(true)"/>
         </a-col>
       </a-row>
       <a-pagination v-if="groupItemsList.length>0" class="pagination" v-model:current="pageRef.pageIndex"

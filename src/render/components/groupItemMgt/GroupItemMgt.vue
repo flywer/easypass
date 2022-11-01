@@ -20,6 +20,7 @@ import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {isEqual} from "lodash-es";
+import GroupItemCard from "@render/components/groupItemMgt/GroupItemCard.vue";
 
 const router = useRouter()
 //从后端传过来的分组数据
@@ -129,7 +130,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
               itemObj.isCommon = row.isCommon == 1
               itemObj.groupId = row.groupId
             }
-            if (isEqual(row.type, 'icon')) {
+            if (isEqual(row.type, '05')) {
               itemObj.iconUrl = row.value
             }
             /*主账号*/
@@ -205,33 +206,11 @@ const onSearch = (value) => {
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
         <a-col v-for="(item) in groupItemsList" :span="24" style="margin-bottom: 15px">
-          <a-card :data-id="item.itemId"
-                  :bordered="false"
-                  :hoverable="true"
-                  size="small"
-                  class="animate__animated animate__flipInX"
-          >
-            <template #title>
-              <a-space>
-                <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
-                <a-avatar v-else shape="square">{{ item.title }}</a-avatar>
-                {{ item.title }}
-                <a-space v-for="(showItem) in item.showItems">
-                  <a-divider type="vertical" style="background-color: #f0f0f0"/>
-                  <span>{{ showItem.title }}：{{ showItem.value }}</span>
-                  <copy-outlined @click="copyText(showItem.value,true)"/>
-                </a-space>
-              </a-space>
-            </template>
-
-            <template #extra>
-              <ItemCardExtra :item="item"
-                             :group-items-list="groupItemsList"
-                             @showItemInfo="updateItemInfo"
-                             @updateList="searchItemsByPage(true)"
-              />
-            </template>
-          </a-card>
+          <GroupItemCard
+              :item="item"
+              :group-items-list="groupItemsList"
+              @showItemInfo="updateItemInfo"
+              @updateList="searchItemsByPage(true)"/>
         </a-col>
       </a-row>
       <a-pagination v-if="groupItemsList.length>0" class="pagination" v-model:current="pageIndex"

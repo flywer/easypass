@@ -63,7 +63,7 @@ onMounted(async () => {
       item.deleteTag = false
       originData.push(item)
     })
-    let iconData = originData.filter(item => isEqual(item.type, 'icon'))
+    let iconData = originData.filter(item => isEqual(item.type, '05'))
     iconRef.value = iconData.length > 0 ? iconData.at(0).value : null
   } else {
     isUpdate.value = false
@@ -127,12 +127,12 @@ const handleSubmit = () => {
     if (isUpdate)
         /*更新*/
       formDataRef.value.forEach(item => {
-        if (isEqual(item.type, 'icon')) {
+        if (isEqual(item.type, '05')) {
           item.value = iconRef.value
         }
       })
     else {
-      formDataRef.value.push({name: '图标', type: 'icon', value: iconRef.value})
+      formDataRef.value.push({name: '图标', type: '05', value: iconRef.value})
     }
 
     saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
@@ -244,7 +244,7 @@ const onchangeIcon = (icon) => {
           >
             <!--名称-->
             <a-form-item
-                v-if="!isEqual(element.type,'icon')"
+                v-if="!isEqual(element.type,'05')"
                 class="form-item"
                 :name="[index,'name']"
                 :rules="rulesRef.name"
@@ -257,7 +257,7 @@ const onchangeIcon = (icon) => {
             </a-form-item>
             <!--内容-->
             <a-form-item
-                v-if="!isEqual(element.type,'icon')"
+                v-if="!isEqual(element.type,'05')"
                 :name="[index,'value']"
                 class="form-item"
                 :rules="rulesRef.value"
@@ -301,20 +301,20 @@ const onchangeIcon = (icon) => {
                         style="margin: 0 0 14px 20px;" :src="iconRef.value"/>
             </template>
 
-            <template v-if="!element.isTitle && !isEqual(element.type,'icon')">
+            <template v-if="!element.isTitle && !isEqual(element.type,'05')">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <a-form-item class="form-item">
                 <a-checkbox v-model:checked="element.isShow">是否显示</a-checkbox>
               </a-form-item>
             </template>
 
-            <template v-if="!element.isAccount && !element.isTitle && !isEqual(element.type,'icon')">
+            <template v-if="!element.isAccount && !element.isTitle && !isEqual(element.type,'05')">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <MinusCircleOutlined @click="handleDelete(element.id,element.key)"
                                    style="margin-left: 4px;margin-bottom: 17px"/>
             </template>
 
-            <div v-if="!isEqual(element.type,'icon')" style="position: absolute;right: 3%;top: 30%;">
+            <div v-if="!isEqual(element.type,'05')" style="position: absolute;right: 3%;top: 30%;">
               <drag-outlined class="animate__animated animate__fadeInRight" v-show="draggableRef.enabled"
                              style="float: right;font-size: 24px;color: #cbcbcb;cursor: pointer"/>
             </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useRoute} from 'vue-router'
-import {createVNode, h, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
+import {computed, createVNode, h, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import {
   MoreOutlined,
   PlusOutlined,
@@ -67,6 +67,11 @@ let searchModelRef = reactive({
   pageIndex: pageIndex.value,
   pageSize: pageSize.value
 })
+
+const isSearch = computed(() => {
+  return isEmpty(searchModelRef.name)
+})
+
 //加载效果是否显示
 let spinning = ref(false)
 //空状态显示
@@ -75,13 +80,14 @@ let showEmpty = ref<boolean>(false)
 const loginModalVisible = ref(false)
 //region emit
 //emit:是否显示新增弹出框，一般用于弹出框关闭时回调
-const setSaveModalVisible = (value) => {
+/*const setSaveModalVisible = (value) => {
   saveModalVisible.value = value
-}
+}*/
 //emit:是否显示更新弹出框
-const setUpdateModalVisible = (value) => {
+/*const setUpdateModalVisible = (value) => {
   updateModal.visible = value
-}
+}*/
+
 //emit:是否显示登录弹出框
 const setLoginModalVisible = (value) => {
   loginModalVisible.value = value
@@ -89,16 +95,16 @@ const setLoginModalVisible = (value) => {
 //endregion
 
 // click:显示新增密码组弹出框
-const showSaveModal = () => {
+/*const showSaveModal = () => {
   if (store.isLogin)
     saveModalVisible.value = true
-}
+}*/
 
 //click: 显示编辑密码组弹出框
-const showUpdateModal = (group) => {
+/*const showUpdateModal = (group) => {
   updateModal.model = cloneDeep(group)
   updateModal.visible = true
-}
+}*/
 
 //enter:查询
 const searchGroupByPage = async (init: boolean, search?: true) => {
@@ -268,8 +274,9 @@ const onUpdateGroup = (groupId: string) => {
 
 /*新增*/
 const onAddGroup = () => {
-  if (store.isLogin)
-      //有临时表单卡片不可再次新增
+  if (store.isLogin) {
+    showEmpty.value = false
+    //有临时表单卡片不可再次新增
     if (groupList.value.filter(item => item.isTemp == true).length > 0) {
       message.warn('每次只可添加一个')
     } else {
@@ -285,7 +292,7 @@ const onAddGroup = () => {
       groupList.value.unshift(emptyGroup)
       groupList.value = cloneDeep(groupList.value.slice(0, pageSize.value))
     }
-  else
+  } else
     message.warn('尚未登录')
 }
 
@@ -373,7 +380,7 @@ const onAddGroup = () => {
     <a-empty v-show="showEmpty" :image="empty" :image-style="{height: '60px'}">
       <template #description>
       </template>
-      <a-button type="primary" v-if="store.isLogin" @click="showSaveModal">创建</a-button>
+      <a-button type="primary" v-if="store.isLogin && isSearch" @click="onAddGroup">创建</a-button>
     </a-empty>
   </a-layout-content>
 

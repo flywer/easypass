@@ -18,11 +18,11 @@ const props = defineProps({
 
 /*排除图标*/
 const itemInfoList = computed(() => {
-  return props.model.filter(item => !isEqual(item.type, 'icon'))
+  return props.model.filter(item => !isEqual(item.type, '05'))
 })
 
 const iconUrl = computed(() => {
-  return props.model.filter(item => isEqual(item.type, 'icon')).map(item => item.value).at(0)
+  return props.model.filter(item => isEqual(item.type, '05')).map(item => item.value).at(0)
 })
 
 //提取标题
