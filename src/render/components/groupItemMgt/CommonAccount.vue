@@ -14,6 +14,7 @@ import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {store} from "@render/store";
+import {isEqual} from "lodash-es";
 
 //加载效果是否显示
 const spinning = ref(false)
@@ -85,7 +86,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
-          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false, groupId: null}
+          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false, groupId: null,iconUrl: null}
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/
@@ -94,6 +95,9 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
               itemObj.title = row.value
               itemObj.isCommon = row.isCommon != null
               itemObj.groupId = row.groupId
+            }
+            if (isEqual(row.type, 'icon')) {
+              itemObj.iconUrl = row.value
             }
             /*主账号*/
             if (row.isAccount) {
@@ -161,6 +165,8 @@ onMounted(async () => {
           >
             <template #title>
               <a-space>
+                <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
+                <a-avatar v-else shape="square">{{ item.title }}</a-avatar>
                 {{ item.title }}
                 <a-space v-for="(showItem) in item.showItems">
                   <a-divider type="vertical" style="background-color: #f0f0f0"/>

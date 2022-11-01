@@ -10,7 +10,8 @@ import {
   ExclamationCircleOutlined,
   SettingOutlined,
   CheckOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  MenuOutlined
 } from '@ant-design/icons-vue'
 import {
   deleteGroupById,
@@ -22,13 +23,13 @@ import {
 import {useRouter} from "vue-router";
 import {store} from "@render/store";
 import SaveGroupModal from "@render/components/groupMgt/SaveGroupModal.vue";
-import UpdateGroupModal from "@render/components/groupMgt/UpdateGroupModal.vue";
 import {Button, message, Modal, notification} from "ant-design-vue";
 import empty from '@render/assets/img/empty.png'
 import LoginModal from "@render/components/common/LoginModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {cloneDeep, isEqual, isNull} from "lodash-es";
 import {isEmpty} from "lodash";
+import {randomColor} from "@render/utils/randomColor";
 
 //路由
 const route = useRoute()
@@ -131,6 +132,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
       res.data.result.rows.forEach(item => {
         item.isEdit = false
         item.isSubmit = false
+        item.avatarColor = item.avatarColor == null ? randomColor() : item.avatarColor
       })
       groupList.value = res.data.result.rows
       showEmpty.value = groupList.value.length <= 0;
@@ -143,8 +145,8 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
 }
 
 //router: 跳转到组项页面
-const showGroupItem = (id: string, name: string,isEdit:boolean) => {
-  if(!isEdit){
+const showGroupItem = (id: string, name: string, isEdit: boolean) => {
+  if (!isEdit) {
     store.currentGroupId = id
     store.currentGroupName = name
     router.push({name: 'groupItems'})
@@ -222,13 +224,12 @@ const onSearch = (value) => {
 /*编辑*/
 const onGroupEdit = (groupId: string) => {
   let group = groupList.value.filter(item => item.id === groupId).at(0)
-  group.isEdit = !group.isEdit
+  group.isEdit = true
 }
 
 /*提交更新*/
 const onUpdateGroup = (groupId: string) => {
   let group = groupList.value.filter(item => item.id === groupId).at(0)
-
   let error = null
   //校验
   if (isEmpty(group.name)) {
@@ -239,7 +240,7 @@ const onUpdateGroup = (groupId: string) => {
   } else {
     //loading
     group.isSubmit = true
-    group.isEdit = !group.isEdit
+    group.isEdit = false
 
     if (group.isTemp) {
       saveGroup(group).then(res => {
@@ -254,7 +255,7 @@ const onUpdateGroup = (groupId: string) => {
     } else {
       updateGroup(group).then(res => {
         if (res.data.success) {
-          message.success(res.data.message)
+          //message.success(res.data.message)
         } else {
           message.error(res.data.message)
         }
@@ -315,7 +316,8 @@ const onAddGroup = () => {
         <a-col v-for="(item) in groupList" :span="8"
                style="margin-bottom: 15px;max-height: 119.141px">
           <a-card :bordered="false" :hoverable="true" size="small" class="animate__animated animate__flipInX">
-            <a-card-meta :data-id="item.id" :data-name="item.name" @click="showGroupItem(item.id,item.name,item.isEdit)">
+            <a-card-meta :data-id="item.id" :data-name="item.name"
+                         @click="showGroupItem(item.id,item.name,item.isEdit)">
               <template #title>
                 <div class="card-title-space" v-show="!item.isEdit">
                   <span>{{ item.name }}</span>
@@ -332,9 +334,15 @@ const onAddGroup = () => {
                          maxlength="10"
                          v-model:value="item.description"/>
               </template>
-              <!--              <template #avatar>
-                              <a-avatar src="https://joeschmoe.io/api/v1/random" />
-                            </template>-->
+              <template #avatar>
+                <a-avatar
+                    shape="square"
+                    size="large"
+                    :style="{ backgroundColor:item.avatarColor , verticalAlign: 'middle' }"
+                >
+                  {{ item.name }}
+                </a-avatar>
+              </template>
             </a-card-meta>
             <template #actions>
               <loading-outlined v-if="!item.isEdit && item.isSubmit"/>
@@ -342,7 +350,14 @@ const onAddGroup = () => {
                               @click="onUpdateGroup(item.id)"/>
               <edit-outlined v-if="!item.isEdit && !item.isSubmit" @click="onGroupEdit(item.id)"/>
               <delete-outlined @click="onDelete(item.id)"/>
-              <setting-outlined/>
+              <a-popover trigger="click" placement="bottom" class="popover-menu">
+                <template #content>
+                  <a-button type="text">更改图标</a-button>
+                  <!--                  <a-divider style="margin: 0"/>
+                                    <a-button type="text">更改图标</a-button>-->
+                </template>
+                <menu-outlined/>
+              </a-popover>
             </template>
           </a-card>
         </a-col>
@@ -360,8 +375,8 @@ const onAddGroup = () => {
   </a-layout-content>
 
   <!--  新增密码组弹框-->
-  <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
-                  @updateTable="searchGroupByPage(true)"/>
+  <!--  <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
+                    @updateTable="searchGroupByPage(true)"/>-->
   <!--  更新密码组弹框-->
   <!--  <UpdateGroupModal :visible="updateModal.visible" :model="updateModal.model" @setVisible="setUpdateModalVisible"
                       @updateTable="searchGroupByPage(true)"/>-->
@@ -403,10 +418,18 @@ const onAddGroup = () => {
     padding: 0;
     margin-bottom: 0
   }
+
+
 }
 
 #content-view {
   overflow: hidden;
 }
 
+</style>
+
+<style>
+.ant-popover-inner-content {
+    padding: 4px;
+  }
 </style>

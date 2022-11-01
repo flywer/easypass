@@ -7,12 +7,22 @@ import {GroupItem} from "@main/model/groupItem";
 import {CopyOutlined} from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
 import {useRouter} from "vue-router";
+import {isEqual} from "lodash-es";
 
 const router = useRouter()
 
 const props = defineProps({
   visible: Boolean,
-  model: {default: <typeof GroupItem>[]}
+  model: {default: []}
+})
+
+/*排除图标*/
+const itemInfoList = computed(() => {
+  return props.model.filter(item => !isEqual(item.type, 'icon'))
+})
+
+const iconUrl = computed(() => {
+  return props.model.filter(item => isEqual(item.type, 'icon')).map(item => item.value).at(0)
 })
 
 //提取标题
@@ -51,7 +61,8 @@ const modalWrap = ref()
       <template #title>
         <a-row>
           <a-col :span="8">
-            <a-typography-title :level="5" style="margin-top: 4px;">{{ title }}</a-typography-title>
+            <a-space> <a-avatar :src="iconUrl"/>
+              <a-typography-title :level="5" style="margin-top: 4px;">{{ title }}</a-typography-title></a-space>
           </a-col>
           <a-col :span="8" :offset="8">
             <a-button type="link" style="float: right" @click="editItems">编辑</a-button>
@@ -59,7 +70,7 @@ const modalWrap = ref()
         </a-row>
       </template>
 
-      <a-row v-for="(item) in model" style="margin-bottom: 12px" class="row-hover">
+      <a-row v-for="(item) in itemInfoList" style="margin-bottom: 12px" class="row-hover">
         <a-col :span="4" :offset="1" align="right" style="float: right">{{ item.name }}&nbsp;:</a-col>
         <a-col :span="16" style="margin-left: 9px;">{{ item.value }}</a-col>
         <a-col :span="2" :offset="0">

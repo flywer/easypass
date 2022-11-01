@@ -19,6 +19,7 @@ import {message, Modal} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
+import {isEqual} from "lodash-es";
 
 const router = useRouter()
 //从后端传过来的分组数据
@@ -53,6 +54,7 @@ const itemInfoModalRef = reactive({
   model: null,/*详情页信息*/
   visible: null/*是否显示组详情*/
 })
+
 const updateItemInfo = (value) => {
   itemInfoModalRef.model = value.model
   itemInfoModalRef.visible = value.visible
@@ -109,7 +111,15 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
       groupItemsList.value = []
       if (itemsRows.length > 0)
         itemsRows.forEach(arr => {
-          let itemObj = {itemId: null, title: '暂无', account: '', showItems: [], isCommon: false, groupId: null}
+          let itemObj = {
+            itemId: null,
+            title: '暂无',
+            account: '',
+            showItems: [],
+            isCommon: false,
+            groupId: null,
+            iconUrl: null
+          }
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/
@@ -118,6 +128,9 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
               itemObj.title = row.value
               itemObj.isCommon = row.isCommon == 1
               itemObj.groupId = row.groupId
+            }
+            if (isEqual(row.type, 'icon')) {
+              itemObj.iconUrl = row.value
             }
             /*主账号*/
             if (row.isAccount) {
@@ -150,9 +163,9 @@ const backToGroupMgt = () => {
 }
 
 /*查询*/
-const onSearch = (value)=>{
-  modelRef.value.value=value
-  searchItemsByPage(false,true)
+const onSearch = (value) => {
+  modelRef.value.value = value
+  searchItemsByPage(false, true)
 }
 
 </script>
@@ -200,6 +213,8 @@ const onSearch = (value)=>{
           >
             <template #title>
               <a-space>
+                <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
+                <a-avatar v-else shape="square">{{ item.title }}</a-avatar>
                 {{ item.title }}
                 <a-space v-for="(showItem) in item.showItems">
                   <a-divider type="vertical" style="background-color: #f0f0f0"/>

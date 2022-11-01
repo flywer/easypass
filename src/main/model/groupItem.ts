@@ -7,6 +7,7 @@ export interface IGroupItemVo extends IPageVo {
     name?: string,
     value?: string,
     itemId?: string,
+    type?:string,
     isTitle?: boolean,
     isCommon?: boolean,
     isAccount?: boolean,
@@ -41,6 +42,10 @@ export let GroupItem = sequelize.define('groupItem', {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         comment: '组项ID：相同组项ID代表为同一组'
+    },
+    type: {
+        type: DataTypes.STRING(24),
+        comment: '项类型：通用，标题，主账号，密码，图标'
     },
     isTitle: {
         type: DataTypes.BOOLEAN,

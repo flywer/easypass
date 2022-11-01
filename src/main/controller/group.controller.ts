@@ -4,6 +4,7 @@ import {channel} from "@render/api/channel";
 import {success, failure} from "@main/vo/resultVo";
 import {GroupItemService} from "@main/service/groupItem.service";
 import log from 'electron-log'
+import {findIcon} from "@common/utils/findIcon";
 
 @Controller()
 export class GroupController {
@@ -117,6 +118,26 @@ export class GroupController {
         } catch (e) {
             log.error(e)
             result = failure("删除失败！")
+        }
+        return result
+    }
+
+
+    /**
+     * 通过标题查询图标
+     * @param title
+     * @param number
+     * @constructor
+     */
+    @IpcHandle(channel.group.findIcon)
+    public async HandleFindIcon(title: string, number: number) {
+        let result
+        try {
+            result = success()
+            result.result = await findIcon(title, number)
+        } catch (e) {
+            log.error(e)
+            result = failure("图标查询失败！")
         }
         return result
     }

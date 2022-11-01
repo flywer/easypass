@@ -28,6 +28,8 @@ export const channel = reactive({
         updateGroup: "group/updateGroup",
         deleteGroupById: "group/deleteGroupById",
         saveOrUpdateGroup: "group/saveOrUpdateGroup",
+        findIcon: "group/findIcon",
+
 
     },
     groupItem: {

@@ -16,6 +16,8 @@ import {Form, FormInstance, Modal, message} from "ant-design-vue";
 import {cloneDeep, isEqual} from "lodash-es";
 import {getItemsListByItemId, saveOrUpdateGroupItems} from "@render/api/groupItem.api";
 import draggable from 'vuedraggable'
+import {findImage} from "@render/api/utils.api";
+import {isEmpty} from "lodash";
 
 const router = useRouter()
 const route = useRoute()
@@ -24,9 +26,9 @@ const route = useRoute()
 const formDataRef = ref(<any>[]);
 /*起始数据*/
 let originData = [
-  {name: '标题', value: '', isTitle: true, isShow: true, key: uuid.v1(), deleteTag: false},
-  {name: '账号', value: '', isAccount: true, isShow: true, key: uuid.v1(), deleteTag: false},
-  {name: '密码', value: '', isPassword: true, isShow: false, key: uuid.v1(), deleteTag: false}
+  {name: '标题', value: '', isTitle: true, isShow: true, key: uuid.v1(), deleteTag: false, type: ''},
+  {name: '账号', value: '', isAccount: true, isShow: true, key: uuid.v1(), deleteTag: false, type: ''},
+  {name: '密码', value: '', isPassword: true, isShow: false, key: uuid.v1(), deleteTag: false, type: ''}
 ];
 /*加载消息key*/
 const loadingKey = 'save'
@@ -61,10 +63,13 @@ onMounted(async () => {
       item.deleteTag = false
       originData.push(item)
     })
-  } else
+    let iconData = originData.filter(item => isEqual(item.type, 'icon'))
+    iconRef.value = iconData.length > 0 ? iconData.at(0).value : null
+  } else {
     isUpdate.value = false
+    iconRef.value = null
+  }
   formDataRef.value = cloneDeep(originData)
-  console.log(formDataRef.value)
 })
 
 /*添加组项*/
@@ -118,6 +123,18 @@ const handleSubmit = () => {
     message.loading({
       content: '保存中...', key: loadingKey
     });
+
+    if (isUpdate)
+        /*更新*/
+      formDataRef.value.forEach(item => {
+        if (isEqual(item.type, 'icon')) {
+          item.value = iconRef.value
+        }
+      })
+    else {
+      formDataRef.value.push({name: '图标', type: 'icon', value: iconRef.value})
+    }
+
     saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
       if (res.data.success) {
         message.success({content: res.data.message, key: loadingKey, duration: 2})
@@ -136,11 +153,6 @@ const handleSubmit = () => {
 
 const draggableRef = reactive({
   enabled: false,
-  list: [
-    {name: "John", id: 0},
-    {name: "Joao", id: 1},
-    {name: "Jean", id: 2}
-  ],
   dragging: false
 })
 
@@ -150,6 +162,32 @@ const onDragSort = () => {
 
   }
 }
+
+/*图标*/
+const iconRef = reactive({
+  value: null,
+  imagesUrl: [],
+  visible: false
+})
+
+const onFindIcon = async (title: string) => {
+  if (!isEmpty(title))
+    await findImage(title, 12).then(res => {
+      if (res.data.success) {
+        iconRef.imagesUrl = cloneDeep(res.data.result)
+        iconRef.value = iconRef.imagesUrl.at(0)
+      } else {
+        iconRef.imagesUrl = []
+        iconRef.value = null
+      }
+    })
+}
+
+const onchangeIcon = (icon) => {
+  iconRef.value = icon
+  iconRef.visible = false
+}
+
 
 </script>
 
@@ -199,43 +237,89 @@ const onDragSort = () => {
                  @end="draggableRef.dragging = false"
       >
         <template #item="{ element,index }">
-
           <a-space class="form-space animate__animated animate__flipInX"
                    :style="{backgroundColor: draggableRef.enabled?'#f6f6f6':null} "
                    :size="0"
                    v-show="!element.deleteTag"
           >
-            <a-form-item class="form-item" :name="[index,'name']"
-                         :rules="rulesRef.name">
-              <a-input placeholder="名称" :bordered="false" v-model:value.trim="element.name"
+            <!--名称-->
+            <a-form-item
+                v-if="!isEqual(element.type,'icon')"
+                class="form-item"
+                :name="[index,'name']"
+                :rules="rulesRef.name"
+            >
+              <a-input placeholder="名称"
+                       :bordered="false"
+                       v-model:value.trim="element.name"
                        :readonly="element.isAccount||element.isTitle"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
-            <a-divider type="vertical" class="my-form-divider-vertical"/>
-            <a-form-item :name="[index,'value']" class="form-item" :rules="rulesRef.value" s>
-              <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"/>
+            <!--内容-->
+            <a-form-item
+                v-if="!isEqual(element.type,'icon')"
+                :name="[index,'value']"
+                class="form-item"
+                :rules="rulesRef.value"
+            >
+              <a-divider type="vertical" class="my-form-divider-vertical" style="height: 30px;margin-bottom: -2px;"/>
+              <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"
+                       @change="element.isTitle?onFindIcon(element.value):null"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
-            <template v-if="!element.isTitle">
+            <!--标题特殊项-->
+            <template v-if="element.isTitle">
+              <a-divider type="vertical" class="my-form-divider-vertical"/>
+              <!--图标选择弹框-->
+              <a-popover
+                  v-if="!isEmpty(iconRef.value) && iconRef.imagesUrl.length>0"
+                  v-model:visible="iconRef.visible"
+                  trigger="click"
+                  placement="bottom"
+              >
+                <template #content>
+                  <a-row :gutter="[0,4]" style="width: 300px;padding-bottom: 8px;">
+                    <a-col :span="6" v-for="(item) in iconRef.imagesUrl">
+                      <div style="width: 75px;text-align:center">
+                        <a-button type="text" style="height: 100%;">
+                          <a-avatar shape="square" :src="item" @click="onchangeIcon(item)"/>
+                        </a-button>
+                      </div>
+                    </a-col>
+                  </a-row>
+                </template>
+                <a-avatar class="form-item" size="large" shape="square"
+                          style="margin: 0 0 14px 20px;border: 1px #e8e8e8 solid;cursor: pointer"
+                          :src="iconRef.value"/>
+              </a-popover>
+              <!--没有值且未搜索，对应新增时-->
+              <a-avatar v-if="isEmpty(iconRef.value) && iconRef.imagesUrl.length===0" size="large" shape="square"
+                        style="margin: 0 0 14px 20px;">{{ element.value }}
+              </a-avatar>
+              <!--有值但未搜索，对应更新时-->
+              <a-avatar v-if="!isEmpty(iconRef.value) && iconRef.imagesUrl.length===0" size="large" shape="square"
+                        style="margin: 0 0 14px 20px;" :src="iconRef.value"/>
+            </template>
+
+            <template v-if="!element.isTitle && !isEqual(element.type,'icon')">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <a-form-item class="form-item">
                 <a-checkbox v-model:checked="element.isShow">是否显示</a-checkbox>
               </a-form-item>
             </template>
-            <template v-if="!element.isAccount && !element.isTitle">
+
+            <template v-if="!element.isAccount && !element.isTitle && !isEqual(element.type,'icon')">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <MinusCircleOutlined @click="handleDelete(element.id,element.key)"
                                    style="margin-left: 4px;margin-bottom: 17px"/>
             </template>
-            <div style="position: absolute;right: 3%;top: 30%;">
+
+            <div v-if="!isEqual(element.type,'icon')" style="position: absolute;right: 3%;top: 30%;">
               <drag-outlined class="animate__animated animate__fadeInRight" v-show="draggableRef.enabled"
                              style="float: right;font-size: 24px;color: #cbcbcb;cursor: pointer"/>
             </div>
           </a-space>
-
-
         </template>
-        <!-- --><!--v-for="(item,index) in formDataRef"-->
       </draggable>
 
     </a-form>
