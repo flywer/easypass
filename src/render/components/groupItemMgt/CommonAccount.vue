@@ -138,11 +138,14 @@ const onSearch = (value) => {
 /*组项类型*/
 const itemType = ref()
 
-
 onMounted(async () => {
   await searchItemsByPage(true)
   itemType.value = (await getItemTypeEnum()).data.result
 })
+
+const setItemVisible = (value) => {
+  itemInfoModalRef.visible = value
+}
 
 </script>
 
@@ -186,7 +189,8 @@ onMounted(async () => {
       </a-empty>
 
     </a-spin>
-    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model"/>
+    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model"
+                    @setItemVisible="setItemVisible"/>
   </a-layout-content>
 
 </template>

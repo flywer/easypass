@@ -172,6 +172,10 @@ const onSearch = (value) => {
   searchItemsByPage(false, true)
 }
 
+const setItemVisible = (value) => {
+  itemInfoModalRef.visible = value
+}
+
 </script>
 
 <template>
@@ -226,7 +230,7 @@ const onSearch = (value) => {
       </a-empty>
 
     </a-spin>
-    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model"/>
+    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model" @setItemVisible="setItemVisible"/>
   </a-layout-content>
 
 </template>

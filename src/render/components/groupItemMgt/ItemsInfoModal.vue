@@ -1,9 +1,6 @@
 <!--查看账号组详情弹窗-->
 <script setup lang="ts">
-
-// 父组件传过来的值，是否显示
-import {computed, onMounted, ref} from "vue";
-import {GroupItem} from "@main/model/groupItem";
+import {computed, onMounted, ref, watch} from "vue";
 import {CopyOutlined} from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
 import {useRouter} from "vue-router";
@@ -17,6 +14,17 @@ const props = defineProps({
   model: {default: []}
 })
 
+const emit = defineEmits(['setItemVisible'])
+
+/*直接使用props属性在打包后会报错，这里新建一个属性去复制visible的值*/
+const modalVisible = ref()
+watch(()=>props.visible,(value)=>{
+  modalVisible.value = value
+})
+
+watch(() => modalVisible.value, () => {
+  emit('setItemVisible', modalVisible.value)
+})
 
 /*组项类型*/
 const itemType = ref()
@@ -65,9 +73,9 @@ const modalWrap = ref()
 <template>
   <div ref="modalWrap" class="modalWrap">
     <a-modal
-        v-model:visible='visible'
+        v-model:visible='modalVisible'
         width="50%"
-        :closable="true"
+        :closable="false"
         :getContainer="modalWrap"
         :footer="null"
     >
@@ -113,16 +121,16 @@ const modalWrap = ref()
     overflow-y: auto;
   }
 
-  :deep(.ant-modal-close-x){
+  :deep(.ant-modal-close-x) {
     width: 30px;
     height: 30px;
     line-height: 30px;
   }
 
 
-/*  :deep(.ant-modal-content) {
-    border-radius: 12px;
-  }*/
+  /*  :deep(.ant-modal-content) {
+      border-radius: 12px;
+    }*/
 }
 </style>
 
