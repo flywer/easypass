@@ -50,10 +50,7 @@
       <template #left>
         版本号
         <a-typography-text type="secondary" v-show="!store.isUpdating">
-          <a-button v-if="!hasUpdates" type="link" style="font-size: 12px" @click="onCheckForUpdate()">检查更新
-          </a-button>
-          <a-button v-if="hasUpdates" type="link" style="font-size: 12px" @click="onDownloadUpdates()">发现船新版本！立即下载
-          </a-button>
+          <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">{{updateText}}</a-button>
         </a-typography-text>
         <a-progress v-show="store.isUpdating"
                     type="circle"
@@ -70,7 +67,7 @@
   </a-layout-content>
 </template>
 <script setup lang="ts">
-import {onMounted, reactive, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {checkForUpdate, downloadUpdate, getAppSettings, getAppVersion, setAppSettings} from "@render/api/app.api";
 import {store} from "@render/store";
 import {message} from "ant-design-vue";
@@ -124,8 +121,13 @@ let progressInfo = ref({
 })
 /*是否自动检查更新*/
 const autoCheckUpdatesChecked = ref(false)
-/*已发现可更新版本*/
-const hasUpdates = ref(false)
+
+const updateText = computed(() => {
+  if (store.hasUpdates)
+    return '发现船新版本！立即下载'
+  else
+    return '检查更新'
+})
 const onCheckForUpdate = async () => {
   await checkForUpdate()
 }
@@ -137,14 +139,6 @@ watch(() => store.isDownloaded, () => {
     progressInfo.value.percent = 100
   }
 })
-
-const onDownloadUpdates = async () => {
-  /*下载更新*/
-  store.isUpdating = true
-  await downloadUpdate().catch(() => {
-    message.error('系统异常')
-  })
-}
 
 onMounted(async () => {
   appVersion.value = (await getAppVersion()).data.result
@@ -173,7 +167,7 @@ onMounted(async () => {
   closeAsHidden.checked = appSettings.closeAsHidden
   enableTrayChecked.value = appSettings.enableTray
   autoCheckUpdatesChecked.value = appSettings.autoCheckUpdates
-  hasUpdates.value = appSettings.hasUpdates
+  store.hasUpdates = appSettings.hasUpdates
 })
 
 </script>

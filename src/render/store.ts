@@ -11,5 +11,6 @@ export const store = reactive({
     isLogin: false,
     selectedMenuKeys: ['100'],
     user: <typeof User>{},
-    loginMode:'02'
+    loginMode: '02',
+    hasUpdates: false,/*发现可更新版本*/
 })

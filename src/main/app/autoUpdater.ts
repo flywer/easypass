@@ -25,7 +25,6 @@ export const handleUpdate = (window) => {
     //当没有可用更新的时候触发
     autoUpdater.on('update-not-available', async function (info) {
         await setHasUpdate(false)
-
         let result = success()
         result.message = '当前为最新版本，无需更新~'
         result.tag = 2
@@ -35,7 +34,6 @@ export const handleUpdate = (window) => {
     //当发现一个可用更新的时候触发
     autoUpdater.on('update-available', async function (info) {
         await setHasUpdate(true)
-
         let result = success()
         result.result = info
         result.tag = 3

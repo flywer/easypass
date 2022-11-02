@@ -126,6 +126,7 @@ const autoCheckUpdates = () => {
         //为最新版本时
       case 2:
         message.success({content: res.message, key: updateKey});
+        store.hasUpdates = false
         break;
         //报错
       case 6:
@@ -133,6 +134,7 @@ const autoCheckUpdates = () => {
         break;
         //有可用更新
       case 3:
+        store.hasUpdates = true
         Modal.confirm({
           title: '提示',
           icon: createVNode(ExclamationCircleOutlined),
