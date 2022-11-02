@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import {createVNode, onMounted, ref} from 'vue'
+import {createVNode, h, onMounted, ref} from 'vue'
 import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
-import {ConfigProvider, message, Modal} from 'ant-design-vue';
-import {downloadUpdate, getAppInfo, getAppTheme, getNetworkInterfaces, quitAndInstall} from "@render/api/app.api";
+import {Button, ConfigProvider, message, Modal, notification} from 'ant-design-vue';
+import {
+  downloadUpdate,
+  getAppSettings,
+  getAppTheme,
+  quitAndInstall, setLoginMode
+} from "@render/api/app.api";
 import {store} from "@render/store";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import config from "@common/config/appConfig.json"
-import {checkLogin, getUserByMac} from "@render/api/user.api";
-import {cloneDeep} from "lodash-es";
+import {checkLogin} from "@render/api/user.api";
+import {cloneDeep, isNull} from "lodash-es";
 import {Model} from "sequelize";
+import {useRouter} from "vue-router";
 
 const manuKey = ref('')
+const router = useRouter()
 
 // 接收子组件传过来的值，此为响应函数
 const getMenuKey = (value) => {
@@ -54,18 +61,53 @@ const updateDownloadedListener = () => {
   })
 }
 
+/*注册提醒*/
+const notificationKey = `open${Date.now()}`;
+const openUnLoginNotification = () => {
+  notification.open({
+    message: '提醒',
+    description:
+        '当前未登录，是否前往登录？',
+    placement: "bottomRight",
+    btn: () =>
+        h(
+            Button,
+            {
+              type: 'primary',
+              size: 'small',
+              onClick: () => {
+                //settings.value.click()
+                store.selectedMenuKeys = ['500']
+                router.push({name: 'settings'})
+                notification.close(notificationKey)
+              },
+            },
+            {default: () => '登录'},
+        ),
+    key: notificationKey,
+  });
+};
+
 onMounted(async () => {
   /*检查是否有已登录账号*/
   checkLogin().then(res => {
     if (res.data.result != null) {
       store.isLogin = true
       store.user = cloneDeep(res.data.result)
-    } else
+    } else{
       store.isLogin = false
-
-    //跨平台模式
-    store.user.mode = '02'
+      openUnLoginNotification()
+    }
   })
+
+  const appSettings = (await getAppSettings()).data.result
+  if (typeof (appSettings.loginMode) == "undefined") { //默认跨平台模式
+    await setLoginMode('02')
+    store.loginMode = '02'
+  } else {
+    store.loginMode = appSettings.loginMode
+  }
+
   await autoThemeConfig()
   updateDownloadedListener()
   autoCheckUpdates()

@@ -10,6 +10,6 @@ export const store = reactive({
     isDownloaded: false,
     isLogin: false,
     selectedMenuKeys: ['100'],
-    user: <typeof User>{}
+    user: <typeof User>{},
+    loginMode:'02'
 })
-

@@ -184,41 +184,8 @@ const onDelete = (id: string) => {
   }
 }
 
-/*注册提醒*/
-const notificationKey = `open${Date.now()}`;
-const openUnLoginNotification = () => {
-  notification.open({
-    message: '提醒',
-    description:
-        '当前为跨平台模式但未登录，是否前往登录？',
-    placement: "bottomRight",
-    btn: () =>
-        h(
-            Button,
-            {
-              type: 'primary',
-              size: 'small',
-              onClick: () => {
-                //store.selectedMenuKeys = ['500']
-                //router.push({name: 'settings'})
-                loginModalVisible.value = true
-                notification.close(notificationKey)
-              },
-            },
-            {default: () => '登录'},
-        ),
-    key: notificationKey,
-  });
-};
-
 onMounted(async () => {
-  if (!store.isLogin)
-    openUnLoginNotification()
   await searchGroupByPage(true)
-})
-
-onUnmounted(() => {
-  notification.close(notificationKey)
 })
 
 /*查询*/
@@ -383,15 +350,6 @@ const onAddGroup = () => {
       <a-button type="primary" v-if="store.isLogin && isSearch" @click="onAddGroup">创建</a-button>
     </a-empty>
   </a-layout-content>
-
-  <!--  新增密码组弹框-->
-  <!--  <SaveGroupModal :visible="saveModalVisible" @setVisible="setSaveModalVisible"
-                    @updateTable="searchGroupByPage(true)"/>-->
-  <!--  更新密码组弹框-->
-  <!--  <UpdateGroupModal :visible="updateModal.visible" :model="updateModal.model" @setVisible="setUpdateModalVisible"
-                      @updateTable="searchGroupByPage(true)"/>-->
-  <!--登录弹框-->
-  <LoginModal :visible="loginModalVisible" @setVisible="setLoginModalVisible" @updateTable="searchGroupByPage(true)"/>
 </template>
 
 <style scoped lang="less">

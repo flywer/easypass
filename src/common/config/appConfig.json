@@ -15,5 +15,6 @@
     "autoCheckUpdates": false,
     "hasUpdates": false
   },
-  "versionType": "02"
+  "versionType": "02",
+  "loginMode": "02"
 }

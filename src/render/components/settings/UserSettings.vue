@@ -3,14 +3,14 @@
     <!--账号模式-->
     <RowCard>
       <template #left>账号模式
-        <a-typography-text type="secondary" style="font-size: 12px;margin-left: 6px">目前只可跨平台使用公共服务器
+        <a-typography-text type="secondary" style="font-size: 12px;margin-left: 6px">
         </a-typography-text>
       </template>
       <template #right>
-        <a-radio-group v-model:value="store.user.mode" button-style="solid">
-          <a-radio-button value="01" disabled="true">
+        <a-radio-group v-model:value="loginMode" button-style="solid" @change="onLoginModeChange">
+          <a-radio-button value="01">
             <a-tooltip>
-              <template #title>其他设备访问时禁止</template>
+              <template #title>本地存储</template>
               本地
             </a-tooltip>
           </a-radio-button>
@@ -128,18 +128,19 @@
 <script setup lang="ts">
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
-import {reactive, watch} from "vue";
+import {createVNode, onMounted, reactive, ref, watch} from "vue";
 import {cloneDeep, isEmpty, random} from "lodash-es";
 import {cancellation, checkPassword, login, logout, register, updateUserInfoByUserId} from "@render/api/user.api";
-import {message} from "ant-design-vue";
+import {message, Modal} from "ant-design-vue";
 import {store} from "@render/store";
 import {
   EditOutlined,
   CheckOutlined,
   CopyOutlined,
-  SwapOutlined
+  SwapOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
+import {appRelaunch, quitAndInstall, setLoginMode} from "@render/api/app.api";
 
 //region 用户登录、注册
 const loginCardRef = reactive({
@@ -215,7 +216,7 @@ const onLogin = async () => {
     message.success(result.data.message)
     store.isLogin = true
     store.user = cloneDeep(result.data.result)
-    store.user.mode = '02'
+    //store.loginMode = '02'
   } else {
     message.warn(result.data.message)
   }
@@ -343,6 +344,31 @@ const onAccountCancellation = () => {
   }
 }
 //endregion
+
+//登录模式切换
+const loginMode = ref()
+onMounted(() => {
+  loginMode.value = store.loginMode
+})
+
+const onLoginModeChange = () => {
+  Modal.confirm({
+    title: '切换数据源',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '此操作需要重启应用，是否继续？',
+    okText: '确认',
+    cancelText: '取消',
+    async onOk() {
+      store.loginMode = loginMode.value
+      await setLoginMode(store.loginMode)
+      await onLogout()
+      await appRelaunch()
+    },
+    onCancel() {
+      loginMode.value = store.loginMode
+    }
+  });
+}
 
 </script>
 <style scoped lang="less">

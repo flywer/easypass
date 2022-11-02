@@ -103,6 +103,20 @@ export class AppController {
     }
 
     /**
+     * 设置登录模式
+     * @param setup
+     * @constructor
+     */
+    @IpcHandle(channel.app.setLoginMode)
+    public async HandleSetLoginMode(setup) {
+        //获取本地设置文件
+        const appSettings = await getAppSettings()
+        /*登录模式*/
+        appSettings.loginMode = setup
+        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
+    }
+
+    /**
      * 获取应用设置
      * @constructor
      */
@@ -124,7 +138,6 @@ export class AppController {
             result = success()
             //判断主题文件是否存在，不存在则创建，并返回实际数据
             let buffer = await readFsSync(this.appThemeFile.getFullPath())
-            console.log(buffer)
             if (buffer == null || isEmpty(buffer.toString())) {
                 writeFs(this.appThemeFile, JSON.stringify(defaultTheme))
                 result.result = defaultTheme
@@ -276,6 +289,16 @@ export class AppController {
             resourcesPath: getResourcePath()
         }
         return result
+    }
+
+    /**
+     * 应用重启
+     * @constructor
+     */
+    @IpcHandle(channel.app.relaunch)
+    public HandleRelaunch() {
+        app.relaunch()
+        app.exit(0)
     }
 
 }

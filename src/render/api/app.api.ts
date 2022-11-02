@@ -78,7 +78,22 @@ export function getAppSettings() {
  * 写入应用设置
  * @param setup
  */
-export function setAppSettings(setup){
+export function setAppSettings(setup) {
     return ipcInstance.send<Result>(channel.app.setAppSettings, setup)
+}
+
+/**
+ * 更新登录模式
+ * @param setup
+ */
+export function setLoginMode(setup) {
+    return ipcInstance.send<Result>(channel.app.setLoginMode, setup)
+}
+
+/**
+ * 应用重启
+ */
+export function appRelaunch() {
+    return ipcInstance.send(channel.app.relaunch)
 }
 

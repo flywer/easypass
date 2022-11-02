@@ -13,32 +13,36 @@ export interface IGroupVo extends IPageVo {
 /**
  * 密码组信息model
  */
-export const Group = sequelize.define('group', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
-        comment: '主键ID'
-    },
-    name: {
-        type: DataTypes.STRING(36),
-        comment: '组名'
-    },
-    description: {
-        type: DataTypes.STRING(128),
-        comment: '描述'
-    },
-    groupIndex: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        unique: true,
-        comment: '排序号'
-    },
-    userId: {
-        type: DataTypes.STRING,
-        comment: '所属用户ID'
-    }
-}, {
-    tableName: 'group',
-    comment: '密码组信息表'
-})
+export let Group
+
+export const groupInit = () => {
+    Group = sequelize.define('group', {
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+            comment: '主键ID'
+        },
+        name: {
+            type: DataTypes.STRING(36),
+            comment: '组名'
+        },
+        description: {
+            type: DataTypes.STRING(128),
+            comment: '描述'
+        },
+        groupIndex: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            unique: true,
+            comment: '排序号'
+        },
+        userId: {
+            type: DataTypes.STRING,
+            comment: '所属用户ID'
+        }
+    }, {
+        tableName: 'group',
+        comment: '密码组信息表'
+    })
+}

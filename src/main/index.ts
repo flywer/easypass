@@ -1,5 +1,5 @@
-import {app, Tray, Menu, nativeImage, nativeTheme, BrowserWindow} from 'electron'
-import {createEinf, IpcSend} from 'einf'
+import {app} from 'electron'
+import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
 import {sequelize} from "@main/sequelize.init";
@@ -8,9 +8,13 @@ import {tray, trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getAppSettings, getNetworkInfo, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppSettings, getUserAppDataFolder} from "@common/utils/utils";
 import log from 'electron-log'
 import * as Path from "path";
+import {groupInit} from "@main/model/group";
+import {GroupItemInit} from "@main/model/groupItem";
+import {UserInit} from "@main/model/user";
+import {databaseInit} from "@main/mapper/defaultSql";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 //设置日志存储位置
@@ -82,7 +86,11 @@ async function bootstrap() {
         //验证是否连接成功
         sequelize.authenticate().then(async () => {
             log.info('===================Database connection succeeded :) ================');
-            //await databaseInit()
+
+            groupInit()
+            GroupItemInit()
+            UserInit()
+            await databaseInit()
 
             /* await GroupItem.sync({force:true})
              //密码组与组项是一对多的关系

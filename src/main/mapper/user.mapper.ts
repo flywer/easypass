@@ -19,8 +19,7 @@ export class UserMapper {
             name: user.name,
             password: user.password,
             account: user.account,
-            mac: user.mac,
-            mode: user.mode
+            mac: user.mac
         })
     }
 

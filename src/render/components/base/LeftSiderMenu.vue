@@ -7,7 +7,6 @@ import {
   SettingOutlined,
   UploadOutlined,
 } from '@ant-design/icons-vue'
-import {ref} from 'vue'
 import {store} from "@render/store";
 
 // 使用defineEmits注册一个自定义事件
@@ -17,6 +16,7 @@ const emit = defineEmits(['getKey'])
 const menuClick = (item) => {
   emit('getKey', item.key)
 }
+
 </script>
 
 <template>
