@@ -54,6 +54,10 @@ const editItems = () => {
   )
 }
 
+const onHidden = () => {
+  console.log(1)
+}
+
 const modalWrap = ref()
 
 </script>
@@ -63,7 +67,7 @@ const modalWrap = ref()
     <a-modal
         v-model:visible='visible'
         width="50%"
-        :closable="false"
+        :closable="true"
         :getContainer="modalWrap"
         :footer="null"
     >
@@ -101,7 +105,7 @@ const modalWrap = ref()
 .modalWrap {
   :deep(.ant-modal-header) {
     padding-bottom: 0;
-    border-radius: 12px 12px 0 0;
+    /*border-radius: 12px 12px 0 0;*/
   }
 
   :deep(.ant-modal-body) {
@@ -109,9 +113,16 @@ const modalWrap = ref()
     overflow-y: auto;
   }
 
-  :deep(.ant-modal-content) {
-    border-radius: 12px;
+  :deep(.ant-modal-close-x){
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
   }
+
+
+/*  :deep(.ant-modal-content) {
+    border-radius: 12px;
+  }*/
 }
 </style>
 
