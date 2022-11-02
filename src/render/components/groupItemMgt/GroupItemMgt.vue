@@ -17,7 +17,7 @@ import empty from '@render/assets/img/empty.png'
 import {message, Modal} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
-import {isEqual} from "lodash-es";
+import {isEmpty, isEqual} from "lodash-es";
 import GroupItemCard from "@render/components/groupItemMgt/GroupItemCard.vue";
 
 const router = useRouter()
@@ -134,7 +134,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
               itemObj.groupId = row.groupId
             }
             if (isEqual(row.type, itemType.value.icon)) {
-              itemObj.iconUrl = row.value
+              itemObj.iconUrl = isEmpty(row.value)?null:row.value
             }
             /*主账号*/
             if (isEqual(row.type, itemType.value.account)) {

@@ -2,7 +2,7 @@
  * @see https://www.electron.build/configuration/configuration
  */
 const config = {
-  productName: 'easyPass',
+  productName: 'EasyPass',
   // copyright: "", //应用版本
   directories: {
     output: 'dist/electron', // 构建后保存的位置
@@ -29,7 +29,7 @@ const config = {
     installerHeaderIcon: './assets/logo_256.ico', // 安装时头部图标
     createDesktopShortcut: true, // 创建桌面图标
     createStartMenuShortcut: true, // 创建开始菜单图标
-    shortcutName: 'easyPass', // 快捷方式名称
+    shortcutName: 'EasyPass', // 快捷方式名称
   },
   publish: [
     {

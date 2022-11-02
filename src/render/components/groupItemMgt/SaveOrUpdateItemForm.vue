@@ -13,7 +13,7 @@ import {
 import {useRoute, useRouter} from "vue-router";
 import {uuid} from 'vue3-uuid';
 import {Form, FormInstance, Modal, message} from "ant-design-vue";
-import {cloneDeep, isEqual} from "lodash-es";
+import {cloneDeep, isEqual, isNull} from "lodash-es";
 import {getItemsListByItemId, getItemTypeEnum, saveOrUpdateGroupItems} from "@render/api/groupItem.api";
 import draggable from 'vuedraggable'
 import {findImage} from "@render/api/utils.api";
@@ -156,16 +156,33 @@ const handleSubmit = () => {
       message.loading({
         content: '保存中...', key: loadingKey
       });
-      if (isUpdate.value){
-        /*更新*/
-        formDataRef.value.forEach(item => {
-          if (isEqual(item.type, itemType.value.icon)) {
-            item.value = iconRef.value
-          }
+      if (isUpdate.value) {
+        //旧数据没有图标，现在新增一个
+        if (isEmpty(formDataRef.value.filter(item => isEqual(item.type, itemType.value.icon)))) {
+          console.log(iconRef.value)
+          formDataRef.value.push({
+            name: '图标',
+            type: itemType.value.icon,
+            value: isNull(iconRef.value)?'':iconRef.value, //可能只更新了其他数据，没有更新图标
+            deleteTag: false,
+            isShow: false
+          })
+        } else {
+          /*更新*/
+          formDataRef.value.forEach(item => {
+            if (isEqual(item.type, itemType.value.icon)) {
+              item.value = iconRef.value
+            }
+          })
+        }
+      } else {
+        formDataRef.value.push({
+          name: '图标',
+          type: itemType.value.icon,
+          value: iconRef.value,
+          deleteTag: false,
+          isShow: false
         })
-      }
-      else {
-        formDataRef.value.push({name: '图标', type: itemType.value.icon, value: iconRef.value,deleteTag: false,isShow:false})
       }
 
       saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
