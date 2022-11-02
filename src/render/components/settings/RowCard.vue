@@ -20,10 +20,8 @@
   </a-row>
 </template>
 
-<script>
-export default {
-  name: "RowCard"
-}
+<script setup lang="ts">
+
 </script>
 
 <style scoped lang="less">
