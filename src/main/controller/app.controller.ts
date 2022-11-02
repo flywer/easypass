@@ -25,9 +25,8 @@ export class AppController {
     private readonly appSettingsFile = {
         folderPath: path.join(getUserAppDataFolder(), '/config'),
         fileName: 'settings.json',
-        fullPath: '',
-        constructor() {
-            this.fullPath = path.join(this.folderPath, this.fileName)
+        getFullPath: () => {
+            return path.join(this.appSettingsFile.folderPath, this.appSettingsFile.fileName)
         }
     }
 
@@ -35,9 +34,8 @@ export class AppController {
     private readonly appThemeFile = {
         folderPath: path.join(getUserAppDataFolder(), '/config'),
         fileName: 'theme.json',
-        fullPath: '',
-        constructor() {
-            this.fullPath = path.join(this.folderPath, this.fileName)
+        getFullPath: () => {
+            return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
         }
     }
 
@@ -125,7 +123,8 @@ export class AppController {
             let defaultTheme = config.defaultTheme
             result = success()
             //判断主题文件是否存在，不存在则创建，并返回实际数据
-            let buffer = await readFsSync(this.appThemeFile.fullPath)
+            let buffer = await readFsSync(this.appThemeFile.getFullPath())
+            console.log(buffer)
             if (buffer == null || isEmpty(buffer.toString())) {
                 writeFs(this.appThemeFile, JSON.stringify(defaultTheme))
                 result.result = defaultTheme
