@@ -1,4 +1,4 @@
-import {app} from 'electron'
+import {app, dialog} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
@@ -85,21 +85,19 @@ async function bootstrap() {
 
         //验证是否连接成功
         sequelize.authenticate().then(async () => {
-            log.info('===================Database connection succeeded :) ================');
-
+            log.info('Database connection succeeded :) ');
             groupInit()
             GroupItemInit()
             UserInit()
             await databaseInit()
-
-            /* await GroupItem.sync({force:true})
-             //密码组与组项是一对多的关系
-             Group.hasMany(GroupItem)
-             GroupItem.belongsTo(Group)
-             await GroupItem.sync({alter: true})//添加外键*/
-
         }).catch(err => {
-            log.error('=================Database connection failed :( ===================', err);
+            log.error('Database connection failed :( ', err);
+            dialog.showMessageBox({
+                type: 'error',
+                title: '数据库连接失败',
+                message: err,
+                buttons: ['ok']
+            })
         });
 
     } catch (error) {
@@ -122,6 +120,6 @@ async function installVueDevtools() {
             log.log("success load : " + result)
         }
     } catch (e) {
-        log.error('Vue Devtools failed to install:', e.toString())
+        log.error('Vue Devtools failed to install:', e)
     }
 }

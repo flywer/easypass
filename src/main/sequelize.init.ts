@@ -45,7 +45,7 @@ export const sequelizeInit = async (database: string, username: string, password
             sequelize = new Sequelize(commonDb.database, commonDb.username, commonDb.password, commonDb.options as Options)
     }
 
-    log.log('===================sequelize init success :)====================')
+    log.log('Sequelize init success :)')
     return sequelize
 }
 

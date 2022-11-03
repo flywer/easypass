@@ -57,7 +57,7 @@ export class GroupItemService {
         //相同账号组有同一个组ID
         let itemId
         if (isUpdate)
-            itemId = groupItems.filter(item => isEqual(item.type,itemTypeEnum.title)).at(0).itemId
+            itemId = groupItems.filter(item => isEqual(item.type, itemTypeEnum.title)).at(0).itemId
         else
             itemId = uuid.v4()
 
