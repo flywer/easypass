@@ -266,7 +266,7 @@ const updatePasswordModelRef = reactive({
   checkPass: ''
 });
 
-let validatePass2 = async (_rule: Rule, value: string) => {
+const validatePass2 = async (_rule: Rule, value: string) => {
   if (value !== updatePasswordModelRef.newPassword) {
     return Promise.reject("两次密码不同");
   } else {

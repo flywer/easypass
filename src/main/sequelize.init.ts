@@ -28,7 +28,7 @@ const localDb = {
 
 
 /* 选择 'mysql' | 'mariadb' | 'postgres' | 'mssql' | 'sqlite'其一 */
-export const sequelizeInit = async (database: string, username: string, password: string, options: Options) => {
+export const sequelizeInit = async () => {
     const appSettings = await getAppSettings()
     if (typeof (appSettings.loginMode) == 'undefined') {
         log.info('默认登录模式：', defaultMode)
@@ -50,7 +50,7 @@ export const sequelizeInit = async (database: string, username: string, password
 }
 
 //实例
-export let sequelize = sequelizeInit('easypass', 'hyq', '147896325q!', {});
+export let sequelize = sequelizeInit();
 
 
 

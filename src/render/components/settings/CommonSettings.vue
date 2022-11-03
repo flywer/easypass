@@ -1,82 +1,17 @@
-<template>
-  <a-layout-content class="setting-content">
-    <!--开机自启-->
-    <RowCard>
-      <template #left>开机自启动</template>
-      <template #right>
-        <a-switch v-model:checked="openAtLoginChecked" @click="onSetAppSettings"/>
-      </template>
-    </RowCard>
-    <!--启用托盘-->
-    <RowCard>
-      <template #left>
-        启用托盘
-      </template>
-      <template #right>
-        <a-switch v-model:checked="enableTrayChecked" @click="onEnableTray"/>
-      </template>
-    </RowCard>
-    <!--启动时最小化到托盘-->
-    <RowCard>
-      <template #left>启动时最小化到托盘</template>
-      <template #right>
-        <a-switch v-model:checked="openAsHidden.checked" :disabled="openAsHidden.disabled"
-                  @click="onSetAppSettings"/>
-      </template>
-    </RowCard>
-    <!--关闭到托盘-->
-    <RowCard>
-      <template #left>
-        关闭时隐藏到托盘
-        <SecondaryText>
-          <template #text>禁用此选项后时关闭主窗口将直接退出程序</template>
-        </SecondaryText>
-      </template>
-      <template #right>
-        <a-switch v-model:checked="closeAsHidden.checked" :disabled="closeAsHidden.disabled"
-                  @click="onSetAppSettings"/>
-      </template>
-    </RowCard>
-    <a-divider class="setting-divider"/>
-    <!--自动检查更新-->
-    <RowCard>
-      <template #left>自动检查更新</template>
-      <template #right>
-        <a-switch v-model:checked="autoCheckUpdatesChecked" @click="onSetAppSettings"/>
-      </template>
-    </RowCard>
-    <!--检查更新-->
-    <RowCard>
-      <template #left>
-        版本号
-        <a-typography-text type="secondary" v-show="!store.isUpdating">
-          <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">{{ updateText }}</a-button>
-        </a-typography-text>
-        <a-progress
-            v-show="store.isUpdating"
-            type="circle"
-            :width="50"
-            :strokeWidth="10"
-            :percent="parseInt(progressInfo.percent.toString())"
-            class="update-progress"
-            style="position: absolute;top: 9%;"
-        />
-      </template>
-      <template #right>
-        <div class="app-version-div">{{ appVersion }}</div>
-      </template>
-    </RowCard>
-  </a-layout-content>
-</template>
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref, watch} from "vue";
-import {checkForUpdate, downloadUpdate, getAppSettings, getAppVersion, setAppSettings} from "@render/api/app.api";
+import {checkForUpdate, getAppSettings, getAppVersion, setAppSettings} from "@render/api/app.api";
 import {store} from "@render/store";
 import {message} from "ant-design-vue";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
+import {
+  DownOutlined,
+  UpOutlined
+} from '@ant-design/icons-vue'
+import ProxyForm from "@render/components/settings/ProxyForm.vue";
 
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
@@ -172,7 +107,120 @@ onMounted(async () => {
   store.hasUpdates = appSettings.hasUpdates
 })
 
+
+const setProxyVisible = ref(false)
+
+/*显示修改密码框*/
+const onShowProxyModal = () => {
+  setProxyVisible.value = !setProxyVisible.value
+}
+
 </script>
+
+<template>
+  <a-layout-content class="setting-content">
+    <!--开机自启-->
+    <RowCard>
+      <template #left>开机自启动</template>
+      <template #right>
+        <a-switch v-model:checked="openAtLoginChecked" @click="onSetAppSettings"/>
+      </template>
+    </RowCard>
+    <!--启用托盘-->
+    <RowCard>
+      <template #left>
+        启用托盘
+      </template>
+      <template #right>
+        <a-switch v-model:checked="enableTrayChecked" @click="onEnableTray"/>
+      </template>
+    </RowCard>
+    <!--启动时最小化到托盘-->
+    <RowCard>
+      <template #left>启动时最小化到托盘</template>
+      <template #right>
+        <a-switch v-model:checked="openAsHidden.checked" :disabled="openAsHidden.disabled"
+                  @click="onSetAppSettings"/>
+      </template>
+    </RowCard>
+    <!--关闭到托盘-->
+    <RowCard>
+      <template #left>
+        关闭时隐藏到托盘
+        <SecondaryText>
+          <template #text>禁用此选项后时关闭主窗口将直接退出程序</template>
+        </SecondaryText>
+      </template>
+      <template #right>
+        <a-switch v-model:checked="closeAsHidden.checked" :disabled="closeAsHidden.disabled"
+                  @click="onSetAppSettings"/>
+      </template>
+    </RowCard>
+    <a-divider class="setting-divider"/>
+    <RowCard :bottom-card-visible="setProxyVisible">
+      <template #left>
+        <a-space style="gap:2px">
+          网络代理
+          <SecondaryText>
+            <template #text>需重启应用更新全局网络代理</template>
+          </SecondaryText>
+        </a-space>
+      </template>
+      <template #right>
+        <a-button v-if="!setProxyVisible" class="animate__animated animate__flipInX"
+                  @click="onShowProxyModal">
+          <template #icon>
+            <down-outlined/>
+          </template>
+          设置
+        </a-button>
+        <a-button v-if="setProxyVisible"
+                  class="animate__animated animate__flipInX"
+                  @click="onShowProxyModal"
+        >
+          <template #icon>
+            <up-outlined/>
+          </template>
+          取消
+        </a-button>
+      </template>
+      <template #bottom-card>
+        <ProxyForm/>
+      </template>
+    </RowCard>
+    <a-divider class="setting-divider"/>
+    <!--自动检查更新-->
+    <RowCard>
+      <template #left>自动检查更新</template>
+      <template #right>
+        <a-switch v-model:checked="autoCheckUpdatesChecked" @click="onSetAppSettings"/>
+      </template>
+    </RowCard>
+    <!--检查更新-->
+    <RowCard>
+      <template #left>
+        版本号
+        <a-typography-text type="secondary" v-show="!store.isUpdating">
+          <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">{{ updateText }}</a-button>
+        </a-typography-text>
+        <a-progress
+            v-show="store.isUpdating"
+            type="circle"
+            :width="50"
+            :strokeWidth="10"
+            :percent="parseInt(progressInfo.percent.toString())"
+            class="update-progress"
+            style="position: absolute;top: 9%;"
+        />
+      </template>
+      <template #right>
+        <div class="app-version-div">{{ appVersion }}</div>
+      </template>
+    </RowCard>
+  </a-layout-content>
+</template>
+
+
 <style scoped lang="less">
 @import "ant-design-vue/dist/antd.variable.less";
 

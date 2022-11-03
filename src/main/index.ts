@@ -1,20 +1,21 @@
-import {app, dialog} from 'electron'
+import {app, BrowserWindow, dialog} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
 import {sequelize} from "@main/sequelize.init";
 import {GroupController} from "@main/controller/group.controller";
-import {tray, trayInit} from "@main/app/app.tray";
+import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getAppSettings, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppProxySettings, getAppSettings, getUserAppDataFolder} from "@common/utils/utils";
 import log from 'electron-log'
 import * as Path from "path";
 import {groupInit} from "@main/model/group";
 import {GroupItemInit} from "@main/model/groupItem";
 import {UserInit} from "@main/model/user";
 import {databaseInit} from "@main/mapper/defaultSql";
+import {isEqual, isNull} from "lodash";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 //设置日志存储位置
@@ -28,8 +29,41 @@ async function electronAppInit() {
     //应用单例运行，不可存在多个同时运行
     if (!app.requestSingleInstanceLock()) app.quit();
 
-
+    //设置操作系统全局名称
     app.setAppUserModelId('EasyPass')
+
+    //region 应用全局网络代理
+    const proxySettings = await getAppProxySettings()
+    if (isEqual(proxySettings.proxyMode, '01')) {
+        app.commandLine.appendSwitch('no-proxy-server')
+        log.info('无网络代理')
+    } else {
+        if (!isNull(proxySettings.model)) {
+            const model = proxySettings.model
+            let server
+            if (isEqual(model.proxyType, '01')) {
+                server = 'http://' + model.hostname + ':' + model.port
+            } else {
+                server = 'socks5://' + model.hostname + ':' + model.port
+            }
+            app.commandLine.removeSwitch('no-proxy-server')
+            app.commandLine.appendSwitch('proxy-server', server);
+            app.commandLine.appendSwitch('proxy-bypass-list', model.bypassList)
+            log.info('网络代理设置成功，代理地址为：' + server)
+        }
+    }
+    //endregion
+
+    ///应用启动后的操作
+    app.whenReady().then(async () => {
+        const appSettings = await getAppSettings()
+        if (appSettings.enableTray)
+            trayInit()
+        if (isDev) {
+            //安装vue开发者工具
+            await installVueDevtools()
+        }
+    })
 
     //当应用程序关闭所有窗口时触发
     app.on('window-all-closed', () => {
@@ -51,20 +85,6 @@ async function electronAppInit() {
             })
         }
     }
-
-    ///应用启动后的操作
-    app.whenReady().then(async () => {
-
-        const appSettings = await getAppSettings()
-        if (appSettings.enableTray)
-            trayInit()
-        if (isDev) {
-            //安装vue开发者工具
-            await installVueDevtools()
-        }
-    })
-
-
 }
 
 /**

@@ -3,7 +3,7 @@ import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
-import {getAppSettings, getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppProxySettings, getAppSettings, getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
 import {readFsSync, writeFs} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
@@ -12,6 +12,7 @@ import * as os from "os";
 import log from "electron-log";
 import {isEmpty} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
+import {isEqual} from "lodash";
 
 @Controller()
 export class AppController {
@@ -34,6 +35,15 @@ export class AppController {
     private readonly appThemeFile = {
         folderPath: path.join(getUserAppDataFolder(), '/config'),
         fileName: 'theme.json',
+        getFullPath: () => {
+            return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
+        }
+    }
+
+    /*网络代理配置文件*/
+    private readonly appProxyFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'proxy.json',
         getFullPath: () => {
             return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
         }
@@ -299,6 +309,37 @@ export class AppController {
     public HandleRelaunch() {
         app.relaunch()
         app.exit(0)
+    }
+
+    /**
+     * 设置网络代理
+     * @param setup
+     * @constructor
+     */
+    @IpcHandle(channel.app.setProxy)
+    public async HandleSetProxy(setup) {
+        let result
+        try {
+            writeFs(this.appProxyFile, JSON.stringify(setup))
+            result = success()
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+    @IpcHandle(channel.app.getAppProxySettings)
+    public async HandleGetAppProxySettings() {
+        let result
+        try {
+            result = success()
+            result.result = await getAppProxySettings()
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
     }
 
 }

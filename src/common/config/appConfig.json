@@ -16,5 +16,14 @@
     "hasUpdates": false
   },
   "versionType": "02",
-  "loginMode": "02"
+  "loginMode": "02",
+  "defaultProxySettings": {
+    "proxyMode": "01",
+    "model": {
+      "proxyType": "01",
+      "hostname": "",
+      "port": null,
+      "bypassList": ""
+    }
+  }
 }

@@ -97,3 +97,17 @@ export function appRelaunch() {
     return ipcInstance.send(channel.app.relaunch)
 }
 
+/**
+ * 应用网络代理设置
+ */
+export function setProxy(setup) {
+    return ipcInstance.send<Result>(channel.app.setProxy,setup)
+}
+
+/**
+ * 获取网络代理设置
+ */
+export function getAppProxySettings(){
+    return ipcInstance.send<Result>(channel.app.getAppProxySettings)
+}
+

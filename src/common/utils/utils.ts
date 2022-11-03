@@ -106,4 +106,19 @@ export const getAppSettings = async () => {
         return parseJson(buffer.toString())
 }
 
+/*获取应用网络代理设置*/
+export const getAppProxySettings = async () => {
+    const defaultSettings = config.defaultProxySettings
+    const appSettingsFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'proxy.json'
+    }
+
+    const buffer = await readFsSync(path.join(appSettingsFile.folderPath, appSettingsFile.fileName))
+    if (buffer == null || isEmpty(buffer.toString()))
+        return defaultSettings
+    else
+        return parseJson(buffer.toString())
+}
+
 //endregion

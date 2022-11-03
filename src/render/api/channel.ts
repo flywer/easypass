@@ -21,6 +21,10 @@ export const channel = reactive({
         setAppSettings: 'app/setAppSettings',
         setLoginMode: 'app/setLoginMode',
         relaunch: 'app/relaunch',
+        setProxy: 'app/setProxy',
+        getAppProxySettings: 'app/getAppProxySettings',
+
+
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',
