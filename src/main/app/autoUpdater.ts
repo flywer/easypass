@@ -102,7 +102,7 @@ export const handleAutoUpdater = (window) => {
 }
 
 /*记录可用更新情况*/
-const setHasUpdate = async (hasUpdate: boolean) => {
+export const setHasUpdate = async (hasUpdate: boolean) => {
     //获取本地设置文件
     const appSettings = await getAppSettings()
     appSettings.hasUpdates = hasUpdate //记录已有可用更新，显示在前端

@@ -13,6 +13,8 @@ import log from "electron-log";
 import {isEmpty} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
 import {isEqual} from "lodash";
+import {setHasUpdate} from "@main/app/autoUpdater";
+import {assignWith} from "lodash-es";
 
 @Controller()
 export class AppController {
@@ -242,10 +244,11 @@ export class AppController {
      * @constructor
      */
     @IpcHandle(channel.app.quitAndInstall)
-    public HandleQuitAndInstall() {
+    public async HandleQuitAndInstall() {
         let result
         try {
             result = success()
+            await setHasUpdate(false)
             //退出并安装
             autoUpdater.quitAndInstall();
         } catch (e) {
@@ -329,6 +332,10 @@ export class AppController {
         return result
     }
 
+    /**
+     * 获取网络代理配置
+     * @constructor
+     */
     @IpcHandle(channel.app.getAppProxySettings)
     public async HandleGetAppProxySettings() {
         let result
