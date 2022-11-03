@@ -4,7 +4,7 @@ import {cloneDeep, isEqual} from 'lodash-es'
 import {appRelaunch, getAppProxySettings, setLoginMode, setProxy} from "@render/api/app.api";
 import {Form, message, Modal} from "ant-design-vue";
 import {Rule} from "ant-design-vue/es/form";
-import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
+import {ExclamationCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons-vue";
 import {store} from "@render/store";
 
 const proxyFormRef = reactive({
@@ -90,6 +90,11 @@ const formReset = () => {
     }
   })
 }
+
+const bypassTooltip1 = "示例:"
+const bypassTooltip2 = "'<local>;*.google.com;*foo.com;1.2.3.4:5678'"
+const bypassTooltip3 = "含义为除了本地地址(localhost,127.0.0.1等等.), google.com子域名, 包含foo.com后缀的主机地址, 以及任何在1.2.3.4:5678上的地址以外的所有主机都将使用此代理服务器"
+
 </script>
 
 <template>
@@ -118,7 +123,17 @@ const formReset = () => {
       <a-input-number v-model:value="proxyFormRef.model.port" :min="0"/>
     </a-form-item>
     <a-form-item label="不为以下项使用代理">
-      <a-input v-model:value="proxyFormRef.model.bypassList"/>
+      <a-space>
+        <a-input v-model:value="proxyFormRef.model.bypassList"/>
+        <a-tooltip>
+          <template #title>
+            <p>{{ bypassTooltip1 }}</p>
+            <p>{{ bypassTooltip2 }}</p>
+            <p>{{ bypassTooltip3 }}</p>
+          </template>
+          <question-circle-outlined/>
+        </a-tooltip>
+      </a-space>
     </a-form-item>
     <a-form-item :wrapper-col="{ offset:6,span:24}">
       <a-button style="width: 20%;margin-right: 20px" @click="formReset">重置</a-button>
