@@ -11,6 +11,7 @@ import parseJson from 'parse-json'
 import {GroupItemService} from "@main/service/groupItem.service";
 import log from 'electron-log'
 import {IUserVo} from "@main/model/user";
+import {sendEmail} from "@common/utils/mailer";
 
 @Controller()
 export class UserController {
@@ -233,6 +234,23 @@ export class UserController {
         } catch (e) {
             log.error('检查密码是否正确失败', e)
             result = failure('检查密码是否正确失败')
+        }
+        return result
+    }
+
+    /**
+     * 向用户邮箱发送邮件
+     * @constructor
+     */
+    @IpcHandle(channel.user.sendEmail)
+    public async HandleSendEmail(data,type) {
+        let result
+        try {
+            sendEmail(data,type)
+            result = success("邮件已发送")
+        } catch (e) {
+            log.error('邮件发送失败！', e)
+            result = failure()
         }
         return result
     }

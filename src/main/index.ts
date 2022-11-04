@@ -16,6 +16,7 @@ import {GroupItemInit} from "@main/model/groupItem";
 import {UserInit} from "@main/model/user";
 import {databaseInit} from "@main/mapper/defaultSql";
 import {isEqual, isNull} from "lodash";
+import {sendEmail} from "@common/utils/mailer";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 //设置日志存储位置
@@ -115,7 +116,7 @@ async function bootstrap() {
             dialog.showMessageBox({
                 type: 'error',
                 title: '数据库连接失败',
-                message: err,
+                message: err.toString(),
                 buttons: ['ok']
             })
         });

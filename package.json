@@ -27,6 +27,7 @@
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
+    "nodemailer": "^6.8.0",
     "pg-hstore": "^2.3.4",
     "sqlite3": "^5.1.2",
     "superagent": "^8.0.3",

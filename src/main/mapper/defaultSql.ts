@@ -12,11 +12,11 @@ export const databaseInit = async () => {
     try {
         await sequelize.transaction(async (t) => {
             //用户信息表结构初始化
-            await User.sync()
+            await User.sync({ alter: true })
             //组信息表结构初始化
-            await Group.sync()
+            await Group.sync({ alter: true })
             //组项信息表结构初始化
-            await GroupItem.sync()
+            await GroupItem.sync({ alter: true })
             log.info("database init succeeded :)")
         });
     } catch (error) {
@@ -24,7 +24,7 @@ export const databaseInit = async () => {
         dialog.showMessageBox({
             type: 'error',
             title: '数据库初始化失败',
-            message: error,
+            message: error.toString(),
             buttons: ['ok']
         })
     }

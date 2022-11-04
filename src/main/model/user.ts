@@ -8,7 +8,8 @@ export interface IUserVo extends IPageVo {
     account?: string,
     password?: string,
     token?: string,
-    mac?: string
+    mac?: string,
+    email?: string
 }
 
 /**
@@ -45,6 +46,10 @@ export const UserInit = () => {
             type: DataTypes.STRING(17),
             comment: '用户Mac地址'
         },
+        email: {
+            type: DataTypes.STRING(64),
+            comment: '邮箱地址'
+        }
     }, {
         tableName: 'user',
         comment: '用户信息表'

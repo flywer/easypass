@@ -13,4 +13,5 @@ export const store = reactive({
     user: <typeof User>{},
     loginMode: '02',
     hasUpdates: false,/*发现可更新版本*/
+    emailValidCode:''
 })
