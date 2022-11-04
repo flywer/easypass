@@ -18,6 +18,7 @@ import {getItemsListByItemId, getItemTypeEnum, saveOrUpdateGroupItems} from "@re
 import draggable from 'vuedraggable'
 import {findImage} from "@render/api/utils.api";
 import {isEmpty} from "lodash";
+import {itemTypeEnum} from "@main/model/groupItem";
 
 const router = useRouter()
 const route = useRoute()
@@ -28,6 +29,8 @@ const formDataRef = ref(<any>[]);
 const itemType = ref()
 /*起始数据*/
 let originData = [];
+/*起始图标选择*/
+let originIconChecked = ''
 /*加载消息key*/
 const loadingKey = 'save'
 /*表单响应实例*/
@@ -47,6 +50,8 @@ const rulesRef = ref({
 const isUpdate = ref(false)
 //密码组ID
 let groupId = null
+/*使用哪种图标*/
+const iconChecked = ref('1')
 
 onMounted(async () => {
   itemType.value = (await getItemTypeEnum()).data.result
@@ -63,6 +68,11 @@ onMounted(async () => {
       item.key = uuid.v1()
       item.deleteTag = false
       originData.push(item)
+      //图标选择初始化
+      if (isEqual(item.type, itemType.value.icon)) {
+        iconChecked.value = isEmpty(item.value) ? '1' : '2'
+        originIconChecked = iconChecked.value
+      }
     })
     let iconData = originData.filter(item => isEqual(item.type, itemType.value.icon))
     iconRef.value = iconData.length > 0 ? iconData.at(0).value : null
@@ -71,6 +81,8 @@ onMounted(async () => {
     iconRef.value = null
   }
   formDataRef.value = cloneDeep(originData)
+
+  await onFindIcon(formDataRef.value.filter(item => isEqual(item.type, itemType.value.title)).map(item => item.value).at(0))
 })
 
 /*初始化空表单*/
@@ -151,38 +163,58 @@ const handleBack = () => {
 
 /*提交*/
 const handleSubmit = () => {
-  if (!isEqual(formDataRef.value, originData))
+  if (!isEqual(formDataRef.value, originData) || !isEqual(iconChecked.value, originIconChecked))
     formRef.value?.validate().then(() => {
       message.loading({
         content: '保存中...', key: loadingKey
       });
+      console.log(iconChecked.value)
       if (isUpdate.value) {
-        //旧数据没有图标，现在新增一个
-        if (isEmpty(formDataRef.value.filter(item => isEqual(item.type, itemType.value.icon)))) {
-          console.log(iconRef.value)
-          formDataRef.value.push({
-            name: '图标',
-            type: itemType.value.icon,
-            value: isNull(iconRef.value)?'':iconRef.value, //可能只更新了其他数据，没有更新图标
-            deleteTag: false,
-            isShow: false
-          })
-        } else {
+
+        //选择自定义图标
+        if (isEqual(iconChecked.value, '2')) {
+          //旧数据没有图标，现在新增一个
+          if (isEmpty(formDataRef.value.filter(item => isEqual(item.type, itemType.value.icon)))) {
+            formDataRef.value.push({
+              name: '图标',
+              type: itemType.value.icon,
+              value: isNull(iconRef.value) ? '' : iconRef.value, //可能只更新了其他数据，没有更新图标
+              deleteTag: false,
+              isShow: false
+            })
+          } else {
+            /*更新*/
+            formDataRef.value.forEach(item => {
+              if (isEqual(item.type, itemType.value.icon)) {
+                item.value = iconRef.value
+              }
+            })
+          }
+        } else {//没有图标
           /*更新*/
           formDataRef.value.forEach(item => {
             if (isEqual(item.type, itemType.value.icon)) {
-              item.value = iconRef.value
+              item.value = ''
             }
           })
         }
       } else {
-        formDataRef.value.push({
-          name: '图标',
-          type: itemType.value.icon,
-          value: iconRef.value,
-          deleteTag: false,
-          isShow: false
-        })
+        if (isEqual(iconChecked.value, '2'))
+          formDataRef.value.push({
+            name: '图标',
+            type: itemType.value.icon,
+            value: iconRef.value,
+            deleteTag: false,
+            isShow: false
+          })
+        else
+          formDataRef.value.push({
+            name: '图标',
+            type: itemType.value.icon,
+            value: '',
+            deleteTag: false,
+            isShow: false
+          })
       }
 
       saveOrUpdateGroupItems(formDataRef.value, groupId, isUpdate.value).then((res) => {
@@ -239,7 +271,6 @@ const onchangeIcon = (icon) => {
   iconRef.value = icon
   iconRef.visible = false
 }
-
 
 </script>
 
@@ -322,35 +353,43 @@ const onchangeIcon = (icon) => {
             <!--标题特殊项-->
             <template v-if="isEqual(element.type,itemType.title)">
               <a-divider type="vertical" class="my-form-divider-vertical"/>
-              <!--图标选择弹框-->
-              <a-popover
-                  v-if="!isEmpty(iconRef.value) && iconRef.imagesUrl.length>0"
-                  v-model:visible="iconRef.visible"
-                  trigger="click"
-                  placement="bottom"
-              >
-                <template #content>
-                  <a-row :gutter="[0,4]" style="width: 300px;padding-bottom: 8px;">
-                    <a-col :span="6" v-for="(item) in iconRef.imagesUrl">
-                      <div style="width: 75px;text-align:center">
-                        <a-button type="text" style="height: 100%;">
-                          <a-avatar shape="square" :src="item" @click="onchangeIcon(item)"/>
-                        </a-button>
-                      </div>
-                    </a-col>
-                  </a-row>
-                </template>
-                <a-avatar class="form-item" size="large" shape="square"
-                          style="margin: 0 0 14px 20px;border: 1px #e8e8e8 solid;cursor: pointer"
-                          :src="iconRef.value"/>
-              </a-popover>
-              <!--没有值且未搜索，对应新增时-->
-              <a-avatar v-if="isEmpty(iconRef.value) && iconRef.imagesUrl.length===0" size="large" shape="square"
-                        style="margin: 0 0 14px 20px;">{{ element.value }}
-              </a-avatar>
-              <!--有值但未搜索，对应更新时-->
-              <a-avatar v-if="!isEmpty(iconRef.value) && iconRef.imagesUrl.length===0" size="large" shape="square"
-                        style="margin: 0 0 14px 20px;" :src="iconRef.value"/>
+              <a-radio-group v-model:value="iconChecked" name="radioGroup">
+                <a-radio value="1">
+                  <a-avatar size="large" shape="square" style="margin: 0 0 14px 20px;">{{ element.value }}</a-avatar>
+                </a-radio>
+                <a-radio value="2">
+                  <!--图标选择弹框-->
+                  <a-popover
+                      v-if="!isEmpty(iconRef.value) && iconRef.imagesUrl.length>0"
+                      v-model:visible="iconRef.visible"
+                      trigger="click"
+                      placement="bottom"
+                  >
+                    <template #content>
+                      <a-row :gutter="[0,4]" style="width: 300px;padding-bottom: 8px;">
+                        <a-col :span="6" v-for="(item) in iconRef.imagesUrl">
+                          <div style="width: 75px;text-align:center">
+                            <a-button type="text" style="height: 100%;">
+                              <a-avatar shape="square" :src="item" @click="onchangeIcon(item)"/>
+                            </a-button>
+                          </div>
+                        </a-col>
+                      </a-row>
+                    </template>
+                    <a-avatar class="form-item" size="large" shape="square"
+                              style="margin: 0 0 14px 20px;border: 1px #e8e8e8 solid;cursor: pointer"
+                              :src="iconRef.value"/>
+                  </a-popover>
+                  <!--没有值且未搜索，对应新增时-->
+                  <a-avatar v-if="isEmpty(iconRef.value) && iconRef.imagesUrl.length===0" size="large" shape="square"
+                            style="margin: 0 0 14px 20px;">{{ element.value }}
+                  </a-avatar>
+                  <!--有值但未搜索，对应更新时-->
+                  <a-avatar v-if="!isEmpty(iconRef.value) && iconRef.imagesUrl.length===0" size="large" shape="square"
+                            style="margin: 0 0 14px 20px;" :src="iconRef.value"/>
+                </a-radio>
+              </a-radio-group>
+
             </template>
 
             <template v-if="!isEqual(element.type,itemType.title) && !isEqual(element.type,itemType.icon)">

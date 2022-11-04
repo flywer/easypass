@@ -14,7 +14,6 @@ import {isEmpty} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
 import {isEqual} from "lodash";
 import {setHasUpdate} from "@main/app/autoUpdater";
-import {assignWith} from "lodash-es";
 
 @Controller()
 export class AppController {
