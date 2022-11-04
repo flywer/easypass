@@ -4,7 +4,7 @@ import {computed, onMounted, ref, watch} from "vue";
 import {CopyOutlined} from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
 import {useRouter} from "vue-router";
-import {isEqual} from "lodash-es";
+import {isEmpty, isEqual, isNull} from "lodash-es";
 import {getItemTypeEnum} from "@render/api/groupItem.api";
 
 const router = useRouter()
@@ -18,7 +18,7 @@ const emit = defineEmits(['setItemVisible'])
 
 /*直接使用props属性在打包后会报错，这里新建一个属性去复制visible的值*/
 const modalVisible = ref()
-watch(()=>props.visible,(value)=>{
+watch(() => props.visible, (value) => {
   modalVisible.value = value
 })
 
@@ -38,6 +38,7 @@ const itemInfoList = computed(() => {
   return props.model.filter(item => !isEqual(item.type, itemType.value.icon) && !isEqual(item.type, itemType.value.title))
 })
 
+/*图标URL*/
 const iconUrl = computed(() => {
   return props.model.filter(item => isEqual(item.type, itemType.value.icon)).map(item => item.value).at(0)
 })
@@ -62,9 +63,6 @@ const editItems = () => {
   )
 }
 
-const onHidden = () => {
-  console.log(1)
-}
 
 const modalWrap = ref()
 
@@ -83,7 +81,8 @@ const modalWrap = ref()
         <a-row>
           <a-col :span="8">
             <a-space>
-              <a-avatar :src="iconUrl" style="margin-bottom: 4px"/>
+              <a-avatar v-if="!isEmpty(iconUrl)" :src="iconUrl" style="margin-bottom: 4px" shape="square"/>
+              <a-avatar v-if="isEmpty(iconUrl)" style="margin-bottom: 4px" shape="square">{{ title.slice(0,1) }}</a-avatar>
               <a-typography-title :level="5" style="margin-top: 4px;">{{ title }}</a-typography-title>
             </a-space>
           </a-col>

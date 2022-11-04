@@ -8,7 +8,7 @@
     <template #title>
       <a-space>
         <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
-        <a-avatar v-else shape="square">{{ item.title }}</a-avatar>
+        <a-avatar v-else shape="square">{{ item.title.slice(0,1) }}</a-avatar>
         {{ item.title }}
         <a-space v-for="(showItem) in item.showItems">
           <a-divider type="vertical" style="background-color: #f0f0f0"/>

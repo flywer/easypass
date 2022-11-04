@@ -355,7 +355,7 @@ const onchangeIcon = (icon) => {
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <a-radio-group v-model:value="iconChecked" name="radioGroup">
                 <a-radio value="1">
-                  <a-avatar size="large" shape="square" style="margin: 0 0 14px 20px;">{{ element.value }}</a-avatar>
+                  <a-avatar size="large" shape="square" style="margin: 0 0 14px 20px;">{{ element.value.slice(0,1) }}</a-avatar>
                 </a-radio>
                 <a-radio value="2">
                   <!--图标选择弹框-->
@@ -389,7 +389,6 @@ const onchangeIcon = (icon) => {
                             style="margin: 0 0 14px 20px;" :src="iconRef.value"/>
                 </a-radio>
               </a-radio-group>
-
             </template>
 
             <template v-if="!isEqual(element.type,itemType.title) && !isEqual(element.type,itemType.icon)">
