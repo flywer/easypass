@@ -143,6 +143,7 @@ const autoCheckUpdates = () => {
           cancelText: '取消',
           async onOk() {
             /*下载更新*/
+            message.info('开始下载')
             store.isUpdating = true
             await downloadUpdate().catch(() => {
               message.error('系统异常')
