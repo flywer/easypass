@@ -24,7 +24,6 @@ export enum itemTypeEnum {
     icon = '05'
 }
 
-
 /**
  * 账号组项model：每个密码组有多个组项，每个组项若itemId相同代表为同一组（不是指密码组）
  */
@@ -59,7 +58,7 @@ export const GroupItemInit = () => {
         },
         isCommon: {
             type: DataTypes.BOOLEAN,
-            defaultValue: 0,
+            defaultValue: false,
             comment: '组项是否是常用账号'
         },
         isShow: {
