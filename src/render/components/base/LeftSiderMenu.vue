@@ -22,7 +22,7 @@ const menuClick = (item) => {
 <template>
   <a-layout-sider id="layout-sider" width="150">
     <div class="logo" style="background-color: #cebfbf">
-      <p class="title">easy pass</p>
+      <p class="title">Easy Pass</p>
     </div>
     <a-menu
         v-model:selectedKeys="store.selectedMenuKeys"
