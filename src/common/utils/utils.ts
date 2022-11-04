@@ -51,9 +51,9 @@ export const getUserHome = () => {
 export const getUserAppDataFolder = () => {
     const userHome = getUserHome()
     if (process.platform == 'win32') {
-        return path.join(userHome, '/AppData/Local/easyPass')
+        return path.join(userHome, '/AppData/Local/EasyPass')
     } else {
-        return path.join(userHome, '/easyPass')
+        return path.join(userHome, '/EasyPass')
     }
 }
 

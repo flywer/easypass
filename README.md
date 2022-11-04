@@ -1,5 +1,5 @@
 
-# easyPass
+# EasyPass
 
 ⚡Vite + Electron & Doubleshot Template
 

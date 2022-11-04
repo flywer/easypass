@@ -4,7 +4,7 @@ import {BorderOutlined, CloseOutlined, MinusOutlined} from '@ant-design/icons-vu
 import {setWindow} from '@render/api/app.api'
 import {ref} from 'vue'
 
-const appName = ref('easyPass')
+const appName = ref('EasyPass')
 
 async function maxWindowBtn() {
   await setWindow('window-max')
