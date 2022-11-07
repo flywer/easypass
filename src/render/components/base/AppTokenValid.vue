@@ -48,7 +48,6 @@ const cloudHtmlUrl = ref('')
 onMounted(async () => {
   let res = (await getResourcePath()).data.result
   cloudHtmlUrl.value =  res + '/assets/cloud/index.html'
-  console.log( cloudHtmlUrl.value)
 })
 
 </script>
