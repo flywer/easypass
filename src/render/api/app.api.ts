@@ -132,3 +132,7 @@ export function checkAppToken(token: string) {
 export function getTokenSettings() {
     return ipcInstance.send<Result>(channel.app.getTokenSettings)
 }
+
+export function getResourcePath() {
+    return ipcInstance.send<Result>(channel.app.getResourcePath)
+}

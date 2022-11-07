@@ -445,4 +445,21 @@ export class AppController {
         return result
     }
 
+    /**
+     * 获取应用资源文件路径
+     * @constructor
+     */
+    @IpcHandle(channel.app.getResourcePath)
+    public HandleGetResourcePath() {
+        let result
+        try {
+            result = success()
+            result.result = getResourcePath()
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
 }

@@ -27,8 +27,7 @@ export const channel = reactive({
         checkAppToken: 'app/checkAppToken',
         getTokenSettings:  'app/getTokenSettings',
         showTokenPanel:  'app/showTokenPanel',
-
-
+        getResourcePath:'app/getResourcePath',
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',

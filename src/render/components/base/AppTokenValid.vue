@@ -1,6 +1,6 @@
 <template>
   <a-layout-content>
-    <iframe src="../../plugins/cloud/index.html" style="height: 568px;width: 917px;overflow: hidden;"/>
+    <iframe :src="cloudHtmlUrl" style="height: 568px;width: 917px;overflow: hidden;"/>
     <div class="content" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
       <!--background-color: #ffffff0a;-->
       <!--      <p class="title" style=" text-align: center;margin: 12px auto 12px auto;">请输入登录令牌</p>-->
@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
-import {checkAppToken} from "@render/api/app.api";
+import {onMounted, ref} from "vue";
+import {checkAppToken, getResourcePath} from "@render/api/app.api";
 import {store} from "@render/store";
 import {message} from "ant-design-vue";
 import {isEmpty} from "lodash-es";
@@ -42,6 +42,15 @@ const checkToken = () => {
     })
   }
 }
+
+const cloudHtmlUrl = ref('')
+
+onMounted(async () => {
+  let res = (await getResourcePath()).data.result
+  cloudHtmlUrl.value =  res + '/assets/cloud/index.html'
+  console.log( cloudHtmlUrl.value)
+})
+
 </script>
 
 <style lang="less" scoped>
