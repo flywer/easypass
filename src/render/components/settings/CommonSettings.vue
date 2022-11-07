@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watch} from "vue";
-import {checkForUpdate, getAppSettings, getAppVersion, setAppSettings} from "@render/api/app.api";
+import {computed, createVNode, onMounted, reactive, ref, watch} from "vue";
+import {
+  checkAppToken,
+  checkForUpdate,
+  getAppSettings,
+  getAppVersion,
+  quitAndInstall,
+  setAppSettings,
+  setAppToken
+} from "@render/api/app.api";
 import {store} from "@render/store";
-import {message} from "ant-design-vue";
+import {message, Modal} from "ant-design-vue";
 import {ipcInstance} from "@render/plugins";
 import {channel} from "@render/api/channel";
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {
-  DownOutlined,
+  DownOutlined, ExclamationCircleOutlined,
   UpOutlined
 } from '@ant-design/icons-vue'
 import ProxyForm from "@render/components/settings/ProxyForm.vue";
+import {Rule} from "ant-design-vue/es/form";
+import {cloneDeep, isEmpty, isEqual, random} from "lodash-es";
 
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
@@ -107,13 +117,118 @@ onMounted(async () => {
   store.hasUpdates = appSettings.hasUpdates
 })
 
-
+//region 网络代理
 const setProxyVisible = ref(false)
 
 /*显示修改密码框*/
 const onShowProxyModal = () => {
   setProxyVisible.value = !setProxyVisible.value
 }
+//endregion
+
+//region 应用令牌
+
+const validateToken = async (_rule: Rule, value: string) => {
+  if (value !== appTokenRef.model.token) {
+    return Promise.reject("两次令牌不同");
+  } else {
+    return Promise.resolve();
+  }
+};
+
+const appTokenRef = reactive({
+  isShowTokenForm: false,
+  model: {
+    token: '',
+    checkToken: ''
+  },
+  rules: {
+    token: [
+      {required: true, message: '令牌不可为空'}
+    ],
+    checkToken: [
+      {required: true, message: '不可为空'},
+      {validator: validateToken, trigger: 'change'}
+    ],
+  }
+})
+
+/*存储应用令牌*/
+const onAppTokenSubmit = () => {
+  setAppToken(appTokenRef.model.token).then(res => {
+    if (res.data.success) {
+      message.success(res.data.message)
+      store.haveToken = true
+      appTokenRef.model = {
+        token: '',
+        checkToken: ''
+      }
+      appTokenRef.isShowTokenForm = false
+    }
+  })
+}
+
+const appTokenCancelRef = reactive({
+  isShowValidTokenForm: false,/*显示原令牌验证框*/
+  validModel: {
+    token: ''
+  }
+})
+
+const onTokenCancelValidToken = () => {
+  if (!isEmpty(appTokenCancelRef.validModel.token))
+    checkAppToken(appTokenCancelRef.validModel.token).then(res => {
+      if (res.data.success) {
+        store.tokenCheckRemainTimes = 5
+        Modal.confirm({
+          title: '提示',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '是否停止使用应用令牌？',
+          okText: '确认',
+          cancelText: '取消',
+          onOk() {
+            setAppToken(null).then(res => {
+              if (res.data.success) {
+                message.success(res.data.message)
+                store.haveToken = false
+                store.showTokenPanel = false
+                appTokenCancelRef.isShowValidTokenForm = false
+              }
+            })
+          },
+        });
+      } else {
+        message.warn(res.data.message)
+        store.tokenCheckRemainTimes--
+        appTokenCancelRef.isShowValidTokenForm = false
+      }
+
+    })
+}
+
+const appTokenUpdateRef = reactive({
+  isShowValidTokenForm: false,/*显示原令牌验证框*/
+  validModel: {
+    token: ''
+  },
+})
+
+const onTokenUpdateValidToken = () => {
+  if (!isEmpty(appTokenUpdateRef.validModel.token))
+    checkAppToken(appTokenUpdateRef.validModel.token).then(res => {
+      if (res.data.success) {
+        store.tokenCheckRemainTimes = 5
+        appTokenUpdateRef.isShowValidTokenForm = false
+        appTokenRef.isShowTokenForm =true
+      } else {
+        store.tokenCheckRemainTimes--
+        message.warn(res.data.message)
+        appTokenUpdateRef.isShowValidTokenForm = false
+      }
+    })
+}
+
+//endregion
 
 </script>
 
@@ -157,6 +272,95 @@ const onShowProxyModal = () => {
       </template>
     </RowCard>
     <a-divider class="setting-divider"/>
+    <!--应用令牌-->
+    <RowCard>
+      <template #left>
+        应用令牌
+        <SecondaryText>
+          <template #text>
+            每次进入应用时验证令牌
+          </template>
+        </SecondaryText>
+      </template>
+      <template #right>
+        <div
+            v-show="
+            !appTokenRef.isShowTokenForm &&
+            !appTokenCancelRef.isShowValidTokenForm &&
+            !appTokenUpdateRef.isShowValidTokenForm "
+            class="animate__animated animate__flipInX">
+          <a-button
+              v-show="!store.haveToken"
+              @click="appTokenRef.isShowTokenForm = true">设置
+          </a-button>
+          <a-space v-show="store.haveToken">
+            <a-button type="link" style=" padding-right: 2px;padding-left: 2px;font-size: 13px;"
+                      @click="appTokenCancelRef.isShowValidTokenForm = true">解除令牌
+            </a-button>
+            <a-button @click="appTokenUpdateRef.isShowValidTokenForm = true">修改</a-button>
+          </a-space>
+        </div>
+        <!--设置令牌-->
+        <a-form
+            class="animate__animated animate__flipInX"
+            v-show="appTokenRef.isShowTokenForm"
+            :model="appTokenRef.model"
+            @finish="onAppTokenSubmit"
+        >
+          <a-input-group compact>
+            <a-form-item name="token" :rules="appTokenRef.rules.token">
+              <a-input-password placeholder="请输入登录令牌" style="width: 180px"
+
+                                v-model:value.trim="appTokenRef.model.token"/>
+            </a-form-item>
+            <a-form-item name="checkToken" :rules="appTokenRef.rules.checkToken">
+              <a-input-password placeholder="确认登录令牌" style="width: 180px"
+                                v-model:value.trim="appTokenRef.model.checkToken"/>
+            </a-form-item>
+            <a-button v-show="!isEmpty(appTokenRef.model.token)" html-type="submit">确定</a-button>
+            <a-button v-show="isEmpty(appTokenRef.model.token)" @click="appTokenRef.isShowTokenForm = false">取消
+            </a-button>
+          </a-input-group>
+        </a-form>
+        <!--解除令牌验证表单-->
+        <a-form
+            class="animate__animated animate__flipInX"
+            v-show="appTokenCancelRef.isShowValidTokenForm"
+            :model="appTokenCancelRef.validModel"
+            @finish="onTokenCancelValidToken"
+        >
+          <a-input-group compact>
+            <a-form-item name="token">
+              <a-input-password placeholder="请输入登录令牌" style="width: 200px"
+                                v-model:value.trim="appTokenCancelRef.validModel.token"/>
+            </a-form-item>
+            <a-button v-show="!isEmpty(appTokenCancelRef.validModel.token)" html-type="submit">确定</a-button>
+            <a-button v-show="isEmpty(appTokenCancelRef.validModel.token)"
+                      @click="appTokenCancelRef.isShowValidTokenForm = false">取消
+            </a-button>
+          </a-input-group>
+        </a-form>
+        <!--修改令牌验证表单-->
+        <a-form
+            class="animate__animated animate__flipInX"
+            v-show="appTokenUpdateRef.isShowValidTokenForm"
+            :model="appTokenUpdateRef.validModel"
+            @finish="onTokenUpdateValidToken"
+        >
+          <a-input-group compact>
+            <a-form-item name="token">
+              <a-input-password placeholder="请输入登录令牌" style="width: 200px"
+                                v-model:value.trim="appTokenUpdateRef.validModel.token"/>
+            </a-form-item>
+            <a-button v-show="!isEmpty(appTokenUpdateRef.validModel.token)" html-type="submit">确定</a-button>
+            <a-button v-show="isEmpty(appTokenUpdateRef.validModel.token)"
+                      @click="appTokenUpdateRef.isShowValidTokenForm = false">取消
+            </a-button>
+          </a-input-group>
+        </a-form>
+      </template>
+    </RowCard>
+    <!--网络代理-->
     <RowCard :bottom-card-visible="setProxyVisible">
       <template #left>
         <a-space style="gap:2px">

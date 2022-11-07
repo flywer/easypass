@@ -101,13 +101,34 @@ export function appRelaunch() {
  * 应用网络代理设置
  */
 export function setProxy(setup) {
-    return ipcInstance.send<Result>(channel.app.setProxy,setup)
+    return ipcInstance.send<Result>(channel.app.setProxy, setup)
 }
 
 /**
  * 获取网络代理设置
  */
-export function getAppProxySettings(){
+export function getAppProxySettings() {
     return ipcInstance.send<Result>(channel.app.getAppProxySettings)
 }
 
+/**
+ * 设置应用令牌
+ */
+export function setAppToken(token: string) {
+    return ipcInstance.send<Result>(channel.app.setAppToken, token)
+}
+
+/**
+ * 校验应用令牌
+ * @param token
+ */
+export function checkAppToken(token: string) {
+    return ipcInstance.send<Result>(channel.app.checkAppToken, token)
+}
+
+/**
+ * 获取应用令牌信息
+ */
+export function getTokenSettings() {
+    return ipcInstance.send<Result>(channel.app.getTokenSettings)
+}

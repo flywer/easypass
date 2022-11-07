@@ -30,7 +30,8 @@
       "@common/*": [
         "src/common/*"
       ]
-    }
+    },
+    "allowJs": true
   },
   "include": [
     "src/**/*.ts",

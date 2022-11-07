@@ -1,9 +1,11 @@
 import {join} from 'path'
 import {BrowserWindow, app, nativeImage} from 'electron'
 import {handleAutoUpdater, handleUpdate} from "@main/app/autoUpdater";
-import {getAppSettings, getResourcePath} from "@common/utils/utils";
+import {getAppSettings, getAppTokenSettings, getResourcePath} from "@common/utils/utils";
 import {tray} from "@main/app/app.tray";
 import {autoUpdater} from "electron-updater";
+import {channel} from "@render/api/channel";
+import log from "electron-log";
 
 const isDev = !app.isPackaged
 let isAutoCheckUpdate = false
@@ -24,9 +26,10 @@ export async function createWindow() {
         },
         autoHideMenuBar: !isDev,
         show: false,
-        icon: nativeImage.createFromPath(join(getResourcePath(), '/assets/logo.png'))
+        icon: nativeImage.createFromPath(join(getResourcePath(), '/assets/logo.png')),
     })
     const appSettings = await getAppSettings()
+
     //准备完毕，将要显示
     win.on("ready-to-show", () => {
         //判断此时是否为开机自启，且是否需要隐藏
@@ -42,6 +45,11 @@ export async function createWindow() {
         : `file://${join(app.getAppPath(), 'dist/render/index.html')}`
     //主窗口加载页面
     win.loadURL(URL).then(async () => {
+        const appTokenSettings = await getAppTokenSettings()
+        if(appTokenSettings.haveToken){
+            win.webContents.send(channel.app.showTokenPanel)
+        }
+
         if (isDev) {
             win.webContents.openDevTools()
         } else {
@@ -63,6 +71,14 @@ export async function createWindow() {
         if (tray != null && !tray.isDestroyed())
             tray.destroy()
         win.destroy()
+    })
+
+    win.on('hide',async () => {
+        const appTokenSettings = await getAppTokenSettings()
+        //是否拥有应用令牌
+        if (appTokenSettings.haveToken) {
+            win.webContents.send(channel.app.showTokenPanel)
+        }
     })
 
     mainWindow = win

@@ -25,5 +25,11 @@
       "port": null,
       "bypassList": ""
     }
+  },
+  "defaultTokenSettings": {
+    "haveToken": false,
+    "showTokenPanel": false,
+    "token": null,
+    "remainTimes": 5
   }
 }

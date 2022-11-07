@@ -1,6 +1,6 @@
 import {Injectable} from 'einf'
 import {UserMapper} from "@main/mapper/user.mapper";
-import {accountEnCrypt} from "@common/utils/cryptoUtils";
+import {accountEncrypt} from "@common/utils/cryptoUtils";
 import {IUserVo} from "@main/model/user";
 
 @Injectable()
@@ -13,7 +13,7 @@ export class UserService {
     }
 
     public async register(userVo: IUserVo) {
-        userVo.password = accountEnCrypt(userVo.password)
+        userVo.password = accountEncrypt(userVo.password)
         return await this.userMapper.register(userVo)
     }
 
@@ -24,7 +24,7 @@ export class UserService {
      */
     public async login(userVo: IUserVo, isAuto: boolean) {
         if (!isAuto)//加密
-            userVo.password = accountEnCrypt(userVo.password)
+            userVo.password = accountEncrypt(userVo.password)
         return (await this.userMapper.getUserByAccountLogin(userVo))?.dataValues
     }
 
@@ -34,7 +34,7 @@ export class UserService {
 
     public async updateUserInfoByUserId(user: IUserVo) {
         if (user.password != null)
-            user.password = accountEnCrypt(user.password)
+            user.password = accountEncrypt(user.password)
         await this.userMapper.updateUserInfoByUserId(user)
     }
 

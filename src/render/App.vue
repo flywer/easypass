@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {createVNode, h, onMounted, ref} from 'vue'
+import {createVNode, h, onMounted, reactive, ref, watch} from 'vue'
 import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
@@ -7,7 +7,7 @@ import {Button, ConfigProvider, message, Modal, notification} from 'ant-design-v
 import {
   downloadUpdate,
   getAppSettings,
-  getAppTheme,
+  getAppTheme, getTokenSettings,
   quitAndInstall, setLoginMode
 } from "@render/api/app.api";
 import {store} from "@render/store";
@@ -16,9 +16,10 @@ import {channel} from "@render/api/channel";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import config from "@common/config/appConfig.json"
 import {checkLogin} from "@render/api/user.api";
-import {cloneDeep, isNull} from "lodash-es";
+import {cloneDeep, isNull, isUndefined} from "lodash-es";
 import {Model} from "sequelize";
 import {useRouter} from "vue-router";
+import AppTokenValid from "@render/components/base/AppTokenValid.vue";
 
 const manuKey = ref('')
 const router = useRouter()
@@ -94,7 +95,7 @@ onMounted(async () => {
     if (res.data.result != null) {
       store.isLogin = true
       store.user = cloneDeep(res.data.result)
-    } else{
+    } else {
       store.isLogin = false
       openUnLoginNotification()
     }
@@ -107,13 +108,29 @@ onMounted(async () => {
   } else {
     store.loginMode = appSettings.loginMode
   }
-
   await autoThemeConfig()
   updateDownloadedListener()
   autoCheckUpdates()
-  //Modal.confirm({content: JSON.stringify((await getAppInfo()).data.result)})
+
+  const tokenSettings = (await getTokenSettings()).data.result
+  store.haveToken = tokenSettings.haveToken;
+  store.showTokenPanel = tokenSettings.haveToken;
+  store.tokenCheckRemainTimes = tokenSettings.remainTimes
+  //界面隐藏时
+  ipcInstance.on(channel.app.showTokenPanel, () => store.showTokenPanel = true)
 })
 
+watch(() => store.tokenCheckRemainTimes, (value) => {
+  if (value === 1) {
+    Modal.confirm({
+      title: '提示',
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '还剩一次输入的机会，一旦错误将永久锁定！',
+      okText: '确认',
+      okCancel: false
+    });
+  }
+})
 
 const autoCheckUpdates = () => {
   const updateKey = 'updateKey'
@@ -160,10 +177,11 @@ const autoCheckUpdates = () => {
   <a-config-provider>
     <WindowBtn/>
     <a-layout has-sider style="min-height: 100vh;">
+      <AppTokenValid v-if="store.haveToken && store.showTokenPanel"/>
       <!-- 左菜单 -->
-      <LeftSiderMenu @getKey="getMenuKey"/>
+      <LeftSiderMenu v-if="!store.showTokenPanel" @getKey="getMenuKey"/>
       <!-- 中心内容组件载体 -->
-      <CenterContent :menu-key="manuKey"/>
+      <CenterContent v-if="!store.showTokenPanel" :menu-key="manuKey"/>
     </a-layout>
   </a-config-provider>
 </template>

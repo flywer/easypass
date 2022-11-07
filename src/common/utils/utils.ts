@@ -121,4 +121,21 @@ export const getAppProxySettings = async () => {
         return parseJson(buffer.toString())
 }
 
+/**
+ * 获取应用令牌信息
+ */
+export const getAppTokenSettings = async () => {
+    const defaultSettings = config.defaultTokenSettings
+    const appTokenFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'token.json'
+    }
+
+    const buffer = await readFsSync(path.join(appTokenFile.folderPath, appTokenFile.fileName))
+    if (buffer == null || isEmpty(buffer.toString()))
+        return defaultSettings
+    else
+        return parseJson(buffer.toString())
+}
+
 //endregion

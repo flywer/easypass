@@ -26,7 +26,7 @@ async function electronAppInit() {
     const isDev = !app.isPackaged
 
     //禁用硬件加速技术
-    app.disableHardwareAcceleration()
+    //app.disableHardwareAcceleration()
     //应用单例运行，不可存在多个同时运行
     if (!app.requestSingleInstanceLock()) app.quit();
 
@@ -120,7 +120,6 @@ async function bootstrap() {
                 buttons: ['ok']
             })
         });
-
     } catch (error) {
         log.error(error)
         app.quit()

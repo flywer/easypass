@@ -3,17 +3,25 @@ import {app, BrowserWindow} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
-import {getAppProxySettings, getAppSettings, getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
+import {
+    getAppProxySettings,
+    getAppSettings,
+    getAppTokenSettings,
+    getResourcePath,
+    getUserAppDataFolder
+} from "@common/utils/utils";
 import {readFsSync, writeFs} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
 import * as os from "os";
 import log from "electron-log";
-import {isEmpty} from "lodash";
+import {isEmpty, isNull} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
-import {isEqual} from "lodash";
 import {setHasUpdate} from "@main/app/autoUpdater";
+import {appTokenDecrypt, appTokenEncrypt} from "@common/utils/cryptoUtils";
+import parseJson from 'parse-json'
+import {isEqual} from "lodash";
 
 @Controller()
 export class AppController {
@@ -45,6 +53,15 @@ export class AppController {
     private readonly appProxyFile = {
         folderPath: path.join(getUserAppDataFolder(), '/config'),
         fileName: 'proxy.json',
+        getFullPath: () => {
+            return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
+        }
+    }
+
+    /*应用令牌文件*/
+    private readonly appTokenFile = {
+        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        fileName: 'token.json',
         getFullPath: () => {
             return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
         }
@@ -344,6 +361,86 @@ export class AppController {
         } catch (e) {
             log.error(e)
             result = failure()
+        }
+        return result
+    }
+
+    /**
+     * 获取应用令牌信息
+     * @constructor
+     */
+    @IpcHandle(channel.app.getTokenSettings)
+    public async HandleGetTokenSettings() {
+        let result
+        try {
+            result = success()
+            result.result = await getAppTokenSettings()
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+
+    /**
+     * 设置应用令牌
+     * @param token
+     * @constructor
+     */
+    @IpcHandle(channel.app.setAppToken)
+    public async HandleSetAppToken(token) {
+        let result
+        try {
+            let tokenSettings = await getAppTokenSettings()
+            if (token != null) {
+                tokenSettings.haveToken = true
+                tokenSettings.showTokenPanel = true
+                tokenSettings.remainTimes = 5
+                tokenSettings.token = appTokenEncrypt(token)  //令牌加密
+                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                result = success('设置令牌成功!')
+            } else {
+                tokenSettings.haveToken = false
+                tokenSettings.showTokenPanel = false
+                tokenSettings.token = null
+                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                result = success('解除令牌成功!')
+            }
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+    /**
+     * 校验应用令牌
+     * @param token
+     * @constructor
+     */
+    @IpcHandle(channel.app.checkAppToken)
+    public async HandleCheckAppToken(token) {
+        let result
+        try {
+            let tokenSettings = await getAppTokenSettings()
+            if (isEqual(appTokenEncrypt(token), tokenSettings.token)) {
+                tokenSettings.remainTimes = 5
+                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                result = success()
+            } else {
+                let tokenSettings = await getAppTokenSettings()
+                if (tokenSettings.remainTimes == 0) {
+                    tokenSettings.remainTimes = 0
+                } else {
+                    tokenSettings.remainTimes = tokenSettings.remainTimes - 1
+                }
+                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                result = failure('令牌错误')
+            }
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
         }
         return result
     }

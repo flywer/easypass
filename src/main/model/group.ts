@@ -33,8 +33,7 @@ export const groupInit = () => {
         },
         groupIndex: {
             type: DataTypes.INTEGER,
-            autoIncrement: true,
-            unique: true,
+            defaultValue:0,
             comment: '排序号'
         },
         userId: {

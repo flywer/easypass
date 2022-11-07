@@ -13,5 +13,8 @@ export const store = reactive({
     user: <typeof User>{},
     loginMode: '02',
     hasUpdates: false,/*发现可更新版本*/
-    emailValidCode:''
+    emailValidCode: '',
+    haveToken: false,/*是否使用了应用令牌*/
+    showTokenPanel: true,/*是否显示应用令牌输入界面*/
+    tokenCheckRemainTimes: 5/*令牌输入剩余校验次数*/
 })

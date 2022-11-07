@@ -16,7 +16,7 @@ import {
   UpOutlined
 } from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
-import {appRelaunch, setLoginMode} from "@render/api/app.api";
+import {appRelaunch, setAppToken, setLoginMode} from "@render/api/app.api";
 import {Rule} from "ant-design-vue/es/form";
 import {sendEmail} from "@render/api/utils.api";
 import {randomValidCode} from "@render/utils/randomValidCode";
@@ -485,6 +485,7 @@ const onUpdatePassword = () => {
     <a-divider class="setting-divider"/>
     <!--绑定邮箱-->
     <EmailBindCard/>
+    <a-divider class="setting-divider"/>
   </a-layout-content>
 </template>
 

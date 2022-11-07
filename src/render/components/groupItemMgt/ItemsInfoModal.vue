@@ -83,7 +83,7 @@ const modalWrap = ref()
             <a-space>
               <a-avatar v-if="!isEmpty(iconUrl)" :src="iconUrl" style="margin-bottom: 4px" shape="square"/>
               <a-avatar v-if="isEmpty(iconUrl)" style="margin-bottom: 4px" shape="square">{{ title.slice(0,1) }}</a-avatar>
-              <a-typography-title :level="5" style="margin-top: 4px;">{{ title }}</a-typography-title>
+              <a-typography-title :level="5" style="margin-top: 4px;width: 295px">{{ title }}</a-typography-title>
             </a-space>
           </a-col>
           <a-col :span="8" :offset="8">

@@ -23,6 +23,10 @@ export const channel = reactive({
         relaunch: 'app/relaunch',
         setProxy: 'app/setProxy',
         getAppProxySettings: 'app/getAppProxySettings',
+        setAppToken: 'app/setAppToken',
+        checkAppToken: 'app/checkAppToken',
+        getTokenSettings:  'app/getTokenSettings',
+        showTokenPanel:  'app/showTokenPanel',
 
 
     },
