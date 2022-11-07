@@ -408,13 +408,13 @@ const onTokenUpdateValidToken = () => {
           <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">{{ updateText }}</a-button>
         </a-typography-text>
         <a-progress
-            v-show="store.isUpdating"
+
             type="circle"
             :width="50"
             :strokeWidth="10"
             :percent="parseInt(progressInfo.percent.toString())"
             class="update-progress"
-            style="position: absolute;top: 9%;"
+            style="position: absolute;top: 9%;margin-left: 12px"
         />
       </template>
       <template #right>
