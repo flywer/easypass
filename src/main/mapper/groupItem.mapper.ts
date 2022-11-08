@@ -55,7 +55,7 @@ export class GroupItemMapper {
             attributes: ['itemId', 'value'],
             where: {
                 type: itemTypeEnum.title,
-                isCommon: isCommon ? 1 : 0,
+                isCommon: isCommon ? 1 : [1, 0],
                 groupId: groupIdList
             }
         })
@@ -99,6 +99,14 @@ export class GroupItemMapper {
             where: {
                 type: itemTypeEnum.title,
                 itemId: itemId
+            }
+        })
+    }
+
+    async updateGroupIdByItemId(groupItem: IGroupItemVo) {
+        await GroupItem.update({groupId: groupItem.groupId}, {
+            where: {
+                itemId: groupItem.itemId
             }
         })
     }

@@ -31,7 +31,7 @@ let pageSize = ref<number>(6)
 let groupItemsCount = ref<number>()
 //查询model
 let modelRef = ref({
-  value: '',
+  value: {},
   groupId: store.currentGroupId,
   pageIndex: pageIndex.value,
   pageSize: pageSize.value,
@@ -93,7 +93,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   refreshSpinning()
 
   modelRef.value.pageSize = pageSize.value
-
+  if (isEmpty(modelRef.value.value)) modelRef.value.value = null //空字段查询会异常
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
@@ -104,10 +104,9 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
     if (search) {
       pageIndex.value = 1
       modelRef.value.pageIndex = 1
-    }
-    modelRef.value.pageIndex = pageIndex.value
+    } else
+      modelRef.value.pageIndex = pageIndex.value
   }
-
   getGroupItemsListByPage(modelRef.value).then(res => {
     if (res.data.success) {
       let itemsRows = res.data.result.rows
@@ -254,5 +253,9 @@ const setItemVisible = (value) => {
   :deep(.tool-btn):hover {
     background-color: @primary-1;
   }
+}
+
+#content-view {
+  overflow-x: hidden;
 }
 </style>

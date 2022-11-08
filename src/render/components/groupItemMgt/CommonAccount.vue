@@ -8,7 +8,7 @@ import {message} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {store} from "@render/store";
-import {isEqual} from "lodash-es";
+import {isEmpty, isEqual} from "lodash-es";
 import GroupItemCard from "@render/components/groupItemMgt/GroupItemCard.vue";
 
 //加载效果是否显示
@@ -63,7 +63,7 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
   refreshSpinning()
 
   modelRef.value.pageSize = pageRef.pageSize
-
+  if (isEmpty(modelRef.value.value)) modelRef.value.value = null //空字段查询会异常
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageRef.pageIndex = 1

@@ -1,6 +1,5 @@
 import {Injectable} from "einf";
 import {Group, IGroupVo} from "@main/model/group";
-import {sequelize} from "@main/sequelize.init";
 import {Op} from "sequelize"
 import {sqlLikePack} from "@common/utils/utils";
 import {IUserVo} from "@main/model/user";
@@ -36,9 +35,7 @@ export class GroupMapper {
      * @param group
      */
     public async saveGroup(group: IGroupVo) {
-        await sequelize.transaction(() => {
-            return Group.create(group)
-        })
+        return await Group.create(group)
     }
 
     /**

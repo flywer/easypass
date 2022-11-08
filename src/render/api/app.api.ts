@@ -133,6 +133,9 @@ export function getTokenSettings() {
     return ipcInstance.send<Result>(channel.app.getTokenSettings)
 }
 
+/**
+ * 获取应用资源路径
+ */
 export function getResourcePath() {
     return ipcInstance.send<Result>(channel.app.getResourcePath)
 }

@@ -26,13 +26,13 @@ export class GroupItemService {
         }
     }
 
-    public async getAllItemsTitleListByPage(groupItem, groupIdList) {
+    public async getAllItemsTitleListByPage(groupItem:IGroupItemVo, groupIdList,isCommon) {
         //全量搜索所有常用账号组标题
-        let allItemTitleList = await this.groupItemMapper.getAllItemsTitleList(true, groupIdList)
+        let allItemTitleList = await this.groupItemMapper.getAllItemsTitleList(isCommon, groupIdList)
         let searchedList = []
         for (const item of allItemTitleList) {
             const decryptData = groupItemDecrypt(item.value)
-            if (decryptData.includes(groupItem.value)) {
+            if (decryptData.includes(groupItem.value) || decryptData.toLowerCase().includes(groupItem.value.toLowerCase())) {
                 searchedList.push(item)
             }
         }
@@ -88,4 +88,7 @@ export class GroupItemService {
     }
 
 
+    public async updateGroupIdByItemId(groupItem: IGroupItemVo) {
+        await this.groupItemMapper.updateGroupIdByItemId(groupItem)
+    }
 }

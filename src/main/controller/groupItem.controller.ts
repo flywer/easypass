@@ -5,6 +5,7 @@ import {failure, Result, success} from "@main/vo/resultVo";
 import log, {error} from 'electron-log'
 import {GroupService} from "@main/service/group.service";
 import {IGroupItemVo, itemTypeEnum} from "@main/model/groupItem";
+import {updateGroupIdByItemId} from "@render/api/groupItem.api";
 
 @Controller()
 export class GroupItemController {
@@ -59,7 +60,7 @@ export class GroupItemController {
             let count: number
             if (groupItemVo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList,false)
                 rows = data.rows
                 count = data.count
             } else {
@@ -111,7 +112,7 @@ export class GroupItemController {
             let count: number
             if (groupItemVo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList,true)
                 rows = data.rows
                 count = data.count
             } else {
@@ -138,7 +139,6 @@ export class GroupItemController {
         }
         return result
     }
-
 
     /**
      * 通过itemId获取组项信息
@@ -212,4 +212,21 @@ export class GroupItemController {
         return result
     }
 
+    /**
+     * 更新组项的组ID
+     * @param groupItem
+     * @constructor
+     */
+    @IpcHandle(channel.groupItem.updateGroupIdByItemId)
+    public async HandleUpdateGroupIdByItemId(groupItem) {
+        let result
+        try {
+            await this.groupItemService.updateGroupIdByItemId(groupItem)
+            result = success()
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
+    }
 }

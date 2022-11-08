@@ -168,9 +168,7 @@ const handleSubmit = () => {
       message.loading({
         content: '保存中...', key: loadingKey
       });
-      console.log(iconChecked.value)
       if (isUpdate.value) {
-
         //选择自定义图标
         if (isEqual(iconChecked.value, '2')) {
           //旧数据没有图标，现在新增一个
@@ -280,13 +278,14 @@ const onchangeIcon = (icon) => {
     <a-space>
       <a-space>
         <!--返回-->
-        <a-button class="tool-btn" type="text" size="large" @click="handleBack">
-          <arrow-left-outlined class="icon"/>
+        <a-button class="tool-btn"  type="text" size="large" @click="handleBack" title="返回">
+          <template #icon><arrow-left-outlined/></template>
+          返回
         </a-button>
       </a-space>
       <!--新增-->
-      <a-button class="tool-btn" type="text" size="large" @click="handleAddItem">
-        <PlusOutlined class="icon"/>
+      <a-button @click="handleAddItem" title="新增">
+        <template #icon><PlusOutlined/></template>新增
       </a-button>
     </a-space>
     <!--右侧-->
@@ -335,7 +334,7 @@ const onchangeIcon = (icon) => {
               <a-input placeholder="名称"
                        :bordered="false"
                        v-model:value.trim="element.name"
-                       :readonly="isEqual(element.type,itemType.account) || isEqual(element.type,itemType.title)"/>
+                       :readonly="isEqual(element.type,itemType.account) || isEqual(element.type,itemType.title)" style="width: 120px;"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
             <!--内容-->
@@ -346,7 +345,7 @@ const onchangeIcon = (icon) => {
                 :rules="rulesRef.value"
             >
               <a-divider type="vertical" class="my-form-divider-vertical" style="height: 30px;margin-bottom: -2px;"/>
-              <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 250px;"
+              <a-input placeholder="内容" :bordered="false" v-model:value="element.value" style="width: 260px;"
                        @change="isEqual(element.type,itemType.title)?onFindIcon(element.value):null"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
@@ -419,6 +418,12 @@ const onchangeIcon = (icon) => {
 
 <style scoped lang="less">
 @import "ant-design-vue/dist/antd.variable.less";
+
+#tool-header {
+  :deep(.tool-btn):hover {
+    background-color: @primary-1;
+  }
+}
 
 #content-view {
   overflow-x: hidden;

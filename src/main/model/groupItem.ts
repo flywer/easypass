@@ -77,6 +77,6 @@ export const GroupItemInit = () => {
         }
     }, {
         tableName: 'group_item',
-        comment: '账号组项表'
+        comment: '账号组项信息表'
     })
 }

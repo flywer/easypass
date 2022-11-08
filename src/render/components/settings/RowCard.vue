@@ -1,5 +1,5 @@
 <template>
-  <a-row type="flex" style="  margin-bottom: 12px;">
+  <a-row type="flex" style="margin-bottom: 12px;">
     <a-col flex="auto">
       <a-card class="card-view" :bordered="false" size="small">
         <a-layout-content>

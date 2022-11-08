@@ -49,6 +49,7 @@ export const channel = reactive({
         setGroupItemCommon: "groupItem/setGroupItemCommon",
         getCommonGroupItemsListByPage: "groupItem/getCommonGroupItemsListByPage",
         getItemTypeEnum:"groupItem/getItemTypeEnum",
+        updateGroupIdByItemId: "groupItem/updateGroupIdByItemId",
     },
     user: {
         getUserByMac: 'user/getUserByMac',

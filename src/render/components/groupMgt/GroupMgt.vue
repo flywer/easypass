@@ -125,7 +125,6 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
   }
   refreshSpinning()
   spinning.value = true
-
   //是否是全量搜索（初始化、刷新）
   if (init) {
     pageIndex.value = 1
@@ -226,6 +225,7 @@ const onUpdateGroup = (groupId: string) => {
     group.isEdit = false
 
     if (group.isTemp) {
+      group.groupIndex = groupList.value.length+1
       saveGroup(group).then(res => {
         if (res.data.success) {
           message.success(res.data.message)
@@ -348,8 +348,6 @@ const onAddGroup = () => {
               <a-popover trigger="click" placement="bottom" class="popover-menu">
                 <template #content>
                   <a-button type="text">更改图标</a-button>
-                  <!--                  <a-divider style="margin: 0"/>
-                                    <a-button type="text">更改图标</a-button>-->
                 </template>
                 <menu-outlined/>
               </a-popover>

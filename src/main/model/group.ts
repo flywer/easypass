@@ -33,7 +33,7 @@ export const groupInit = () => {
         },
         groupIndex: {
             type: DataTypes.INTEGER,
-            defaultValue:0,
+            defaultValue: 0,
             comment: '排序号'
         },
         userId: {
@@ -42,6 +42,6 @@ export const groupInit = () => {
         }
     }, {
         tableName: 'group',
-        comment: '密码组信息表'
+        comment: '账号组信息表'
     })
 }

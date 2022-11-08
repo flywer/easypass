@@ -82,7 +82,7 @@ export class GroupController {
             result = success("新增成功！")
         } catch (e) {
             log.error(e)
-            result = failure("更新失败！")
+            result = failure("新增失败！")
         }
         return result
     }
@@ -123,7 +123,6 @@ export class GroupController {
         return result
     }
 
-
     /**
      * 通过标题查询图标
      * @param title
@@ -142,4 +141,5 @@ export class GroupController {
         }
         return result
     }
+
 }
