@@ -1,10 +1,11 @@
 <!-- 窗口的右上角三个操作按钮 -->
 <script setup lang="ts">
 import {BorderOutlined, CloseOutlined, MinusOutlined} from '@ant-design/icons-vue'
-import {setWindow} from '@render/api/app.api'
-import {ref} from 'vue'
+import {getAppVersion, setWindow} from '@render/api/app.api'
+import {onMounted, ref} from 'vue'
 
 const appName = ref('EasyPass')
+const appVersion = ref()
 
 async function maxWindowBtn() {
   await setWindow('window-max')
@@ -17,13 +18,17 @@ async function minWindowBtn() {
 async function closeWindowBtn() {
   await setWindow('window-close')
 }
+
+onMounted(async () => {
+  appVersion.value = (await getAppVersion()).data.result
+})
 </script>
 
 <template>
   <a-layout id="topBar">
     <a-layout-content>
       <div class="appName">
-        {{ appName }}
+        {{ appName }}&nbsp;v{{appVersion}}
       </div>
       <section id="btnGroup" style="float: right">
         <a-button type="text" class="windowBtn" @click="minWindowBtn">
