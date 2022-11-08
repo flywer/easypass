@@ -29,11 +29,12 @@ const menuClick = (item) => {
         theme="light"
         mode="inline"
         @click="menuClick"
-        style="height: 472px;"
+        style="height: 472px;
+        user-select: none;"
     >
       <a-menu-item key="100">
         <LockOutlined/>
-        <span>密码管理</span>
+        <span>账号管理</span>
       </a-menu-item>
       <a-menu-item key="200">
         <DesktopOutlined/>

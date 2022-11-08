@@ -43,6 +43,7 @@ export class GroupController {
             result = success()
             result.result = {rows: rows, count: count}
         } catch (error) {
+            console.log(error.code)
             log.error(error)
             result = failure()
         }

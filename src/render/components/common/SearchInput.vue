@@ -1,8 +1,8 @@
 <template>
   <a-space id="search-input-space" style="gap: 0px">
     <!--搜索-->
-    <a-button class="tool-btn" id="search-btn" type="text" size="large" @click="showSearchInput">
-      <search-outlined class="icon"/>
+    <a-button class="tool-btn" id="search-btn" type="text" size="large" @click="showSearchInput" title="搜索">
+      <template #icon><search-outlined/></template>
     </a-button>
     <!--搜索框动画-->
     <transition name="search">

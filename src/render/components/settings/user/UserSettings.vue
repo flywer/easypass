@@ -20,7 +20,7 @@ import {appRelaunch, setAppToken, setLoginMode} from "@render/api/app.api";
 import {Rule} from "ant-design-vue/es/form";
 import {sendEmail} from "@render/api/utils.api";
 import {randomValidCode} from "@render/utils/randomValidCode";
-import EmailBindCard from "@render/components/settings/EmailBindCard.vue";
+import EmailBindCard from "@render/components/settings/user/EmailBindCard.vue";
 
 //region 账号模式
 //登录模式切换
@@ -485,7 +485,6 @@ const onUpdatePassword = () => {
     <a-divider class="setting-divider"/>
     <!--绑定邮箱-->
     <EmailBindCard/>
-    <a-divider class="setting-divider"/>
   </a-layout-content>
 </template>
 

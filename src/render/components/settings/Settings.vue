@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import UISettings from "@render/components/settings/UISettings.vue";
-import CommonSettings from "@render/components/settings/CommonSettings.vue";
-import UserSettings from "@render/components/settings/UserSettings.vue";
+import UISettings from "@render/components/settings/ui/UISettings.vue";
+import CommonSettings from "@render/components/settings/common/CommonSettings.vue";
+import UserSettings from "@render/components/settings/user/UserSettings.vue";
 
 const tabActiveKey = ref('1')
 </script>

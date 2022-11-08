@@ -19,7 +19,7 @@ import {
   DownOutlined, ExclamationCircleOutlined,
   UpOutlined
 } from '@ant-design/icons-vue'
-import ProxyForm from "@render/components/settings/ProxyForm.vue";
+import ProxyForm from "@render/components/settings/common/ProxyForm.vue";
 import {Rule} from "ant-design-vue/es/form";
 import {cloneDeep, isEmpty, isEqual, random} from "lodash-es";
 
@@ -408,7 +408,7 @@ const onTokenUpdateValidToken = () => {
           <a-button type="link" style="font-size: 12px" @click="onCheckForUpdate()">{{ updateText }}</a-button>
         </a-typography-text>
         <a-progress
-
+            v-show="store.isUpdating"
             type="circle"
             :width="50"
             :strokeWidth="10"

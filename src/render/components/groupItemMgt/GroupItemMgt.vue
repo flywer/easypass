@@ -127,21 +127,21 @@ const searchItemsByPage = async (init: boolean, search?: true) => {
           //每个组里有多个项，提取每个
           arr.forEach(row => {
             /*标题*/
-            if (isEqual(row.type,itemType.value.title)) {
+            if (isEqual(row.type, itemType.value.title)) {
               itemObj.itemId = row.itemId
               itemObj.title = row.value
               itemObj.isCommon = row.isCommon == 1
               itemObj.groupId = row.groupId
             }
             if (isEqual(row.type, itemType.value.icon)) {
-              itemObj.iconUrl = isEmpty(row.value)?null:row.value
+              itemObj.iconUrl = isEmpty(row.value) ? null : row.value
             }
             /*主账号*/
             if (isEqual(row.type, itemType.value.account)) {
               itemObj.account = row.value
             }
             /*展示出来的组项*/
-            if (row.isShow && !isEqual(row.type,itemType.value.title)) {
+            if (row.isShow && !isEqual(row.type, itemType.value.title)) {
               let showItem = {title: null, value: null}
               showItem.title = row.name
               showItem.value = row.value
@@ -184,15 +184,21 @@ const setItemVisible = (value) => {
     <a-space style="gap: 4px">
       <a-space>
         <!--返回-->
-        <a-button class="tool-btn" type="text" size="large" @click="backToGroupMgt">
-          <arrow-left-outlined class="icon"/>
+        <a-button class="tool-btn" type="text" size="large" @click="backToGroupMgt" title="返回">
+          <template #icon>
+            <arrow-left-outlined/>
+          </template>
+          返回
         </a-button>
-        <a-typography-title :level="5" style="margin-bottom: 2px">{{ groupModelRef.name }}</a-typography-title>
-        <a-divider type="vertical" class="divider"/>
+        <a-typography-title :level="5" style="margin-bottom: -1px">{{ groupModelRef.name }}</a-typography-title>
+        <a-divider type="vertical" class="divider" style="height: 17px;"/>
       </a-space>
       <!--新增-->
-      <a-button class="tool-btn" type="text" size="large" @click="showAddItemModal">
-        <PlusOutlined class="icon"/>
+      <a-button class="tool-btn" type="text" size="large" @click="showAddItemModal" title="新增">
+        <template #icon>
+          <PlusOutlined/>
+        </template>
+        新增
       </a-button>
       <!--搜索框-->
       <SearchInput @onSearch="onSearch"/>
@@ -200,11 +206,16 @@ const setItemVisible = (value) => {
     <!--右侧-->
     <a-space style="float: right">
       <!--刷新-->
-      <a-button class="tool-btn" type="text" size="large" @click="searchItemsByPage(true)">
-        <reload-outlined class="icon" :spin="refreshSpin"/>
+      <a-button class="tool-btn" type="text" size="large" @click="searchItemsByPage(true)" title="刷新">
+        <template #icon>
+          <reload-outlined :spin="refreshSpin"/>
+        </template>
+        刷新
       </a-button>
-      <a-button class="tool-btn" type="text" size="large">
-        <MoreOutlined class="icon"/>
+      <a-button class="tool-btn" type="text" size="large" title="更多">
+        <template #icon>
+          <MoreOutlined/>
+        </template>
       </a-button>
     </a-space>
   </a-layout-header>
@@ -230,7 +241,8 @@ const setItemVisible = (value) => {
       </a-empty>
 
     </a-spin>
-    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model" @setItemVisible="setItemVisible"/>
+    <ItemsInfoModal :visible="itemInfoModalRef.visible" :model="itemInfoModalRef.model"
+                    @setItemVisible="setItemVisible"/>
   </a-layout-content>
 
 </template>

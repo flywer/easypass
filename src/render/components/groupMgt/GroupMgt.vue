@@ -78,6 +78,8 @@ let spinning = ref(false)
 let showEmpty = ref<boolean>(false)
 //登录弹框显示
 const loginModalVisible = ref(false)
+//刷新动画
+let refreshSpin = ref(false)
 //region emit
 //emit:是否显示新增弹出框，一般用于弹出框关闭时回调
 /*const setSaveModalVisible = (value) => {
@@ -106,6 +108,14 @@ const setLoginModalVisible = (value) => {
   updateModal.visible = true
 }*/
 
+//刷新动画
+const refreshSpinning = () => {
+  refreshSpin.value = true
+  setTimeout(() => {
+    refreshSpin.value = false
+  }, 1000)
+}
+
 //enter:查询
 const searchGroupByPage = async (init: boolean, search?: true) => {
   if (!store.isLogin) {
@@ -113,7 +123,7 @@ const searchGroupByPage = async (init: boolean, search?: true) => {
     showEmpty.value = true
     return null
   }
-
+  refreshSpinning()
   spinning.value = true
 
   //是否是全量搜索（初始化、刷新）
@@ -270,19 +280,27 @@ const onAddGroup = () => {
   <a-layout-header id="tool-header">
     <a-space style="gap: 4px">
       <!--新增弹出框 -->
-      <a-button class="tool-btn" type="text" size="large" @click="onAddGroup"><!--showSaveModal-->
-        <PlusOutlined class="icon"/>
+      <a-button class="tool-btn" type="text" size="large" @click="onAddGroup" title="新增"><!--showSaveModal-->
+        <template #icon>
+          <PlusOutlined/>
+        </template>
+        新增
       </a-button>
       <!--搜索框-->
       <SearchInput @onSearch="onSearch"/>
     </a-space>
     <!--右侧-->
     <a-space style="float: right">
-      <a-button class="tool-btn" type="text" size="large" @click="searchGroupByPage(true)">
-        <reload-outlined class="icon"/>
+      <a-button class="tool-btn" type="text" size="large" @click="searchGroupByPage(true)" title="刷新">
+        <template #icon>
+          <reload-outlined :spin="refreshSpin"/>
+        </template>
+        刷新
       </a-button>
-      <a-button class="tool-btn" type="text" size="large">
-        <MoreOutlined class="icon"/>
+      <a-button class="tool-btn" type="text" size="large" title="更多">
+        <template #icon>
+          <MoreOutlined/>
+        </template>
       </a-button>
     </a-space>
   </a-layout-header>
@@ -291,7 +309,7 @@ const onAddGroup = () => {
     <a-spin :spinning="spinning">
       <a-row :gutter="16">
         <a-col v-for="(item) in groupList" :span="8"
-               style="margin-bottom: 15px;max-height: 119.141px">
+               style="margin-bottom: 15px;max-height: 119.141px;user-select: none;">
           <a-card :bordered="false" :hoverable="true" size="small" class="animate__animated animate__flipInX">
             <a-card-meta :data-id="item.id" :data-name="item.name"
                          @click="showGroupItem(item.id,item.name,item.isEdit)">
