@@ -111,14 +111,18 @@ onMounted(async () => {
   await autoThemeConfig()
   updateDownloadedListener()
   autoCheckUpdates()
+  await appTokenInit()
+})
 
+/*应用令牌初始化*/
+const appTokenInit = async () => {
   const tokenSettings = (await getTokenSettings()).data.result
   store.haveToken = tokenSettings.haveToken;
   store.showTokenPanel = tokenSettings.haveToken;
   store.tokenCheckRemainTimes = tokenSettings.remainTimes
   //界面隐藏时
   ipcInstance.on(channel.app.showTokenPanel, () => store.showTokenPanel = true)
-})
+}
 
 watch(() => store.tokenCheckRemainTimes, (value) => {
   if (value === 1) {
