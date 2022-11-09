@@ -161,11 +161,11 @@ const autoCheckUpdates = () => {
           content: '发现更新的版本 ' + res.result.version + ' ，是否下载最新版本？',
           okText: '确认',
           cancelText: '取消',
-          async onOk() {
+          onOk() {
             /*下载更新*/
             message.info('开始下载')
             store.isUpdating = true
-            await downloadUpdate().catch(() => {
+             downloadUpdate().catch(() => {
               message.error('系统异常')
             })
           },

@@ -8,7 +8,7 @@ import {
     getAppSettings,
     getAppTokenSettings,
     getResourcePath,
-    getAppDataPath, getAppTempDataPath
+    getAppDataPath, getAppTempDataPath, getAppPath
 } from "@common/utils/utils";
 import {readFsSync, writeFs, calcSize} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
@@ -542,7 +542,7 @@ export class AppController {
     }
 
     /**
-     * 打开应用资源文件夹
+     * 打开应用文件夹
      * @constructor
      */
     @IpcHandle(channel.app.openAppFolder)
@@ -550,7 +550,7 @@ export class AppController {
         let result
         try {
             result = success()
-            await shell.openPath(getResourcePath())
+            await shell.openPath(getAppPath())
         } catch (e) {
             log.error(e)
             result = failure('系统异常')
@@ -559,7 +559,7 @@ export class AppController {
     }
 
     /**
-     * 获取应用资源文件夹大小
+     * 获取应用文件夹大小
      * @constructor
      */
     @IpcHandle(channel.app.getAppFolderSize)
@@ -567,7 +567,7 @@ export class AppController {
         let result
         try {
             result = success()
-            await calcSize(getResourcePath(), (err, size) => {
+            await calcSize(getAppPath(), (err, size) => {
                 if (err) log.error(err)
                 result.result = size
             })

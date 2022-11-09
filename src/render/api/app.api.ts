@@ -193,7 +193,7 @@ export function openAppFolder() {
 }
 
 /**
- * 获取应用资源文件夹大小
+ * 获取应用文件夹大小
  */
 export function getAppFolderSize() {
     return ipcInstance.send<Result>(channel.app.getAppFolderSize)
