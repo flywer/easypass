@@ -9,7 +9,7 @@ import {
   getTokenSettings,
   setAppMinSizeLock,
   setAppSettings,
-  setAppToken
+  setAppToken, showEmojiPanel
 } from "@render/api/app.api";
 import {store} from "@render/store";
 import {message, Modal} from "ant-design-vue";
@@ -468,7 +468,7 @@ const onAppMinSizeLock = () => {
     <RowCard>
       <template #left>存储空间</template>
       <template #right>
-
+        <a-button>打开App文件夹</a-button>
       </template>
     </RowCard>
   </a-layout-content>

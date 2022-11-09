@@ -502,4 +502,22 @@ export class AppController {
         return result
     }
 
+    /**
+     * 打开系统自身的emoji选取器
+     * @constructor
+     */
+    @IpcHandle(channel.app.showEmojiPanel)
+    public HandleShowEmojiPanel() {
+        let result
+        try {
+            result = success()
+            if (app.isEmojiPanelSupported())
+                app.showEmojiPanel()
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
 }

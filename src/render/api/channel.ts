@@ -30,7 +30,7 @@ export const channel = reactive({
         getResourcePath:'app/getResourcePath',
         setAppMinSizeLock: 'app/setAppMinSizeLock',
         getAppMetrics: 'app/getAppMetrics',
-
+        showEmojiPanel: 'app/showEmojiPanel',
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',
