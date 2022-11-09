@@ -1,6 +1,7 @@
 import {ipcInstance} from '@render/plugins'
 import {channel} from "@render/api/channel";
 import {Result} from "@main/vo/resultVo";
+import {getAppDataPath} from "@common/utils/utils";
 
 /**
  * 设置主窗体 最大化、最小化、关闭
@@ -136,7 +137,7 @@ export function getTokenSettings() {
 /**
  * 获取应用资源路径
  */
-export function getResourcePath() {
+export function getResourceFolder() {
     return ipcInstance.send<Result>(channel.app.getResourcePath)
 }
 
@@ -161,3 +162,54 @@ export function getAppMetrics() {
 export function showEmojiPanel() {
     return ipcInstance.send<Result>(channel.app.showEmojiPanel)
 }
+
+/**
+ * 打开文件夹
+ * @param path
+ */
+export function openPath(path: string) {
+    return ipcInstance.send<Result>(channel.app.openPath)
+}
+
+/**
+ * 打开AppData文件夹
+ */
+export function openAppDataFolder() {
+    return ipcInstance.send<Result>(channel.app.openAppDataFolder)
+}
+
+/**
+ * 获取AppData文件夹大小
+ */
+export function getAppDataFolderSize() {
+    return ipcInstance.send<Result>(channel.app.getAppDataFolderSize)
+}
+
+/**
+ * 打开应用资源文件夹
+ */
+export function openAppFolder() {
+    return ipcInstance.send<Result>(channel.app.openAppFolder)
+}
+
+/**
+ * 获取应用资源文件夹大小
+ */
+export function getAppFolderSize() {
+    return ipcInstance.send<Result>(channel.app.getAppFolderSize)
+}
+
+/**
+ * 打开应用Temp文件夹
+ */
+export function openAppTempDataFolder() {
+    return ipcInstance.send<Result>(channel.app.openAppTempDataFolder)
+}
+
+/**
+ * 获取应用Temp文件夹大小
+ */
+export function getAppTempDataFolderSize() {
+    return ipcInstance.send<Result>(channel.app.getAppTempDataFolderSize)
+}
+

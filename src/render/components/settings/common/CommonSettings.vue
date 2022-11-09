@@ -2,14 +2,17 @@
 import {computed, createVNode, onMounted, reactive, ref, watch} from "vue";
 import {
   checkAppToken,
-  checkForUpdate,
-  getAppMetrics,
-  getAppSettings,
+  checkForUpdate, getAppDataFolderSize, getAppFolderSize,
+  getAppSettings, getAppTempDataFolderSize,
   getAppVersion,
   getTokenSettings,
+  openAppDataFolder,
+  openAppFolder,
+  openAppTempDataFolder,
+  openPath,
   setAppMinSizeLock,
   setAppSettings,
-  setAppToken, showEmojiPanel
+  setAppToken,
 } from "@render/api/app.api";
 import {store} from "@render/store";
 import {message, Modal} from "ant-design-vue";
@@ -18,12 +21,15 @@ import {channel} from "@render/api/channel";
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {
-  DownOutlined, ExclamationCircleOutlined,
-  UpOutlined
+  DownOutlined,
+  ExclamationCircleOutlined,
+  UpOutlined,
+  LoadingOutlined
 } from '@ant-design/icons-vue'
 import ProxyForm from "@render/components/settings/common/ProxyForm.vue";
 import {Rule} from "ant-design-vue/es/form";
-import {cloneDeep, isEmpty, isEqual, random} from "lodash-es";
+import {cloneDeep, isEmpty, isEqual} from "lodash-es";
+import {byteConvert} from "@render/utils/byteConvert";
 
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
@@ -118,11 +124,11 @@ onMounted(async () => {
 })
 
 //region 网络代理
-const setProxyVisible = ref(false)
+const proxyVisible = ref(false)
 
 /*显示修改密码框*/
 const onShowProxyModal = () => {
-  setProxyVisible.value = !setProxyVisible.value
+  proxyVisible.value = !proxyVisible.value
 }
 //endregion
 
@@ -260,6 +266,59 @@ const onAppMinSizeLock = () => {
 
 //endregion
 
+//region 存储空间
+const onOpenAppFolder = () => {
+  openAppFolder()
+}
+
+const onOpenAppDataFolder = () => {
+  openAppDataFolder()
+}
+
+const onOpenAppTempDataFolder = () => {
+  openAppTempDataFolder()
+}
+
+const storageInfoRef = reactive({
+  isShow: false,
+  appFolderSize: '0',
+  appDataFolderSize: '0',
+  appTempDataFolderSize: '0',
+  loading: {/*计算时加载动画*/
+    appFolderSizeLoading: true,
+    appDataFolderSizeLoading: true,
+    appTempDataFolderSizeLoading: true
+  }
+})
+
+const onShowStorageInfo = () => {
+  storageInfoRef.isShow = !storageInfoRef.isShow
+}
+
+onMounted(() => {
+  getAppFolderSize().then(res => {
+    if (res.data.success)
+      storageInfoRef.appFolderSize = byteConvert(res.data.result)
+  }).then(() => {
+    storageInfoRef.loading.appFolderSizeLoading = false
+  })
+
+  getAppDataFolderSize().then(res => {
+    if (res.data.success)
+      storageInfoRef.appDataFolderSize = byteConvert(res.data.result)
+  }).then(() => {
+    storageInfoRef.loading.appDataFolderSizeLoading = false
+  })
+
+  getAppTempDataFolderSize().then(res => {
+    if (res.data.success)
+      storageInfoRef.appTempDataFolderSize = byteConvert(res.data.result)
+  }).then(() => {
+    storageInfoRef.loading.appTempDataFolderSizeLoading = false
+  })
+
+})
+//endregion
 </script>
 
 <template>
@@ -403,7 +462,7 @@ const onAppMinSizeLock = () => {
     </RowCard>
     <a-divider class="setting-divider"/>
     <!--网络代理-->
-    <RowCard :bottom-card-visible="setProxyVisible">
+    <RowCard :bottom-card-visible="proxyVisible">
       <template #left>
         <a-space style="gap:2px">
           网络代理
@@ -413,14 +472,14 @@ const onAppMinSizeLock = () => {
         </a-space>
       </template>
       <template #right>
-        <a-button v-if="!setProxyVisible" class="animate__animated animate__flipInX"
+        <a-button v-if="!proxyVisible" class="animate__animated animate__flipInX"
                   @click="onShowProxyModal">
           <template #icon>
             <down-outlined/>
           </template>
           设置
         </a-button>
-        <a-button v-if="setProxyVisible"
+        <a-button v-if="proxyVisible"
                   class="animate__animated animate__flipInX"
                   @click="onShowProxyModal"
         >
@@ -465,15 +524,51 @@ const onAppMinSizeLock = () => {
     </RowCard>
     <a-divider class="setting-divider"/>
     <!--应用情况-->
-    <RowCard>
-      <template #left>存储空间</template>
+    <RowCard :bottom-card-visible="storageInfoRef.isShow">
+      <template #left>存储空间
+        <SecondaryText>
+          <template #text>
+            <span>应用资源占用空间：</span>
+            <span v-if="!storageInfoRef.loading.appFolderSizeLoading">{{ storageInfoRef.appFolderSize }}</span>
+            <span v-else><loading-outlined/></span>
+          </template>
+        </SecondaryText>
+      </template>
       <template #right>
-        <a-button>打开App文件夹</a-button>
+
+        <a-button @click="onOpenAppFolder">打开App文件夹</a-button>
+        <a-button type="text" size="middle" class="tool-btn" style="margin-left: 4px" @click="onShowStorageInfo">
+          <template #icon>
+            <down-outlined :rotate="storageInfoRef.isShow?180:0"/>
+          </template>
+        </a-button>
+      </template>
+      <template #bottom-card>
+        <a-row type="flex" align="middle">
+          <a-col :flex="2">
+            <span>AppData文件已占空间：</span>
+            <span v-if="!storageInfoRef.loading.appDataFolderSizeLoading">{{ storageInfoRef.appDataFolderSize }}</span>
+            <span v-else><loading-outlined/></span>
+          </a-col>
+          <a-col>
+            <a-button @click="onOpenAppDataFolder">打开AppData文件夹</a-button>
+          </a-col>
+        </a-row>
+        <a-row type="flex" align="middle" style="margin-top: 8px">
+          <a-col :flex="2">
+            <span>临时文件已占空间：</span>
+            <span v-if="!storageInfoRef.loading.appTempDataFolderSizeLoading">
+              {{ storageInfoRef.appTempDataFolderSize }}</span>
+            <span v-else><loading-outlined/></span>
+          </a-col>
+          <a-col>
+            <a-button @click="onOpenAppTempDataFolder">打开Temp文件夹</a-button>
+          </a-col>
+        </a-row>
       </template>
     </RowCard>
   </a-layout-content>
 </template>
-
 
 <style scoped lang="less">
 @import "ant-design-vue/dist/antd.variable.less";
@@ -483,4 +578,7 @@ const onAppMinSizeLock = () => {
   padding: 0 14px;
 }
 
+.tool-btn:hover {
+  background-color: @primary-1;
+}
 </style>

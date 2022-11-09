@@ -2,7 +2,7 @@ import {Controller, IpcHandle, Window} from "einf";
 import {BrowserWindow} from "electron";
 import {UserService} from "@main/service/user.service";
 import {channel} from "@render/api/channel";
-import {getDateString, getNetworkInfo, getUserAppDataFolder,} from "@common/utils/utils";
+import {getDateString, getNetworkInfo, getAppDataPath,} from "@common/utils/utils";
 import {deleteFileFs, readFsSync, writeFs} from '@common/utils/fsUtils'
 import {failure, success} from "@main/vo/resultVo";
 import path from "path";
@@ -25,7 +25,7 @@ export class UserController {
 
     /*用户本地信息文件*/
     private readonly userConfigFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'userConfig.json',
         getFullPath: () => {
             return path.join(this.userConfigFile.folderPath, this.userConfigFile.fileName)

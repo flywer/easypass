@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from "vue";
-import {checkAppToken, getResourcePath} from "@render/api/app.api";
+import {checkAppToken, getResourceFolder} from "@render/api/app.api";
 import {store} from "@render/store";
 import {message} from "ant-design-vue";
 import {isEmpty} from "lodash-es";
@@ -46,7 +46,7 @@ const checkToken = () => {
 const cloudHtmlUrl = ref('')
 
 onMounted(async () => {
-  let res = (await getResourcePath()).data.result
+  let res = (await getResourceFolder()).data.result
   cloudHtmlUrl.value =  res + '/assets/cloud/index.html'
 })
 

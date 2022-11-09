@@ -4,7 +4,7 @@ import log from "electron-log";
 import {autoUpdater} from "electron-updater";
 import {nativeImage, Notification} from 'electron'
 import path, {join} from "path";
-import {getAppSettings, getResourcePath, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppSettings, getResourcePath, getAppDataPath} from "@common/utils/utils";
 import {writeFs} from "@common/utils/fsUtils";
 
 /**
@@ -107,7 +107,7 @@ export const setHasUpdate = async (hasUpdate: boolean) => {
     const appSettings = await getAppSettings()
     appSettings.hasUpdates = hasUpdate //记录已有可用更新，显示在前端
     writeFs({
-        folderPath: join(getUserAppDataFolder(), '/config'),
+        folderPath: join(getAppDataPath(), '/config'),
         fileName: 'settings.json'
     }, JSON.stringify(appSettings))
 }

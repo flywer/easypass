@@ -1,7 +1,7 @@
 import {DataTypes, Options, Sequelize} from "sequelize";
 import log from 'electron-log'
 import path from "path";
-import {getAppSettings, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppSettings, getAppDataPath} from "@common/utils/utils";
 import config from "@common/config/appConfig.json";
 import {isEqual} from "lodash";
 
@@ -23,7 +23,7 @@ const commonDb = {
 
 const localDb = {
     dialect: 'sqlite',
-    storage: path.join(getUserAppDataFolder(), '/local/db.sqlite')
+    storage: path.join(getAppDataPath(), '/local/db.sqlite')
 }
 
 

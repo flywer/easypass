@@ -8,7 +8,7 @@ import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getAppProxySettings, getAppSettings, getUserAppDataFolder} from "@common/utils/utils";
+import {getAppProxySettings, getAppSettings, getAppDataPath, getAppTempDataPath} from "@common/utils/utils";
 import log from 'electron-log'
 import * as Path from "path";
 import {groupInit} from "@main/model/group";
@@ -16,11 +16,9 @@ import {GroupItemInit} from "@main/model/groupItem";
 import {UserInit} from "@main/model/user";
 import {databaseInit} from "@main/mapper/defaultSql";
 import {isEqual, isNull} from "lodash";
-import {sendEmail} from "@common/utils/mailer";
+import {appLogInit} from "@main/app/app.log";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
-//设置日志存储位置
-log.transports.file.resolvePath = () => Path.join(getUserAppDataFolder(), 'logs/main.log')
 
 async function electronAppInit() {
     const isDev = !app.isPackaged
@@ -93,6 +91,8 @@ async function electronAppInit() {
  */
 async function bootstrap() {
     try {
+        appLogInit()
+
         await electronAppInit()
 
         await createEinf({

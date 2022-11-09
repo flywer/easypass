@@ -6,6 +6,8 @@ import {isEmpty} from "lodash";
 import config from "@common/config/appConfig.json";
 import parseJson from 'parse-json'
 import log from "electron-log";
+import fs from "fs";
+import {promisify} from 'util'
 
 //region 字符串
 
@@ -41,20 +43,21 @@ export const getDateString = () => {
  * 获取操作系统home文件夹
  */
 export const getUserHome = () => {
-    return process.env[(process.platform ==
-        'win32') ? 'USERPROFILE' : 'HOME'];
+    return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
 
 /**
  * 获取本应用在操作系统中的文件存储位置
  */
-export const getUserAppDataFolder = () => {
-    const userHome = getUserHome()
-    if (process.platform == 'win32') {
-        return path.join(userHome, '/AppData/Local/EasyPass')
-    } else {
-        return path.join(userHome, '/EasyPass')
-    }
+export const getAppDataPath = () => {
+    return path.join(os.homedir(), '/AppData/Local/EasyPass')
+}
+
+/**
+ * 获取本应用在操作系统的临时文件存储位置
+ */
+export const getAppTempDataPath = () => {
+    return path.join(os.tmpdir(), '/EasyPass')
 }
 
 
@@ -96,7 +99,7 @@ export const getNetworkInfo = () => {
 export const getAppSettings = async () => {
     const defaultSettings = config.defaultSettings
     const appSettingsFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'settings.json'
     }
     const buffer = await readFsSync(path.join(appSettingsFile.folderPath, appSettingsFile.fileName))
@@ -110,7 +113,7 @@ export const getAppSettings = async () => {
 export const getAppProxySettings = async () => {
     const defaultSettings = config.defaultProxySettings
     const appSettingsFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'proxy.json'
     }
 
@@ -127,7 +130,7 @@ export const getAppProxySettings = async () => {
 export const getAppTokenSettings = async () => {
     const defaultSettings = config.defaultTokenSettings
     const appTokenFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'token.json'
     }
 
@@ -137,5 +140,4 @@ export const getAppTokenSettings = async () => {
     else
         return parseJson(buffer.toString())
 }
-
 //endregion

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import log from 'electron-log'
+import {promisify} from "util";
 
 /**
  * 异步写入本地文件，没有则创建
@@ -108,3 +109,44 @@ export const fileExistAndWrite = (folderPath: string, fileName: string, data?) =
     })
 }
 
+// 使用promisify方法来promise化指定方法
+const stat = promisify(fs.stat)
+const readdir = promisify(fs.readdir)
+
+/**
+ * 异步计算文件夹的大小
+ * 利用回调函数和递归来完成多层级目录中的文件大小计算
+ * @param dirPath
+ * @param cb
+ */
+export const calcSize = async (dirPath, cb) => {
+    let fileSize = 0;
+    let error = null
+
+    async function calc(dirPath) {
+        try {
+            const statObj = await stat(dirPath)
+            if (statObj.isDirectory()) {
+                const files = await readdir(dirPath)
+                let dirs = files.map(item => {
+                    return path.join(dirPath, item)
+                })
+                let index = 0
+                async function next() {
+                    if (index < dirs.length) {
+                        let current = dirs[index++]
+                        await calc(current)
+                        await next()
+                    }
+                }
+                return await next()
+            } else {
+                fileSize += statObj.size
+            }
+        } catch (err) {
+            error = err
+        }
+    }
+    await calc(dirPath)
+    cb(error, fileSize)
+}

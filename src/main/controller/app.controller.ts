@@ -1,5 +1,5 @@
 import {Controller, IpcHandle, Window} from 'einf'
-import {app, BrowserWindow} from 'electron'
+import {app, BrowserWindow, shell} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
@@ -8,9 +8,9 @@ import {
     getAppSettings,
     getAppTokenSettings,
     getResourcePath,
-    getUserAppDataFolder
+    getAppDataPath, getAppTempDataPath
 } from "@common/utils/utils";
-import {readFsSync, writeFs} from "@common/utils/fsUtils";
+import {readFsSync, writeFs, calcSize} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
@@ -21,6 +21,8 @@ import {tray, trayInit} from "@main/app/app.tray";
 import {setHasUpdate} from "@main/app/autoUpdater";
 import {appTokenDecrypt, appTokenEncrypt} from "@common/utils/cryptoUtils";
 import {isEqual} from "lodash";
+import fs from "fs";
+import {getAppTempDataFolderSize} from "@render/api/app.api";
 
 @Controller()
 export class AppController {
@@ -32,7 +34,7 @@ export class AppController {
 
     /*应用设置文件*/
     private readonly appSettingsFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'settings.json',
         getFullPath: () => {
             return path.join(this.appSettingsFile.folderPath, this.appSettingsFile.fileName)
@@ -41,7 +43,7 @@ export class AppController {
 
     /*应用主题文件*/
     private readonly appThemeFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'theme.json',
         getFullPath: () => {
             return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
@@ -50,7 +52,7 @@ export class AppController {
 
     /*网络代理配置文件*/
     private readonly appProxyFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'proxy.json',
         getFullPath: () => {
             return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
@@ -59,7 +61,7 @@ export class AppController {
 
     /*应用令牌文件*/
     private readonly appTokenFile = {
-        folderPath: path.join(getUserAppDataFolder(), '/config'),
+        folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'token.json',
         getFullPath: () => {
             return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
@@ -520,4 +522,133 @@ export class AppController {
         return result
     }
 
+    /**
+     * 根据路径打开文件
+     * @param path
+     * @constructor
+     */
+    @IpcHandle(channel.app.openPath)
+    public async HandleOpenPath(path: string) {
+        let result
+        try {
+            result = success()
+            if (!isEmpty(path))
+                await shell.openPath(path)
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 打开应用资源文件夹
+     * @constructor
+     */
+    @IpcHandle(channel.app.openAppFolder)
+    public async HandleOpenAppFolder() {
+        let result
+        try {
+            result = success()
+            await shell.openPath(getResourcePath())
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 获取应用资源文件夹大小
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppFolderSize)
+    public async HandleGetAppFolderSize() {
+        let result
+        try {
+            result = success()
+            await calcSize(getResourcePath(), (err, size) => {
+                if (err) log.error(err)
+                result.result = size
+            })
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 打开应用AppData文件夹
+     * @constructor
+     */
+    @IpcHandle(channel.app.openAppDataFolder)
+    public async HandleOpenAppDataFolder() {
+        let result
+        try {
+            result = success()
+            await shell.openPath(getAppDataPath())
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 获取应用AppData文件夹大小
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppDataFolderSize)
+    public async HandleGetAppDataFolderSize() {
+        let result
+        try {
+            result = success()
+            await calcSize(getAppDataPath(), (err, size) => {
+                if (err) log.error(err)
+                result.result = size
+            })
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 打开应用Temp文件夹
+     * @constructor
+     */
+    @IpcHandle(channel.app.openAppTempDataFolder)
+    public async HandleOpenAppTempDataFolder() {
+        let result
+        try {
+            result = success()
+            await shell.openPath(getAppTempDataPath())
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 获取应用Temp文件夹大小
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppTempDataFolderSize)
+    public async HandleGetAppTempDataFolderSize() {
+        let result
+        try {
+            result = success()
+            await calcSize(getAppTempDataPath(), (err, size) => {
+                if (err) log.error(err)
+                result.result = size
+            })
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
 }

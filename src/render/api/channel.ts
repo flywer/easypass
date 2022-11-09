@@ -31,6 +31,14 @@ export const channel = reactive({
         setAppMinSizeLock: 'app/setAppMinSizeLock',
         getAppMetrics: 'app/getAppMetrics',
         showEmojiPanel: 'app/showEmojiPanel',
+        openPath:'app/openPath',
+        openAppFolder: 'app/openAppFolder',
+        openAppDataFolder: 'app/openAppDataFolder',
+        openAppTempDataFolder: 'app/openAppTempDataFolder',
+        getAppFolderSize:'app/getAppFolderSize',
+        getAppDataFolderSize: 'app/getAppDataFolderSize',
+        getAppTempDataFolderSize: 'app/getAppTempDataFolderSize',
+
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',
