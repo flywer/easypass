@@ -160,10 +160,15 @@ const setItemVisible = (value) => {
     <a-space style="float: right">
       <!--刷新-->
       <a-button class="tool-btn" type="text" size="large" @click="searchItemsByPage(true)">
-        <reload-outlined class="icon" :spin="refreshSpin"/>
+        <template #icon>
+          <reload-outlined :spin="refreshSpin"/>
+        </template>
+        刷新
       </a-button>
       <a-button class="tool-btn" type="text" size="large">
-        <MoreOutlined class="icon"/>
+        <template #icon>
+          <MoreOutlined/>
+        </template>
       </a-button>
     </a-space>
   </a-layout-header>

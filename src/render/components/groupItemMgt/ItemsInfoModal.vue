@@ -93,9 +93,9 @@ const modalWrap = ref()
       </template>
 
       <a-row v-for="(item) in itemInfoList" style="margin-bottom: 12px" class="row-hover">
-        <a-col :span="4" :offset="1" align="right" style="float: right">{{ item.name }}&nbsp;:</a-col>
+        <a-col :span="5" align="right" style="float: right">{{ item.name }}&nbsp;:</a-col>
         <a-col :span="16" style="margin-left: 9px;">{{ item.value }}</a-col>
-        <a-col :span="2" :offset="0">
+        <a-col :span="1" :offset="0">
           <copy-outlined @click="copyText(item.value,true)"/>
         </a-col>
       </a-row>

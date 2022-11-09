@@ -219,7 +219,7 @@ const onTokenUpdateValidToken = () => {
       if (res.data.success) {
         store.tokenCheckRemainTimes = 5
         appTokenUpdateRef.isShowValidTokenForm = false
-        appTokenRef.isShowTokenForm =true
+        appTokenRef.isShowTokenForm = true
       } else {
         store.tokenCheckRemainTimes--
         message.warn(res.data.message)
@@ -288,7 +288,8 @@ const onTokenUpdateValidToken = () => {
             !appTokenRef.isShowTokenForm &&
             !appTokenCancelRef.isShowValidTokenForm &&
             !appTokenUpdateRef.isShowValidTokenForm "
-            class="animate__animated animate__flipInX">
+            class="animate__animated animate__flipInX"
+        >
           <a-button
               v-show="!store.haveToken"
               @click="appTokenRef.isShowTokenForm = true">设置
@@ -306,11 +307,11 @@ const onTokenUpdateValidToken = () => {
             v-show="appTokenRef.isShowTokenForm"
             :model="appTokenRef.model"
             @finish="onAppTokenSubmit"
+            style="height: 48px"
         >
           <a-input-group compact>
             <a-form-item name="token" :rules="appTokenRef.rules.token">
               <a-input-password placeholder="请输入登录令牌" style="width: 180px"
-
                                 v-model:value.trim="appTokenRef.model.token"/>
             </a-form-item>
             <a-form-item name="checkToken" :rules="appTokenRef.rules.checkToken">
@@ -328,6 +329,7 @@ const onTokenUpdateValidToken = () => {
             v-show="appTokenCancelRef.isShowValidTokenForm"
             :model="appTokenCancelRef.validModel"
             @finish="onTokenCancelValidToken"
+            style="height: 48px"
         >
           <a-input-group compact>
             <a-form-item name="token">
@@ -346,6 +348,7 @@ const onTokenUpdateValidToken = () => {
             v-show="appTokenUpdateRef.isShowValidTokenForm"
             :model="appTokenUpdateRef.validModel"
             @finish="onTokenUpdateValidToken"
+            style="height: 48px"
         >
           <a-input-group compact>
             <a-form-item name="token">
