@@ -20,7 +20,6 @@ import {isEmpty, isNull} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
 import {setHasUpdate} from "@main/app/autoUpdater";
 import {appTokenDecrypt, appTokenEncrypt} from "@common/utils/cryptoUtils";
-import parseJson from 'parse-json'
 import {isEqual} from "lodash";
 
 @Controller()
@@ -75,6 +74,7 @@ export class AppController {
     @IpcHandle(channel.app.setWindow)
     public async HandleSetWindow(setup: string) {
         if (setup === 'window-min') {
+
             this.mainWindow.minimize()
         } else if (setup === 'window-max') {
             if (this.mainWindow.isMaximized())
@@ -365,6 +365,7 @@ export class AppController {
         return result
     }
 
+    //region 应用令牌
     /**
      * 获取应用令牌信息
      * @constructor
@@ -382,7 +383,6 @@ export class AppController {
         return result
     }
 
-
     /**
      * 设置应用令牌
      * @param token
@@ -397,6 +397,7 @@ export class AppController {
                 tokenSettings.haveToken = true
                 tokenSettings.showTokenPanel = true
                 tokenSettings.remainTimes = 5
+                tokenSettings.appMinSizeLock = false
                 tokenSettings.token = appTokenEncrypt(token)  //令牌加密
                 writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
                 result = success('设置令牌成功!')
@@ -444,6 +445,28 @@ export class AppController {
         }
         return result
     }
+
+    /**
+     * 设置最小化时锁住应用
+     * @param setup
+     * @constructor
+     */
+    @IpcHandle(channel.app.setAppMinSizeLock)
+    public async HandleSetAppMinSizeLock(setup:boolean) {
+        let result
+        try {
+            let tokenSettings = await getAppTokenSettings()
+            tokenSettings.appMinSizeLock = setup
+            writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+            result = success()
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
+    }
+
+    //endregion
 
     /**
      * 获取应用资源文件路径

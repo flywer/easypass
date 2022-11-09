@@ -4,8 +4,8 @@ import {
   checkAppToken,
   checkForUpdate,
   getAppSettings,
-  getAppVersion,
-  quitAndInstall,
+  getAppVersion, getTokenSettings,
+  quitAndInstall, setAppMinSizeLock,
   setAppSettings,
   setAppToken
 } from "@render/api/app.api";
@@ -230,6 +230,35 @@ const onTokenUpdateValidToken = () => {
 
 //endregion
 
+//region 最小化时锁住应用
+const appMinSizeLockRef = reactive({
+  checked: false,
+  disabled: true
+})
+
+onMounted(async () => {
+  appMinSizeLockRef.disabled = !store.haveToken;
+  const tokenSettings = (await getTokenSettings()).data.result
+  if (typeof (tokenSettings.appMinSizeLock) != 'undefined')
+    appMinSizeLockRef.checked = tokenSettings.appMinSizeLock
+  else
+    appMinSizeLockRef.checked = false
+})
+
+watch(() => store.haveToken, (value) => {
+  appMinSizeLockRef.disabled = !value;
+})
+
+const onAppMinSizeLock = () => {
+  setAppMinSizeLock(appMinSizeLockRef.checked).then(res => {
+    if (!res.data.success) {
+      message.error(res.data.message)
+      appMinSizeLockRef.checked = !appMinSizeLockRef.checked
+    }
+  })
+}
+
+//endregion
 </script>
 
 <template>
@@ -363,6 +392,15 @@ const onTokenUpdateValidToken = () => {
         </a-form>
       </template>
     </RowCard>
+    <!--最小化时锁住应用-->
+    <RowCard>
+      <template #left>最小化时锁住应用</template>
+      <template #right>
+        <a-switch v-model:checked="appMinSizeLockRef.checked" :disabled="appMinSizeLockRef.disabled"
+                  @click="onAppMinSizeLock"/>
+      </template>
+    </RowCard>
+    <a-divider class="setting-divider"/>
     <!--网络代理-->
     <RowCard :bottom-card-visible="setProxyVisible">
       <template #left>

@@ -81,6 +81,14 @@ export async function createWindow() {
         }
     })
 
+    win.on('minimize',async () => {
+        const appTokenSettings = await getAppTokenSettings()
+        //是否拥有应用令牌
+        if (appTokenSettings.haveToken && appTokenSettings.appMinSizeLock) {
+            win.webContents.send(channel.app.showTokenPanel)
+        }
+    })
+
     mainWindow = win
     return win
 }

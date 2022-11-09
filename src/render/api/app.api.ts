@@ -139,3 +139,7 @@ export function getTokenSettings() {
 export function getResourcePath() {
     return ipcInstance.send<Result>(channel.app.getResourcePath)
 }
+
+export function setAppMinSizeLock(setup:boolean){
+    return ipcInstance.send<Result>(channel.app.setAppMinSizeLock,setup)
+}

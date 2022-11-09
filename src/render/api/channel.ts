@@ -28,6 +28,7 @@ export const channel = reactive({
         getTokenSettings:  'app/getTokenSettings',
         showTokenPanel:  'app/showTokenPanel',
         getResourcePath:'app/getResourcePath',
+        setAppMinSizeLock: 'app/setAppMinSizeLock',
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',
