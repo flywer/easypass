@@ -80,33 +80,6 @@ let showEmpty = ref<boolean>(false)
 const loginModalVisible = ref(false)
 //刷新动画
 let refreshSpin = ref(false)
-//region emit
-//emit:是否显示新增弹出框，一般用于弹出框关闭时回调
-/*const setSaveModalVisible = (value) => {
-  saveModalVisible.value = value
-}*/
-//emit:是否显示更新弹出框
-/*const setUpdateModalVisible = (value) => {
-  updateModal.visible = value
-}*/
-
-//emit:是否显示登录弹出框
-const setLoginModalVisible = (value) => {
-  loginModalVisible.value = value
-}
-//endregion
-
-// click:显示新增密码组弹出框
-/*const showSaveModal = () => {
-  if (store.isLogin)
-    saveModalVisible.value = true
-}*/
-
-//click: 显示编辑密码组弹出框
-/*const showUpdateModal = (group) => {
-  updateModal.model = cloneDeep(group)
-  updateModal.visible = true
-}*/
 
 //刷新动画
 const refreshSpinning = () => {
@@ -216,7 +189,16 @@ const onUpdateGroup = (groupId: string) => {
   //校验
   if (isEmpty(group.name)) {
     error = '组名不能为空!'
-  }
+  } /*else if (new RegExp(
+      "[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]"
+  ).test(group.name)) {
+    error = '组名不能包含特殊字符和空格!'
+  } else if (new RegExp(
+      "[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]"
+  ).test(group.description)) {
+    error = '备注不能包含特殊字符和空格!'
+  }*/
+
   if (error != null) {
     message.error(error)
   } else {
@@ -225,7 +207,7 @@ const onUpdateGroup = (groupId: string) => {
     group.isEdit = false
 
     if (group.isTemp) {
-      group.groupIndex = groupList.value.length+1
+      group.groupIndex = groupList.value.length + 1
       saveGroup(group).then(res => {
         if (res.data.success) {
           message.success(res.data.message)
