@@ -27,6 +27,7 @@ export async function createWindow() {
         autoHideMenuBar: !isDev,
         show: false,
         icon: nativeImage.createFromPath(join(getResourcePath(), '/assets/logo.png')),
+        backgroundColor: '#ffffff'
     })
     const appSettings = await getAppSettings()
 
