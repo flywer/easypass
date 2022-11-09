@@ -140,6 +140,17 @@ export function getResourcePath() {
     return ipcInstance.send<Result>(channel.app.getResourcePath)
 }
 
+/**
+ * 设置最小化时锁住应用
+ * @param setup
+ */
 export function setAppMinSizeLock(setup:boolean){
     return ipcInstance.send<Result>(channel.app.setAppMinSizeLock,setup)
+}
+
+/**
+ * 获取包含所有与应用相关的进程的内存和CPU的使用统计
+ */
+export function getAppMetrics(){
+    return ipcInstance.send<Result>(channel.app.getAppMetrics)
 }

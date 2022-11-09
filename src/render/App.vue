@@ -123,7 +123,6 @@ const appTokenInit = async () => {
   //界面隐藏时
   ipcInstance.on(channel.app.showTokenPanel, () => store.showTokenPanel = true)
 }
-
 watch(() => store.tokenCheckRemainTimes, (value) => {
   if (value === 1) {
     Modal.confirm({

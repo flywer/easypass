@@ -452,7 +452,7 @@ export class AppController {
      * @constructor
      */
     @IpcHandle(channel.app.setAppMinSizeLock)
-    public async HandleSetAppMinSizeLock(setup:boolean) {
+    public async HandleSetAppMinSizeLock(setup: boolean) {
         let result
         try {
             let tokenSettings = await getAppTokenSettings()
@@ -478,6 +478,23 @@ export class AppController {
         try {
             result = success()
             result.result = getResourcePath()
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 获取包含所有与应用相关的进程的内存和CPU的使用统计
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppMetrics)
+    public HandleGetAppMetrics() {
+        let result
+        try {
+            result = success()
+            result.result = app.getAppMetrics()
         } catch (e) {
             log.error(e)
             result = failure('系统异常')

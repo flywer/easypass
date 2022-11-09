@@ -3,9 +3,11 @@ import {computed, createVNode, onMounted, reactive, ref, watch} from "vue";
 import {
   checkAppToken,
   checkForUpdate,
+  getAppMetrics,
   getAppSettings,
-  getAppVersion, getTokenSettings,
-  quitAndInstall, setAppMinSizeLock,
+  getAppVersion,
+  getTokenSettings,
+  setAppMinSizeLock,
   setAppSettings,
   setAppToken
 } from "@render/api/app.api";
@@ -38,7 +40,6 @@ const closeAsHidden = reactive({
   disabled: false
 });
 
-
 /*是否启用托盘*/
 const onEnableTray = () => {
   if (!enableTrayChecked.value) {
@@ -52,7 +53,6 @@ const onEnableTray = () => {
   }
   onSetAppSettings()
 }
-
 
 //region 应用更新设置
 /*当前版本号*/
@@ -259,6 +259,7 @@ const onAppMinSizeLock = () => {
 }
 
 //endregion
+
 </script>
 
 <template>
@@ -460,6 +461,14 @@ const onAppMinSizeLock = () => {
       </template>
       <template #right>
         <div class="app-version-div">{{ appVersion }}</div>
+      </template>
+    </RowCard>
+    <a-divider class="setting-divider"/>
+    <!--应用情况-->
+    <RowCard>
+      <template #left>存储空间</template>
+      <template #right>
+
       </template>
     </RowCard>
   </a-layout-content>
