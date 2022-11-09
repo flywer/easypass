@@ -36,6 +36,11 @@ export const getDateString = () => {
     return moment().format('YYYY-MM-DD HH:mm:ss')
 }
 
+export const getDayString= ()=>{
+    moment.locale('zh-cn') //设置时区
+    return moment().format('YYYY-MM-DD')
+}
+
 //endregion
 
 //region 应用
