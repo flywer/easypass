@@ -52,7 +52,7 @@ const updateDownloadedListener = () => {
     Modal.confirm({
       title: '提示',
       icon: createVNode(ExclamationCircleOutlined),
-      content: '是否退出并安装？',
+      content: '下载完成，是否退出并安装？',
       okText: '确认',
       cancelText: '取消',
       onOk() {
