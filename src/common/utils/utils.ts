@@ -37,7 +37,7 @@ export const getDateString = () => {
     return moment().format('YYYY-MM-DD HH:mm:ss')
 }
 
-export const getDayString= ()=>{
+export const getDayString = () => {
     moment.locale('zh-cn') //设置时区
     return moment().format('YYYY-MM-DD')
 }
@@ -78,7 +78,7 @@ export const getResourcePath = () => {
         : process.cwd(); // Dev Mode
 }
 
-export const getAppPath=()=>{
+export const getAppPath = () => {
     return path.dirname(app.getPath('exe'))
 }
 
@@ -119,7 +119,9 @@ export const getAppSettings = async () => {
         return parseJson(buffer.toString())
 }
 
-/*获取应用网络代理设置*/
+/**
+ * 获取应用网络代理设置
+ */
 export const getAppProxySettings = async () => {
     const defaultSettings = config.defaultProxySettings
     const appSettingsFile = {
@@ -145,6 +147,44 @@ export const getAppTokenSettings = async () => {
     }
 
     const buffer = await readFsSync(path.join(appTokenFile.folderPath, appTokenFile.fileName))
+    if (buffer == null || isEmpty(buffer.toString()))
+        return defaultSettings
+    else
+        return parseJson(buffer.toString())
+}
+
+/**
+ * 获取应用数据库目前需要进行的操作配置
+ */
+export const getAppDbStat = async () => {
+    const defaultSettings = config.databaseStat
+    const appBdStat = {
+        folderPath: path.join(getAppDataPath(), '/config'),
+        fileName: 'dbStat.json'
+    }
+
+    const buffer = await readFsSync(path.join(appBdStat.folderPath, appBdStat.fileName))
+    if (buffer == null || isEmpty(buffer.toString()))
+        return defaultSettings
+    else
+        return parseJson(buffer.toString())
+}
+
+/**
+ * 获取应用目前可使用的数据源
+ */
+export const getDataSourceSettings = async () => {
+    const defaultSettings = [{
+        name: '本地默认',
+        dialect: 'sqlite',
+        storage: path.join(getAppDataPath(), '/local/easy_pass.sqlite')
+    }]
+
+    const dataSourceSettings = {
+        folderPath: path.join(getAppDataPath(), '/config'),
+        fileName: 'databases.json'
+    }
+    const buffer = await readFsSync(path.join(dataSourceSettings.folderPath, dataSourceSettings.fileName))
     if (buffer == null || isEmpty(buffer.toString()))
         return defaultSettings
     else

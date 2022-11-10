@@ -220,3 +220,10 @@ export function lockApp() {
     return ipcInstance.send<Result>(channel.app.lockApp)
 }
 
+/**
+ * 获取数据源
+ */
+export function getDataSourceList() {
+    return ipcInstance.send<Result>(channel.app.getDataSourceList)
+}
+

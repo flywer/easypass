@@ -31,5 +31,11 @@
     "showTokenPanel": false,
     "token": null,
     "remainTimes": 5
+  },
+  "databaseStat": {
+    "shouldInit": false,
+    "alter": false,
+    "force": false,
+    "currentDb": 0
   }
 }

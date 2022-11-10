@@ -21,6 +21,8 @@ watch(() => props.menuKey, () => {
     router.push({name: 'groupMgt', params: {key: props.menuKey}})
   } else if (props.menuKey === '200') {
     router.push({name: 'commonAccount'})
+  } else if (props.menuKey === '400') {
+    router.push({name: 'dataSource'})
   } else if (props.menuKey === '500') {
     router.push({name: 'settings'})
   }

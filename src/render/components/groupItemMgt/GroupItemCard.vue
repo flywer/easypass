@@ -40,7 +40,6 @@ const props = defineProps({
 // 定义事件
 const emit = defineEmits(['showItemInfo', 'updateList'])
 
-
 const updateItemInfo = ({model, visible}) => {
   // 关闭弹窗
   emit('showItemInfo', {model: model, visible: visible})
@@ -50,8 +49,8 @@ const searchItemsByPage = (init: boolean) => {
   emit('updateList', init)
 }
 
-
 </script>
+
 <style scoped lang="less">
 @import "ant-design-vue/dist/antd.variable.less";
 

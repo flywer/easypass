@@ -8,7 +8,7 @@ import {
     getAppSettings,
     getAppTokenSettings,
     getResourcePath,
-    getAppDataPath, getAppTempDataPath, getAppPath
+    getAppDataPath, getAppTempDataPath, getAppPath, getDataSourceSettings
 } from "@common/utils/utils";
 import {readFsSync, calcSize, jsonfileWrite} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
@@ -466,6 +466,10 @@ export class AppController {
         return result
     }
 
+    /**
+     * 锁应用
+     * @constructor
+     */
     @IpcHandle(channel.app.lockApp)
     public async HandleLockApp() {
         const appTokenSettings = await getAppTokenSettings()
@@ -652,6 +656,23 @@ export class AppController {
                 if (err) log.error(err)
                 result.result = size
             })
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 获取数据源列表
+     * @constructor
+     */
+    @IpcHandle(channel.app.getDataSourceList)
+    public async HandleGetDataSourceList() {
+        let result
+        try {
+            result = success()
+            result.result = await getDataSourceSettings()
         } catch (e) {
             log.error(e)
             result = failure('系统异常')

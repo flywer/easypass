@@ -6,6 +6,8 @@ const Settings = () => import('@render/components/settings/Settings.vue')
 const GroupItems = () => import('@render/components/groupItemMgt/GroupItemMgt.vue')
 const GroupItemTableForm = () => import('@render/components/groupItemMgt/SaveOrUpdateItemForm.vue')
 const CommonAccount = () => import('@render/components/groupItemMgt/CommonAccount.vue')
+const DataSourceMgt = () => import('@render/components/dataSourceMgt/DataSourceMgt.vue')
+
 // 定义一些路由
 // 每个路由都需要映射到一个组件。
 const routes: Array<RouteRecordRaw> = [
@@ -35,6 +37,10 @@ const routes: Array<RouteRecordRaw> = [
         path: '/save_item',
         name: 'groupItemTableForm',
         component: GroupItemTableForm,
+    }, {
+        path: '/dataSource',
+        name: 'dataSource',
+        component: DataSourceMgt,
     }
 ]
 

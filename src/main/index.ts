@@ -8,14 +8,15 @@ import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getAppProxySettings, getAppSettings} from "@common/utils/utils";
+import {getAppDbStat, getAppProxySettings, getAppSettings} from "@common/utils/utils";
 import log from 'electron-log'
 import {groupInit} from "@main/model/group";
 import {GroupItemInit} from "@main/model/groupItem";
-import {UserInit} from "@main/model/user";
-import {databaseInit} from "@main/mapper/defaultSql";
+import {User, UserInit} from "@main/model/user";
+import {databaseInit} from "@main/mapper/databaseInit";
 import {isEqual, isNull} from "lodash";
 import {appLogInit} from "@main/app/app.log";
+import {QueryTypes} from "sequelize";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -47,7 +48,7 @@ async function electronAppInit() {
             app.commandLine.removeSwitch('no-proxy-server')
             app.commandLine.appendSwitch('proxy-server', server);
             app.commandLine.appendSwitch('proxy-bypass-list', model.bypassList)
-            log.info('网络代理设置成功，代理地址为：' + server)
+            //log.info('网络代理设置成功，代理地址为：' + server)
         }
     }
     //endregion
@@ -109,6 +110,10 @@ async function bootstrap() {
             groupInit()
             GroupItemInit()
             UserInit()
+            let appBdStat = await getAppDbStat()
+            if (appBdStat.shouldInit) {
+                await databaseInit(appBdStat.alter, appBdStat.force)
+            }
             await databaseInit()
         }).catch(err => {
             log.error('Database connection failed :( ', err);
