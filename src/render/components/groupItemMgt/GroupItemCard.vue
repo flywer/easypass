@@ -8,12 +8,12 @@
     <template #title>
       <a-space>
         <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
-        <a-avatar v-else shape="square">{{ item.title.slice(0,1) }}</a-avatar>
+        <a-avatar v-else shape="square">{{ item.title.slice(0, 1) }}</a-avatar>
         {{ item.title }}
         <a-space v-for="(showItem) in item.showItems">
           <a-divider type="vertical" style="background-color: #f0f0f0"/>
           <span>{{ showItem.title }}：{{ showItem.value }}</span>
-          <copy-outlined @click="copyText(showItem.value,true)"/>
+          <copy-outlined @click="copyText(showItem.value,true)" class="copy-btn"/>
         </a-space>
       </a-space>
     </template>
@@ -55,4 +55,9 @@ const searchItemsByPage = (init: boolean) => {
 <style scoped lang="less">
 @import "ant-design-vue/dist/antd.variable.less";
 
+.copy-btn {
+  :hover {
+    font-size: 15px;
+  }
+}
 </style>
