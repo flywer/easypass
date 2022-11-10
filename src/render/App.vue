@@ -123,6 +123,7 @@ const appTokenInit = async () => {
   //界面隐藏时
   ipcInstance.on(channel.app.showTokenPanel, () => store.showTokenPanel = true)
 }
+/*令牌剩余输入次数检测*/
 watch(() => store.tokenCheckRemainTimes, (value) => {
   if (value === 1) {
     Modal.confirm({
@@ -165,7 +166,7 @@ const autoCheckUpdates = () => {
             /*下载更新*/
             message.info('开始下载')
             store.isUpdating = true
-             downloadUpdate().catch(() => {
+            downloadUpdate().catch(() => {
               message.error('系统异常')
             })
           },
@@ -194,10 +195,10 @@ const autoCheckUpdates = () => {
 
 //自定义滚动条 参考：https://blog.csdn.net/u012551928/article/details/109286853
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
   height: 10px;
   border-radius: 10px;
-  background-color: #F5F5F5;
+  //background-color: #F5F5F5;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -209,7 +210,7 @@ const autoCheckUpdates = () => {
 
 ::-webkit-scrollbar-track {
   border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  //-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   background-color: #F5F5F5;
 }
 </style>
