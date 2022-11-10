@@ -466,6 +466,15 @@ export class AppController {
         return result
     }
 
+    @IpcHandle(channel.app.lockApp)
+    public async HandleLockApp() {
+        const appTokenSettings = await getAppTokenSettings()
+        //是否拥有应用令牌
+        if (appTokenSettings.haveToken) {
+            this.mainWindow.webContents.send(channel.app.showTokenPanel)
+        }
+    }
+
     //endregion
 
     /**

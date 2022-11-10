@@ -1,13 +1,8 @@
 <!-- 左侧菜单 -->
 <script setup lang="ts">
-import {
-  DatabaseOutlined,
-  DesktopOutlined,
-  LockOutlined,
-  SettingOutlined,
-  UploadOutlined,
-} from '@ant-design/icons-vue'
+import {DatabaseOutlined, DesktopOutlined, LockOutlined, SettingOutlined, UploadOutlined,} from '@ant-design/icons-vue'
 import {store} from "@render/store";
+import AppBottomTool from "@render/components/base/AppBottomTool.vue";
 
 // 使用defineEmits注册一个自定义事件
 const emit = defineEmits(['getKey'])
@@ -53,6 +48,8 @@ const menuClick = (item) => {
         <span>设置</span>
       </a-menu-item>
     </a-menu>
+
+    <AppBottomTool/>
   </a-layout-sider>
 </template>
 
@@ -90,4 +87,5 @@ const menuClick = (item) => {
 .title {
   background-color: @primary-color;
 }
+
 </style>

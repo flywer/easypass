@@ -213,3 +213,10 @@ export function getAppTempDataFolderSize() {
     return ipcInstance.send<Result>(channel.app.getAppTempDataFolderSize)
 }
 
+/**
+ * 应用锁屏
+ */
+export function lockApp() {
+    return ipcInstance.send<Result>(channel.app.lockApp)
+}
+

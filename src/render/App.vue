@@ -180,11 +180,11 @@ const autoCheckUpdates = () => {
   <a-config-provider>
     <WindowBtn/>
     <a-layout has-sider style="min-height: 100vh;">
-      <AppTokenValid v-if="store.haveToken && store.showTokenPanel"/>
+      <AppTokenValid v-show="store.haveToken && store.showTokenPanel"/>
       <!-- 左菜单 -->
-      <LeftSiderMenu v-if="!store.showTokenPanel" @getKey="getMenuKey"/>
+      <LeftSiderMenu v-show="!store.showTokenPanel" @getKey="getMenuKey"/>
       <!-- 中心内容组件载体 -->
-      <CenterContent v-if="!store.showTokenPanel" :menu-key="manuKey"/>
+      <CenterContent v-show="!store.showTokenPanel" :menu-key="manuKey"/>
     </a-layout>
   </a-config-provider>
 </template>

@@ -38,7 +38,7 @@ export const channel = reactive({
         getAppFolderSize:'app/getAppFolderSize',
         getAppDataFolderSize: 'app/getAppDataFolderSize',
         getAppTempDataFolderSize: 'app/getAppTempDataFolderSize',
-
+        lockApp: 'app/lockApp',
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',
