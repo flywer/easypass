@@ -177,10 +177,6 @@ const onMove = () => {
       height="318px"
       title="移动到"
       :closable="true"
-      ok-text="移动至此"
-      cancel-text="取消"
-      @ok=""
-      @cancel=""
   >
     <div style="max-height: 245px;overflow-y: auto;">
     <a-row v-for="group in itemMoveRef.groupList" style="margin-bottom: 4px;">

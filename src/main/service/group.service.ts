@@ -24,7 +24,7 @@ export class GroupService {
         }
     }
 
-    public async getGroupById(groupId: string) {
+    public async getGroupById(groupId: string|[]) {
         return (await this.groupMapper.getGroupById(groupId)).map(item => item.dataValues);
     }
 

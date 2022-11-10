@@ -26,8 +26,12 @@ export class GroupMapper {
      * 通过组ID获取信息
      * @param groupId
      */
-    public async getGroupById(groupId: string) {
-        return await Group.findByPk(groupId)
+    public async getGroupById(groupId: string | []) {
+        return await Group.findAll({
+            where: {
+                id: groupId
+            },
+        })
     }
 
     /**

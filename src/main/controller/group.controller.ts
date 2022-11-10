@@ -5,6 +5,10 @@ import {success, failure} from "@main/vo/resultVo";
 import {GroupItemService} from "@main/service/groupItem.service";
 import log from 'electron-log'
 import {findIcon} from "@common/utils/findIcon";
+import {isEqual} from "lodash";
+import {itemTypeEnum} from "@main/model/groupItem";
+import {jsonfileWrite} from "@common/utils/fsUtils";
+import {dialog} from "electron";
 
 @Controller()
 export class GroupController {
@@ -138,6 +142,76 @@ export class GroupController {
         } catch (e) {
             log.error(e)
             result = failure("图标查询失败！")
+        }
+        return result
+    }
+
+    /**
+     * 根据组导出账号组
+     * @param groupIds
+     * @param isSimple 是否仅导出KV值（name,value），否则根据原数据格式导出，便于数据再次导入
+     * @constructor
+     */
+    @IpcHandle(channel.group.exportByGroupIds)
+    public async HandleExportByGroupIds(groupIds: [], isSimple: boolean) {
+        let result
+        try {
+            result = success()
+            let groupJson = []
+            const groupData = await this.groupService.getGroupById(groupIds)
+            for (const group of groupData) {
+                /*获取这个组中组项ID列表*/
+                let itemIdList = await this.groupItemService.getItemsIdListByGroupId(group.id)
+                //账号组格式
+                let accountList = []
+                for (const id of itemIdList) {
+                    //通过itemId去获取每个组项信息
+                    let items = await this.groupItemService.getItemsListByItemId(id.itemId)
+                    let account = {
+                        title: '',
+                        itemsList: [],
+                        isCommon: 0
+                    }
+                    items.forEach(item => {
+                        if (isEqual(item.type, itemTypeEnum.title)) {
+                            account.title = item.value
+                            account.isCommon = item.isCommon
+                        } else {
+                            let i = {
+                                name: item.name,
+                                value: item.value,
+                                type: item.type
+                            }
+                            account.itemsList.push(i)
+                        }
+                    })
+                    accountList.push(account)
+                }
+                let g = {
+                    name: group.name,
+                    description: group.description,
+                    accountList: accountList
+                }
+                groupJson.push(g)
+            }
+            await dialog.showSaveDialog({
+                title: '导出至',
+                defaultPath: '账号列表',
+                filters: [
+                    {name: 'Json', extensions: ['json']},
+                ]
+            }).then(res => {
+                if (!res.canceled) {
+                    jsonfileWrite(res.filePath, groupJson, {spaces: 2})
+                    result.message = '导出成功！'
+                    result.tag = 1
+                } else {
+                    result.tag = 2
+                }
+            })
+        } catch (e) {
+            log.error(e)
+            result = failure()
         }
         return result
     }

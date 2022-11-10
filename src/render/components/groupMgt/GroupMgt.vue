@@ -11,10 +11,13 @@ import {
   SettingOutlined,
   CheckOutlined,
   LoadingOutlined,
-  MenuOutlined
+  MenuOutlined,
+  DragOutlined,
+  DownloadOutlined,
+  FolderOutlined
 } from '@ant-design/icons-vue'
 import {
-  deleteGroupById,
+  deleteGroupById, exportByGroupIds, getGroupListByUserInfo,
   getGroupListByUserInfoByPage,
   saveGroup,
   saveOrUpdateGroup,
@@ -255,6 +258,47 @@ const onAddGroup = () => {
     message.warn('尚未登录')
 }
 
+const exportGroupRef = reactive({
+  modalVisible: false,
+  checkedGroupList: [],
+  groupList: [],/*待选列表*/
+  isCheckedAll: false,
+  loading:false
+})
+
+const onShowExportModal = async () => {
+  exportGroupRef.modalVisible = true
+  exportGroupRef.groupList = (await getGroupListByUserInfo({id: store.user.id})).data.result
+  exportGroupRef.checkedGroupList = [] /*初始化*/
+}
+watch(() => exportGroupRef.checkedGroupList, (value) => {
+  exportGroupRef.isCheckedAll = isEqual(value.length, exportGroupRef.groupList.length);/*是否全选*/
+})
+
+const onCheckedAll = () => {
+  exportGroupRef.checkedGroupList = cloneDeep(exportGroupRef.groupList.map(item => item.id))
+}
+
+const onUncheckedAll = () => {
+  exportGroupRef.checkedGroupList = []
+}
+
+/*导出*/
+const onExport = () => {
+  exportGroupRef.loading = true
+  exportByGroupIds(exportGroupRef.checkedGroupList, false).then(res => {
+    if (res.data.success && res.data.tag == 1) {
+      message.success(res.data.message)
+      exportGroupRef.modalVisible = false
+    } else if (!res.data.success) {
+      message.error(res.data.message)
+      exportGroupRef.modalVisible = false
+    }
+  }).then(()=>{
+    exportGroupRef.loading = false
+  })
+}
+
 </script>
 
 <template>
@@ -272,18 +316,27 @@ const onAddGroup = () => {
       <SearchInput @onSearch="onSearch"/>
     </a-space>
     <!--右侧-->
-    <a-space style="float: right">
+    <a-space style="float: right;gap: 4px">
       <a-button class="tool-btn" type="text" size="large" @click="searchGroupByPage(true)" title="刷新">
         <template #icon>
           <reload-outlined :spin="refreshSpin"/>
         </template>
         刷新
       </a-button>
-      <a-button class="tool-btn" type="text" size="large" title="更多">
+      <a-button class="tool-btn" type="text" size="large" @click="onShowExportModal" title="导出">
         <template #icon>
-          <MoreOutlined/>
+          <download-outlined/>
         </template>
+        导出
       </a-button>
+      <!--更多-->
+      <a-popover placement="bottom">
+        <template #content>
+        </template>
+        <div class="more-btn">
+          <more-outlined class="icon"/>
+        </div>
+      </a-popover>
     </a-space>
   </a-layout-header>
   <!--组-->
@@ -348,6 +401,41 @@ const onAddGroup = () => {
       <a-button type="primary" v-if="store.isLogin && isSearch" @click="onAddGroup">创建</a-button>
     </a-empty>
   </a-layout-content>
+
+  <a-modal v-model:visible="exportGroupRef.modalVisible"
+           width="50%"
+           height="318px"
+           title="导出"
+           :closable="true"
+           ok-text="导出至"
+           cancel-text="取消"
+           @ok=""
+           @cancel=""
+  >
+    <div style="max-height: 245px;overflow-y: auto;">
+      <a-checkbox-group v-model:value="exportGroupRef.checkedGroupList">
+        <a-row v-for="group in exportGroupRef.groupList" style="margin-bottom: 4px;width: 385px;">
+          <a-col style="width: 100%" :class="group.isSelected?'':'group-col'" @click="">
+            <div style="width: 100%;height: 48px;cursor: pointer"
+                 :class="group.isSelected?'selected':'unSelected'">
+              <a-space align="center" style="height: 100%;padding-left: 5px;">
+                <folder-outlined style="font-size: 24px;"/>
+                {{ group.name }}
+                <a-checkbox :value="group.id" style="margin-left: 285px;"></a-checkbox>
+              </a-space>
+            </div>
+          </a-col>
+        </a-row>
+      </a-checkbox-group>
+    </div>
+
+    <template #footer>
+      <a-button v-if="!exportGroupRef.isCheckedAll" style="float: left" @click="onCheckedAll">全选</a-button>
+      <a-button v-if="exportGroupRef.isCheckedAll" style="float: left" @click="onUncheckedAll">取消全选</a-button>
+      <a-button @click="exportGroupRef.modalVisible = false">取消</a-button>
+      <a-button type="primary" :disabled="isNull(exportGroupRef.checkedGroupList)" @click="onExport" :loading="exportGroupRef.loading">导出至</a-button>
+    </template>
+  </a-modal>
 </template>
 
 <style scoped lang="less">
@@ -384,12 +472,41 @@ const onAddGroup = () => {
     padding: 0;
     margin-bottom: 0
   }
+}
+
+.more-btn {
+  :hover {
+    background-color: @primary-1;
+  }
+
+  height: 40px;
+  width: 32px;
+  cursor: pointer;
+
+  .icon {
+    font-size: 16px;
+    padding: 10px 5px 8px 5px;
+  }
 
 
 }
 
 #content-view {
   overflow: hidden;
+}
+
+.group-col {
+  :hover {
+    background-color: @primary-2;
+  }
+}
+
+.selected {
+  background-color: @primary-3;
+}
+
+.unSelected {
+  background: none;
 }
 
 </style>

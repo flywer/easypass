@@ -31,3 +31,8 @@ export function deleteGroupById(itemId: string) {
     return ipcInstance.send<Result>(channel.group.deleteGroupById, itemId)
 }
 
+export function exportByGroupIds(groupIds:any[],isSimple:boolean){
+    return ipcInstance.send<Result>(channel.group.exportByGroupIds, groupIds,isSimple)
+}
+
+

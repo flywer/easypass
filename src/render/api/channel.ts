@@ -49,8 +49,7 @@ export const channel = reactive({
         deleteGroupById: "group/deleteGroupById",
         saveOrUpdateGroup: "group/saveOrUpdateGroup",
         findIcon: "group/findIcon",
-
-
+        exportByGroupIds:  "group/exportByGroupIds",
     },
     groupItem: {
         saveOrUpdateGroupItems: 'groupItem/saveGroupItems',

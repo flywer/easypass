@@ -70,6 +70,26 @@ export class GroupItemMapper {
         })
     }
 
+    public async getItemsListByGroupId(groupId: string) {
+        return await GroupItem.findAll({
+            where: {
+                groupId: groupId
+            },
+            order: ['itemIndex']
+        })
+    }
+
+    public async getItemsIdListByGroupId(groupId: string) {
+        return await GroupItem.findAll({
+            attributes: ['itemId'],
+            where: {
+                groupId: groupId
+            },
+            group: 'itemId'
+        })
+    }
+
+
     public async deleteGroupItemByItemId(itemId: string) {
         await GroupItem.destroy({
             where: {
@@ -103,7 +123,7 @@ export class GroupItemMapper {
         })
     }
 
-    async updateGroupIdByItemId(groupItem: IGroupItemVo) {
+    public async updateGroupIdByItemId(groupItem: IGroupItemVo) {
         await GroupItem.update({groupId: groupItem.groupId}, {
             where: {
                 itemId: groupItem.itemId

@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import log from 'electron-log'
 import {promisify} from "util";
+import jsonfile from 'jsonfile'
+import {isEqual} from "lodash";
 
 /**
  * 异步写入本地文件，没有则创建
@@ -16,7 +18,7 @@ export const writeFs = ({folderPath, fileName}, data) => {
             if (e.code === 'ENOENT') {
                 fs.mkdir(folderPath, {recursive: true}, (error) => {
                     if (error) log.error(error)
-                    else{
+                    else {
                         fs.writeFile(path.join(folderPath, fileName), data, (err) => {
                             if (err) log.error(err)
                         })
@@ -84,31 +86,6 @@ export const deleteFileFs = (filePath: string) => {
     })
 }
 
-/**
- * 判断此路径、文件是否存在，存在则读取，不存在则创建并写入
- * @param folderPath
- * @param fileName
- * @param data
- */
-export const fileExistAndWrite = (folderPath: string, fileName: string, data?) => {
-    return new Promise((resolve, reject) => {
-        fs.open(path.join(folderPath, fileName), 'r', (e) => {
-            //不存在
-            if (e) {
-                if (e.code === 'ENOENT') {
-                    log.info(fileName + ' does not exist, was created')
-                    fs.mkdir(folderPath, {recursive: true}, (err) => {
-                        if (err) log.error(e)
-                    })
-                    //写入
-                    fs.writeFileSync(path.join(folderPath, fileName), data)
-                }
-            }
-            resolve(fs.readFileSync(path.join(folderPath, fileName)))
-        })
-    })
-}
-
 // 使用promisify方法来promise化指定方法
 const stat = promisify(fs.stat)
 const readdir = promisify(fs.readdir)
@@ -132,6 +109,7 @@ export const calcSize = async (dirPath, cb) => {
                     return path.join(dirPath, item)
                 })
                 let index = 0
+
                 async function next() {
                     if (index < dirs.length) {
                         let current = dirs[index++]
@@ -139,6 +117,7 @@ export const calcSize = async (dirPath, cb) => {
                         await next()
                     }
                 }
+
                 return await next()
             } else {
                 fileSize += statObj.size
@@ -147,6 +126,16 @@ export const calcSize = async (dirPath, cb) => {
             error = err
         }
     }
+
     await calc(dirPath)
     cb(error, fileSize)
+}
+
+//region jsonfile模块的方法
+
+export const jsonfileWrite = (filePath: string, obj, option?: {}) => {
+    jsonfile.writeFile(filePath, obj, option, function (err) {
+        if (err) log.error(err)
+        else log.log(filePath + '\twrite success!');
+    })
 }
