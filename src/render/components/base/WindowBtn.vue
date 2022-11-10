@@ -55,6 +55,7 @@ onMounted(async () => {
   left: 0;
   width: 100%;
   z-index: 9999;
+  user-select: none;
 
   .appName {
     float: left;
