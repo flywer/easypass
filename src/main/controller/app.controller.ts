@@ -10,7 +10,7 @@ import {
     getResourcePath,
     getAppDataPath, getAppTempDataPath, getAppPath
 } from "@common/utils/utils";
-import {readFsSync, writeFs, calcSize} from "@common/utils/fsUtils";
+import {readFsSync, calcSize, jsonfileWrite} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
@@ -21,8 +21,6 @@ import {tray, trayInit} from "@main/app/app.tray";
 import {setHasUpdate} from "@main/app/autoUpdater";
 import {appTokenDecrypt, appTokenEncrypt} from "@common/utils/cryptoUtils";
 import {isEqual} from "lodash";
-import fs from "fs";
-import {getAppTempDataFolderSize} from "@render/api/app.api";
 
 @Controller()
 export class AppController {
@@ -55,7 +53,7 @@ export class AppController {
         folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'proxy.json',
         getFullPath: () => {
-            return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
+            return path.join(this.appProxyFile.folderPath, this.appProxyFile.fileName)
         }
     }
 
@@ -64,7 +62,7 @@ export class AppController {
         folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'token.json',
         getFullPath: () => {
-            return path.join(this.appThemeFile.folderPath, this.appThemeFile.fileName)
+            return path.join(this.appTokenFile.folderPath, this.appTokenFile.fileName)
         }
     }
 
@@ -129,7 +127,7 @@ export class AppController {
         /*是否自动检查更新*/
         appSettings.autoCheckUpdates = setup.autoCheckUpdates
 
-        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
+        jsonfileWrite(this.appSettingsFile.getFullPath(), appSettings, {spaces: 2})
     }
 
     /**
@@ -143,7 +141,7 @@ export class AppController {
         const appSettings = await getAppSettings()
         /*登录模式*/
         appSettings.loginMode = setup
-        writeFs(this.appSettingsFile, JSON.stringify(appSettings))
+        jsonfileWrite(this.appSettingsFile.getFullPath(), appSettings, {spaces: 2})
     }
 
     /**
@@ -169,7 +167,7 @@ export class AppController {
             //判断主题文件是否存在，不存在则创建，并返回实际数据
             let buffer = await readFsSync(this.appThemeFile.getFullPath())
             if (buffer == null || isEmpty(buffer.toString())) {
-                writeFs(this.appThemeFile, JSON.stringify(defaultTheme))
+                jsonfileWrite(this.appThemeFile.getFullPath(), defaultTheme, {spaces: 2})
                 result.result = defaultTheme
             } else {
                 result.result = JSON.parse(buffer.toString())
@@ -190,7 +188,7 @@ export class AppController {
     public async HandleSetAppTheme(data) {
         let result
         try {
-            writeFs(this.appThemeFile, data)
+            jsonfileWrite(this.appThemeFile.getFullPath(), data, {spaces: 2})
             result = success()
         } catch (e) {
             log.error(e)
@@ -341,7 +339,7 @@ export class AppController {
     public async HandleSetProxy(setup) {
         let result
         try {
-            writeFs(this.appProxyFile, JSON.stringify(setup))
+            jsonfileWrite(this.appProxyFile.getFullPath(), setup, {spaces: 2})
             result = success()
         } catch (e) {
             log.error(e)
@@ -401,13 +399,13 @@ export class AppController {
                 tokenSettings.remainTimes = 5
                 tokenSettings.appMinSizeLock = false
                 tokenSettings.token = appTokenEncrypt(token)  //令牌加密
-                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                jsonfileWrite(this.appTokenFile.getFullPath(), tokenSettings, {spaces: 2})
                 result = success('设置令牌成功!')
             } else {
                 tokenSettings.haveToken = false
                 tokenSettings.showTokenPanel = false
                 tokenSettings.token = null
-                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                jsonfileWrite(this.appTokenFile.getFullPath(), tokenSettings, {spaces: 2})
                 result = success('解除令牌成功!')
             }
         } catch (e) {
@@ -429,7 +427,7 @@ export class AppController {
             let tokenSettings = await getAppTokenSettings()
             if (isEqual(appTokenEncrypt(token), tokenSettings.token)) {
                 tokenSettings.remainTimes = 5
-                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                jsonfileWrite(this.appTokenFile.getFullPath(), tokenSettings, {spaces: 2})
                 result = success()
             } else {
                 let tokenSettings = await getAppTokenSettings()
@@ -438,7 +436,7 @@ export class AppController {
                 } else {
                     tokenSettings.remainTimes = tokenSettings.remainTimes - 1
                 }
-                writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+                jsonfileWrite(this.appTokenFile.getFullPath(), tokenSettings, {spaces: 2})
                 result = failure('令牌错误')
             }
         } catch (e) {
@@ -459,7 +457,7 @@ export class AppController {
         try {
             let tokenSettings = await getAppTokenSettings()
             tokenSettings.appMinSizeLock = setup
-            writeFs(this.appTokenFile, JSON.stringify(tokenSettings))
+            jsonfileWrite(this.appTokenFile.getFullPath(), tokenSettings, {spaces: 2})
             result = success()
         } catch (e) {
             log.error(e)

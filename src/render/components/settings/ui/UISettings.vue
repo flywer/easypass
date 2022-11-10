@@ -38,7 +38,7 @@ const handleSaveTheme = async (type: string, e: any) => {
   ConfigProvider.config({
     theme: colorState,
   });
-  await setAppTheme(JSON.stringify(colorState))
+  await setAppTheme(colorState)
 }
 
 </script>

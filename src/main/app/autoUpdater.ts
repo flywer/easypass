@@ -5,7 +5,7 @@ import {autoUpdater} from "electron-updater";
 import {nativeImage, Notification} from 'electron'
 import path, {join} from "path";
 import {getAppSettings, getResourcePath, getAppDataPath} from "@common/utils/utils";
-import {writeFs} from "@common/utils/fsUtils";
+import {jsonfileWrite} from "@common/utils/fsUtils";
 
 /**
  * 用户自主更新时的设置
@@ -106,9 +106,6 @@ export const setHasUpdate = async (hasUpdate: boolean) => {
     //获取本地设置文件
     const appSettings = await getAppSettings()
     appSettings.hasUpdates = hasUpdate //记录已有可用更新，显示在前端
-    writeFs({
-        folderPath: join(getAppDataPath(), '/config'),
-        fileName: 'settings.json'
-    }, JSON.stringify(appSettings))
+    jsonfileWrite(join(getAppDataPath(), '/config/settings.json'), appSettings, {spaces: 2})
 }
 

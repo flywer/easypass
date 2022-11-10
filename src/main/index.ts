@@ -8,9 +8,8 @@ import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getAppProxySettings, getAppSettings, getAppDataPath, getAppTempDataPath} from "@common/utils/utils";
+import {getAppProxySettings, getAppSettings} from "@common/utils/utils";
 import log from 'electron-log'
-import * as Path from "path";
 import {groupInit} from "@main/model/group";
 import {GroupItemInit} from "@main/model/groupItem";
 import {UserInit} from "@main/model/user";

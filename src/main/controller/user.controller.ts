@@ -3,7 +3,7 @@ import {BrowserWindow} from "electron";
 import {UserService} from "@main/service/user.service";
 import {channel} from "@render/api/channel";
 import {getDateString, getNetworkInfo, getAppDataPath,} from "@common/utils/utils";
-import {deleteFileFs, readFsSync, writeFs} from '@common/utils/fsUtils'
+import {deleteFileFs, jsonfileWrite, readFsSync} from '@common/utils/fsUtils'
 import {failure, success} from "@main/vo/resultVo";
 import path from "path";
 import {GroupService} from "@main/service/group.service";
@@ -100,7 +100,7 @@ export class UserController {
             } else {
                 const data = result.result
                 data.lastLoginTime = getDateString()
-                writeFs(this.userConfigFile, JSON.stringify(data))
+                jsonfileWrite(this.userConfigFile.getFullPath(), data, {spaces: 2})
                 result.tag = 2
                 result.message = '登录成功！'
             }
@@ -130,7 +130,7 @@ export class UserController {
                 } else {
                     res.lastLoginTime = getDateString()
                     result.result = res
-                    writeFs(this.userConfigFile, JSON.stringify(res))
+                    jsonfileWrite(this.userConfigFile.getFullPath(), res, {spaces: 2})
                 }
             } else {
                 //不存在本地记录
@@ -205,7 +205,7 @@ export class UserController {
                 await this.userService.updateUserInfoByUserId(user)
                 let userData = await this.userService.getUserById(user.id)
                 //更新本地文件
-                writeFs(this.userConfigFile, JSON.stringify(userData))
+                jsonfileWrite(this.userConfigFile.getFullPath(), userData, {spaces: 2})
                 result = success("更新成功！")
             }
         } catch (error) {
@@ -243,10 +243,10 @@ export class UserController {
      * @constructor
      */
     @IpcHandle(channel.user.sendEmail)
-    public async HandleSendEmail(data,type) {
+    public async HandleSendEmail(data, type) {
         let result
         try {
-            sendEmail(data,type)
+            sendEmail(data, type)
             result = success("邮件已发送")
         } catch (e) {
             log.error('邮件发送失败！', e)
