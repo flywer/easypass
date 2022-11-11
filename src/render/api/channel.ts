@@ -40,6 +40,12 @@ export const channel = reactive({
         getAppTempDataFolderSize: 'app/getAppTempDataFolderSize',
         lockApp: 'app/lockApp',
         getDataSourceList: 'app/searchDatabases',
+        showOpenDialog: 'app/showOpenDialog',
+        showSaveDialog: 'app/showSaveDialog',
+        dataSourceTest: 'app/dataSourceTest',
+        addDataSource: 'app/addDataSource',
+        getAppDbStat:'app/getAppDbStat',
+
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',

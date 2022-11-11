@@ -36,6 +36,6 @@
     "shouldInit": false,
     "alter": false,
     "force": false,
-    "currentDb": 0
+    "currentDSId": "default"
   }
 }

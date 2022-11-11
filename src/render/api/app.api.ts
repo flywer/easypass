@@ -227,3 +227,16 @@ export function getDataSourceList() {
     return ipcInstance.send<Result>(channel.app.getDataSourceList)
 }
 
+/**
+ * 添加数据源
+ */
+export function addDataSource(options) {
+    return ipcInstance.send<Result>(channel.app.addDataSource, options)
+}
+
+/**
+ * 获取应用数据库目前需要进行的操作配置
+ */
+export function getAppDbStat() {
+    return ipcInstance.send<Result>(channel.app.getAppDbStat)
+}

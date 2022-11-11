@@ -17,5 +17,20 @@ export function findImage(q: string, number: number) {
  * @param type
  */
 export function sendEmail(data: { email: string, validCode: string }, type: number) {
-    return ipcInstance.send<Result>(channel.user.sendEmail, data,type)
+    return ipcInstance.send<Result>(channel.user.sendEmail, data, type)
+}
+
+/**
+ * 显示打开文件弹出框
+ */
+export function showOpenDialog(options) {
+    return ipcInstance.send<Result>(channel.app.showOpenDialog, options)
+}
+
+export function showSaveDialog(options) {
+    return ipcInstance.send<Result>(channel.app.showSaveDialog, options)
+}
+
+export function dataSourceTest(type: number, options) {
+    return ipcInstance.send<Result>(channel.app.dataSourceTest, type, options)
 }

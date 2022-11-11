@@ -4,6 +4,7 @@ import path from "path";
 import {getAppSettings, getAppDataPath, getDataSourceSettings, getAppDbStat} from "@common/utils/utils";
 import config from "@common/config/appConfig.json";
 import {isEqual} from "lodash";
+import {constant} from "lodash-es";
 
 const defaultMode = config.loginMode /*目前默认为跨平台*/
 
@@ -23,32 +24,17 @@ const commonDb = {
 
 /* 选择 'mysql' | 'mariadb' | 'postgres' | 'mssql' | 'sqlite'其一 */
 export const sequelizeInit = async () => {
-
     let dataSourceSettings = await getDataSourceSettings()
-    let curDb = dataSourceSettings.at((await getAppDbStat()).currentDb)
-    if (isEqual(curDb.dialect, 'sqlite')) {
-        sequelize = new Sequelize({dialect: 'sqlite', storage: curDb.storage})
-    } else if (isEqual(curDb.dialect, 'mysql')) {
-        sequelize = new Sequelize(curDb.database, curDb.username, curDb.password, curDb.options as Options)
+    /*通过数据源ID获取当前激活的数据源*/
+    const dsId = (await getAppDbStat()).currentDSId
+    let curDS = dataSourceSettings.filter(item => isEqual(item.id, dsId)).at(0)
+    if (isEqual(curDS.dialect, 'sqlite')) {
+        sequelize = new Sequelize({dialect: 'sqlite', storage: curDS.storage})
+    } else if (isEqual(curDS.dialect, 'mysql')) {
+        sequelize = new Sequelize(curDS.database, curDS.username, curDS.password, curDS.options as Options)
     }
 
-    /*    const appSettings = await getAppSettings()
-
-        if (typeof (appSettings.loginMode) == 'undefined') {
-            //log.info('默认登录模式：', defaultMode)
-            //默认
-            if (isEqual(defaultMode, '01'))
-                sequelize = new Sequelize(defaultLocalSqliteDb as Options)
-            else
-                sequelize = new Sequelize(commonDb.database, commonDb.username, commonDb.password, commonDb.options as Options)
-        } else {
-            //log.info('登录模式：', appSettings.loginMode)
-            if (isEqual(appSettings.loginMode, '01'))
-                sequelize = new Sequelize(defaultLocalSqliteDb as Options)
-            else
-                sequelize = new Sequelize(commonDb.database, commonDb.username, commonDb.password, commonDb.options as Options)
-        }*/
-
+    //sequelize = new Sequelize(commonDb.database,commonDb.username,commonDb.password,commonDb.options as Options)
     log.log('Sequelize init success :)')
     return sequelize
 }

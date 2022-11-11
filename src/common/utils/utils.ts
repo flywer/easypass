@@ -175,6 +175,8 @@ export const getAppDbStat = async () => {
  */
 export const getDataSourceSettings = async () => {
     const defaultSettings = [{
+        id: 'default',
+        type: 1,
         name: '本地默认',
         dialect: 'sqlite',
         storage: path.join(getAppDataPath(), '/local/easy_pass.sqlite')
@@ -182,7 +184,7 @@ export const getDataSourceSettings = async () => {
 
     const dataSourceSettings = {
         folderPath: path.join(getAppDataPath(), '/config'),
-        fileName: 'databases.json'
+        fileName: 'ds.json'
     }
     const buffer = await readFsSync(path.join(dataSourceSettings.folderPath, dataSourceSettings.fileName))
     if (buffer == null || isEmpty(buffer.toString()))

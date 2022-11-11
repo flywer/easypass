@@ -6,3 +6,9 @@ export interface IpcResponse<T> {
     data?: T
     error?: any
 }
+
+export enum dataSourceType {
+    none,
+    sqlite,
+    mysql
+}

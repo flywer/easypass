@@ -1,26 +1,31 @@
 import {Controller, IpcHandle, Window} from 'einf'
-import {app, BrowserWindow, shell} from 'electron'
+import {app, BrowserWindow, dialog, shell} from 'electron'
 import {AppService} from '../service/app.service'
 import path, {join} from "path";
 import {channel} from "@render/api/channel";
 import {
+    getAppDataPath,
+    getAppDbStat,
+    getAppPath,
     getAppProxySettings,
     getAppSettings,
+    getAppTempDataPath,
     getAppTokenSettings,
-    getResourcePath,
-    getAppDataPath, getAppTempDataPath, getAppPath, getDataSourceSettings
+    getDataSourceSettings,
+    getResourcePath
 } from "@common/utils/utils";
-import {readFsSync, calcSize, jsonfileWrite} from "@common/utils/fsUtils";
+import {calcSize, jsonfileWrite, readFsSync} from "@common/utils/fsUtils";
 import {failure, success} from "@main/vo/resultVo";
 import config from "@common/config/appConfig.json"
 import {autoUpdater} from "electron-updater";
 import * as os from "os";
 import log from "electron-log";
-import {isEmpty, isNull} from "lodash";
+import {isEmpty, isEqual} from "lodash";
 import {tray, trayInit} from "@main/app/app.tray";
 import {setHasUpdate} from "@main/app/autoUpdater";
-import {appTokenDecrypt, appTokenEncrypt} from "@common/utils/cryptoUtils";
-import {isEqual} from "lodash";
+import {appTokenEncrypt} from "@common/utils/cryptoUtils";
+import {dataSourceType} from "@common/types";
+import {Sequelize} from "sequelize";
 
 @Controller()
 export class AppController {
@@ -63,6 +68,14 @@ export class AppController {
         fileName: 'token.json',
         getFullPath: () => {
             return path.join(this.appTokenFile.folderPath, this.appTokenFile.fileName)
+        }
+    }
+
+    private readonly appDSFile = {
+        folderPath: path.join(getAppDataPath(), '/config'),
+        fileName: 'ds.json',
+        getFullPath: () => {
+            return path.join(this.appDSFile.folderPath, this.appDSFile.fileName)
         }
     }
 
@@ -679,4 +692,122 @@ export class AppController {
         }
         return result
     }
+
+    /**
+     * 弹出打开文件框
+     * @param options
+     * @constructor
+     */
+    @IpcHandle(channel.app.showOpenDialog)
+    public async HandleShowOpenDialog(options) {
+        let result
+        try {
+            result = success()
+            await dialog.showOpenDialog({
+                title: options.title,
+                filters: options.filters
+            }).then(res => {
+                if (!res.canceled) {
+                    result.result = res.filePaths
+                    result.tag = 1
+                }
+            })
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 弹出保存文件框
+     * @param options
+     * @constructor
+     */
+    @IpcHandle(channel.app.showSaveDialog)
+    public async HandleShowSaveDialog(options) {
+        let result
+        try {
+            result = success()
+            await dialog.showSaveDialog({
+                title: options.title,
+                defaultPath: options.defaultPath,
+                filters: options.filters
+            }).then(res => {
+                if (!res.canceled) {
+                    result.result = res.filePath
+                    result.tag = 1
+                }
+            })
+        } catch (e) {
+            log.error(e)
+            result = failure('系统异常')
+        }
+        return result
+    }
+
+    /**
+     * 数据源测试
+     * @param type
+     * @param options
+     * @constructor
+     */
+    @IpcHandle(channel.app.dataSourceTest)
+    public async HandleDataSourceTest(type: dataSourceType, options) {
+        let result
+        try {
+            console.log(options)
+            let s = new Sequelize(options)
+            await s.authenticate().then(() => {
+                result = success('连接成功')
+            }).catch(e => {
+                result = failure('连接失败')
+                result.result = e
+            })
+            await s.close()
+            return result
+        } catch (e) {
+            log.error(e)
+            result = failure('测试失败,系统异常')
+            result.result = e
+        }
+        return result
+    }
+
+    /**
+     * 新增数据源
+     * @constructor
+     */
+    @IpcHandle(channel.app.addDataSource)
+    public async HandleAddDataSource(opt) {
+        let result
+        try {
+            let ds = (await getDataSourceSettings()) as any[]
+            ds.push(opt)
+            jsonfileWrite(this.appDSFile.getFullPath(), ds, {spaces: 2})
+            result = success('数据源添加成功')
+        } catch (e) {
+            log.error(e)
+            result = failure('数据源添加失败')
+        }
+        return result
+    }
+
+    /**
+     * 获取应用数据库目前需要进行的操作配置
+     * @constructor
+     */
+    @IpcHandle(channel.app.getAppDbStat)
+    public async HandleGetAppDbStat() {
+        let result
+        try {
+            result = success()
+            result.result = await getAppDbStat()
+        } catch (e) {
+            log.error(e)
+            result = failure()
+        }
+        return result
+    }
+
 }
