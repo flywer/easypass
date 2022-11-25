@@ -322,7 +322,7 @@ const onUpdatePassword = () => {
 <template>
   <a-layout-content class="setting-content">
     <!--账号模式-->
-    <RowCard>
+<!--    <RowCard>
       <template #left>账号模式
       </template>
       <template #right>
@@ -341,7 +341,7 @@ const onUpdatePassword = () => {
           </a-radio-button>
         </a-radio-group>
       </template>
-    </RowCard>
+    </RowCard>-->
     <!--用户登录-->
     <RowCard v-if="!store.isLogin" class="user-login-card">
       <template #left>用户{{ loginCardRef.titleText }}</template>
@@ -482,7 +482,6 @@ const onUpdatePassword = () => {
         </a-input-group>
       </template>
     </RowCard>
-    <a-divider class="setting-divider"/>
     <!--绑定邮箱-->
     <EmailBindCard/>
   </a-layout-content>

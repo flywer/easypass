@@ -240,3 +240,18 @@ export function addDataSource(options) {
 export function getAppDbStat() {
     return ipcInstance.send<Result>(channel.app.getAppDbStat)
 }
+
+/**
+ * 切换数据源
+ */
+export function changeDataSource(id: string) {
+    return ipcInstance.send<Result>(channel.app.changeDataSource,id)
+}
+
+/**
+ * 删除数据源
+ * @param id
+ */
+export function deleteDataSource(id:string){
+    return ipcInstance.send<Result>(channel.app.deleteDataSource,id)
+}

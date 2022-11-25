@@ -71,11 +71,21 @@ export class AppController {
         }
     }
 
+    /*数据源文件*/
     private readonly appDSFile = {
         folderPath: path.join(getAppDataPath(), '/config'),
         fileName: 'ds.json',
         getFullPath: () => {
             return path.join(this.appDSFile.folderPath, this.appDSFile.fileName)
+        }
+    }
+
+    /*数据库操作文件*/
+    private readonly appDSStatFile = {
+        folderPath: path.join(getAppDataPath(), '/config'),
+        fileName: 'dbStat.json',
+        getFullPath: () => {
+            return path.join(this.appDSStatFile.folderPath, this.appDSStatFile.fileName)
         }
     }
 
@@ -810,4 +820,40 @@ export class AppController {
         return result
     }
 
+    /**
+     * 切换数据源
+     */
+    @IpcHandle(channel.app.changeDataSource)
+    public async HandleChangeDataSource(id: string) {
+        let result
+        try {
+            let appDbStat = await getAppDbStat()
+            appDbStat.currentDSId = id
+            jsonfileWrite(this.appDSStatFile.getFullPath(), appDbStat, {spaces: 2})
+            result = success('切换数据源成功')
+        } catch (e) {
+            log.error(e)
+            result = failure('切换数据源失败')
+        }
+        return result
+    }
+
+    /**
+     * 删除数据源
+     */
+    @IpcHandle(channel.app.deleteDataSource)
+    public async HandleDeleteDataSource(id: string) {
+        let result
+        try {
+            let dsList = (await getDataSourceSettings()) as any[]
+            dsList = dsList.filter(item => !isEqual(item.id, id))
+
+            jsonfileWrite(this.appDSFile.getFullPath(), dsList, {spaces: 2})
+            result = success('数据源删除成功')
+        } catch (e) {
+            log.error(e)
+            result = failure('数据源删除失败')
+        }
+        return result
+    }
 }

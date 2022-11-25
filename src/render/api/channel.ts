@@ -45,7 +45,8 @@ export const channel = reactive({
         dataSourceTest: 'app/dataSourceTest',
         addDataSource: 'app/addDataSource',
         getAppDbStat:'app/getAppDbStat',
-
+        changeDataSource: 'app/changeDataSource',
+        deleteDataSource: 'app/deleteDataSource'
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',

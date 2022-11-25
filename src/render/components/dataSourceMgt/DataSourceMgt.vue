@@ -10,8 +10,15 @@ import {
   LoadingOutlined
 } from '@ant-design/icons-vue'
 import {onMounted, reactive, ref, watch, createVNode} from "vue";
-import {addDataSource, getAppDbStat, getDataSourceList} from "@render/api/app.api";
-import {CollapseProps, FormInstance, message} from "ant-design-vue";
+import {
+  addDataSource,
+  appRelaunch,
+  changeDataSource,
+  deleteDataSource,
+  getAppDbStat,
+  getDataSourceList
+} from "@render/api/app.api";
+import {CollapseProps, FormInstance, message, Modal} from "ant-design-vue";
 import {cloneDeep, isEmpty, isEqual} from "lodash-es";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {defaultOpenDialogOptions, showAppOpenDialog, showAppSaveDialog} from "@render/utils/fileDialog";
@@ -68,21 +75,19 @@ const newDataSourceRef = reactive({
 let currentDSId = ref()
 
 onMounted(async () => {
-  searchDataSourceList()
-  /*当前数据源*/
-  currentDSId.value = (await getAppDbStat()).data.result.currentDSId
+  await onRefresh()
 })
 
 /*查询数据源*/
-const searchDataSourceList = () => {
+const searchDataSourceList = async () => {
   spinning.value = true
   refreshSpinning()
 
-  getDataSourceList().then(res => {
+  await getDataSourceList().then(res => {
     if (res.data.success) {
       dataSourceList.value = res.data.result
-      dataSourceList.value.forEach(db => {
-        db.isHover = false
+      dataSourceList.value.forEach(ds => {
+        ds.isHover = false
       })
     } else {
       message.error(res.data.message)
@@ -92,9 +97,35 @@ const searchDataSourceList = () => {
   })
 }
 
-/*删除数据源*/
-const onDeleteDataSource = () => {
+/*刷新或重载*/
+const onRefresh = async () => {
+  /*当前数据源ID*/
+  currentDSId.value = (await getAppDbStat()).data.result.currentDSId
+  await searchDataSourceList()
+  let currentDS = dataSourceList.value.filter(ds => isEqual(ds.id, currentDSId.value)).at(0);
+  //过滤掉选中的数据源
+  dataSourceList.value = cloneDeep(dataSourceList.value.filter(ds => !isEqual(ds.id, currentDSId.value)));
+  dataSourceList.value.unshift(currentDS)
+}
 
+/*删除数据源*/
+const onDeleteDataSource = (id: string) => {
+  Modal.confirm({
+    title: '提示',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '是否删除此数据源？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      deleteDataSource(id).then(res => {
+        if (res.data.success) {
+          message.success(res.data.message)
+          onRefresh()
+        } else
+          message.warn(res.data.message)
+      })
+    }
+  })
 }
 
 /*数据源类型格式化*/
@@ -111,8 +142,35 @@ const onShowDataSourceModal = () => {
 }
 
 /*切换数据源*/
-const onChangeDataSource = () => {
-
+const onChangeDataSource = (id: string) => {
+  console.log(id)
+  Modal.confirm({
+    title: '提示',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '是否切换至此数据源？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      changeDataSource(id).then(async res => {
+        if (res.data.success) {
+          message.success(res.data.message)
+          await onRefresh()
+        } else {
+          message.warn(res.data.message)
+        }
+        Modal.confirm({
+          title: '提示',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '是否立即重启应用生效？',
+          okText: '确认',
+          cancelText: '取消',
+          onOk() {
+            appRelaunch()
+          }
+        })
+      })
+    },
+  });
 }
 
 /*新增数据源*/
@@ -131,7 +189,7 @@ const onAddDataSource = () => {
       addDataSource(opt).then(res => {
         if (res.data.success) {
           message.success(res.data.message)
-          searchDataSourceList()
+          onRefresh()
         } else {
           message.error(res.data.message)
         }
@@ -154,7 +212,7 @@ const onAddDataSource = () => {
       addDataSource(opt).then(res => {
         if (res.data.success) {
           message.success(res.data.message)
-          searchDataSourceList()
+          onRefresh()
         } else {
           message.error(res.data.message)
         }
@@ -294,7 +352,7 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
     <!--右侧-->
     <a-space style="float: right">
       <!--刷新-->
-      <a-button class="tool-btn" type="text" size="large" @click="searchDataSourceList">
+      <a-button class="tool-btn" type="text" size="large" @click="onRefresh">
         <template #icon>
           <reload-outlined :spin="refreshSpin"/>
         </template>
@@ -344,22 +402,27 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                     <a-tag color="#2db7f5" style="margin-top: 0.3em;">当前数据源</a-tag>
                   </a-col>
                   <a-col v-else>
-                    <a-button color="#2db7f5" size="small" style="margin-top: 0.3em;" @click="onChangeDataSource">
+                    <a-button color="#2db7f5" size="small" style="margin-top: 0.3em;"
+                              @click="onChangeDataSource(ds.id)">
                       切换至此数据源
                     </a-button>
                   </a-col>
                 </a-row>
                 <a-row style="margin-top: 17px">
-                  <a-col><a-typography style="line-height: 32px;">数据库类型：{{ dialectFormat(ds.type) }}</a-typography></a-col>
-                  <a-col :offset="15"><a-button type="link">编辑</a-button></a-col>
+                  <a-col>
+                    <a-typography style="line-height: 32px;">数据库类型：{{ dialectFormat(ds.type) }}</a-typography>
+                  </a-col>
+                  <a-col :offset="15">
+                    <a-button type="link">编辑</a-button>
+                  </a-col>
                 </a-row>
               </a-col>
             </a-row>
 
             <!--删除按钮-->
             <close-outlined
-                v-show="ds.isHover"
-                @click="onDeleteDataSource"
+                v-show="ds.isHover && !isEqual(currentDSId,ds.id)"
+                @click="onDeleteDataSource(ds.id)"
                 class="close-btn"
                 style="" title="删除"/>
             <!--            <div style="background-color: rgb(0, 120, 255);
@@ -370,7 +433,7 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                 bottom: 3%;">
                         </div>-->
             <a-collapse v-model:activeKey="activeKey" ghost :expand-icon-position="expandIconPosition">
-              <a-collapse-panel :key="ds.id" header="This is panel header 1" :style="customStyle">
+              <a-collapse-panel :key="ds.id" header="详情" :style="customStyle">
                 <div v-if="isEqual(ds.type,1)" style="margin:0 0  0 24px;">
                   <a-row>
                     <a-col>

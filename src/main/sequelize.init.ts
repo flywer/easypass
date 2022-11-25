@@ -31,7 +31,11 @@ export const sequelizeInit = async () => {
     if (isEqual(curDS.dialect, 'sqlite')) {
         sequelize = new Sequelize({dialect: 'sqlite', storage: curDS.storage})
     } else if (isEqual(curDS.dialect, 'mysql')) {
-        sequelize = new Sequelize(curDS.database, curDS.username, curDS.password, curDS.options as Options)
+        sequelize = new Sequelize(curDS.database, curDS.username, curDS.password, {
+            host:curDS.hostname,
+            dialect: curDS.dialect,
+            port:curDS.port
+        })
     }
 
     //sequelize = new Sequelize(commonDb.database,commonDb.username,commonDb.password,commonDb.options as Options)
