@@ -8,20 +8,6 @@ import {constant} from "lodash-es";
 
 const defaultMode = config.loginMode /*目前默认为跨平台*/
 
-const commonDb = {
-    database: 'easy_pass',
-    username: 'hyq',
-    password: '147896325q!',
-    options: {
-        host: 'rm-2zer84p8izdqu3x8ngo.mysql.rds.aliyuncs.com',
-        dialect: "mysql",
-        dialectOptions: {
-            charset: 'utf8mb4'
-        },
-        timezone: '+08:00'
-    }
-}
-
 /* 选择 'mysql' | 'mariadb' | 'postgres' | 'mssql' | 'sqlite'其一 */
 export const sequelizeInit = async () => {
     let dataSourceSettings = await getDataSourceSettings()
