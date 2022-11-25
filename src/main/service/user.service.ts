@@ -42,5 +42,12 @@ export class UserService {
         await this.userMapper.deleteUserById(userId)
     }
 
-
+    /**
+     * 校验注册时信息检查，true为通过，false为不通过
+     * @param userVo
+     */
+    public async registerCheck(userVo) {
+        let res = (await this.userMapper.getUserByAccount(userVo));
+        return res.length <= 0;
+    }
 }

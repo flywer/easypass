@@ -3,7 +3,15 @@ import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {createVNode, onMounted, reactive, ref, watch} from "vue";
 import {cloneDeep, isEmpty, isEqual, random} from "lodash-es";
-import {cancellation, checkPassword, login, logout, register, updateUserInfoByUserId} from "@render/api/user.api";
+import {
+  cancellation,
+  checkPassword,
+  login,
+  logout,
+  register,
+  registerCheck,
+  updateUserInfoByUserId
+} from "@render/api/user.api";
 import {Form, message, Modal} from "ant-design-vue";
 import {store} from "@render/store";
 import {
@@ -80,40 +88,47 @@ const formRules = reactive({
 const onRegister = async () => {
   loginCardRef.activeSpinning = true
 
-  //设置初始昵称
-  if (isEmpty(loginCardRef.registerModel.name))
-    loginCardRef.registerModel.name = '小白' + random(100000, 999999)
-  register({
-    account: loginCardRef.registerModel.account,
-    name: loginCardRef.registerModel.name,
-    mode: '02',
-    password: loginCardRef.registerModel.password
-  }).then(async res => {
-    if (res.data.success) {
-      message.success(res.data.message)
-      //登录
-      let result = await login({
-        account: loginCardRef.registerModel.account,
-        password: loginCardRef.registerModel.password
-      })
-      if (result.data.tag == 2) {
-        store.isLogin = true
-        store.user = cloneDeep(result.data.result)
-      } else {
-        message.warn(result.data.message)
-      }
-    } else message.warn(res.data.message)
+  //检查账号是否已被注册
+  const res = (await registerCheck({account: loginCardRef.registerModel.account})).data
+  if (res.success) {
+    //设置初始昵称
+    if (isEmpty(loginCardRef.registerModel.name))
+      loginCardRef.registerModel.name = '小白' + random(100000, 999999)
+    register({
+      account: loginCardRef.registerModel.account,
+      name: loginCardRef.registerModel.name,
+      mode: '02',
+      password: loginCardRef.registerModel.password
+    }).then(async res => {
+      if (res.data.success) {
+        message.success(res.data.message)
+        //登录
+        let result = await login({
+          account: loginCardRef.registerModel.account,
+          password: loginCardRef.registerModel.password
+        })
+        if (result.data.tag == 2) {
+          store.isLogin = true
+          store.user = cloneDeep(result.data.result)
+        } else {
+          message.warn(result.data.message)
+        }
+      } else message.warn(res.data.message)
 
-    //初始化
-    loginCardRef.registerModel = {
-      name: '',
-      account: '',
-      password: ''
-    }
+      //初始化
+      loginCardRef.registerModel = {
+        name: '',
+        account: '',
+        password: ''
+      }
+      loginCardRef.activeSpinning = false
+    }).catch(e => {
+      console.error(e)
+    })
+  } else {
+    message.warn(res.message)
     loginCardRef.activeSpinning = false
-  }).catch(e => {
-    console.error(e)
-  })
+  }
 }
 
 /*登录*/
@@ -322,26 +337,26 @@ const onUpdatePassword = () => {
 <template>
   <a-layout-content class="setting-content">
     <!--账号模式-->
-<!--    <RowCard>
-      <template #left>账号模式
-      </template>
-      <template #right>
-        <a-radio-group v-model:value="loginMode" button-style="solid" @change="onLoginModeChange">
-          <a-radio-button value="01">
-            <a-tooltip>
-              <template #title>本地存储</template>
-              本地
-            </a-tooltip>
-          </a-radio-button>
-          <a-radio-button value="02">
-            <a-tooltip>
-              <template #title>账号可在其他设备登录</template>
-              跨平台
-            </a-tooltip>
-          </a-radio-button>
-        </a-radio-group>
-      </template>
-    </RowCard>-->
+    <!--    <RowCard>
+          <template #left>账号模式
+          </template>
+          <template #right>
+            <a-radio-group v-model:value="loginMode" button-style="solid" @change="onLoginModeChange">
+              <a-radio-button value="01">
+                <a-tooltip>
+                  <template #title>本地存储</template>
+                  本地
+                </a-tooltip>
+              </a-radio-button>
+              <a-radio-button value="02">
+                <a-tooltip>
+                  <template #title>账号可在其他设备登录</template>
+                  跨平台
+                </a-tooltip>
+              </a-radio-button>
+            </a-radio-group>
+          </template>
+        </RowCard>-->
     <!--用户登录-->
     <RowCard v-if="!store.isLogin" class="user-login-card">
       <template #left>用户{{ loginCardRef.titleText }}</template>

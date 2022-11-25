@@ -79,6 +79,6 @@ export const channel = reactive({
         updateUserInfoByUserId: 'user/updateUserInfoByUserId',
         checkPassword: 'user/checkPassword',
         sendEmail: 'user/sendEmail',
-
+        registerCheck: 'user/registerCheck'
     }
 })

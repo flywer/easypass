@@ -32,6 +32,14 @@ export class UserMapper {
         })
     }
 
+    public async getUserByAccount(user: IUserVo) {
+        return await User.findAll({
+            where: {
+                account: user.account
+            }
+        })
+    }
+
     public async deleteUserById(userId: string) {
         await User.destroy({
             where: {

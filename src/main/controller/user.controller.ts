@@ -254,5 +254,26 @@ export class UserController {
         }
         return result
     }
+
+    /**
+     * 注册时检查操作
+     * @param userVo
+     * @constructor
+     */
+    @IpcHandle(channel.user.registerCheck)
+    public async HandleRegisterCheck(userVo) {
+        userVo = userVo as IUserVo
+        let result
+        try {
+            if (await this.userService.registerCheck(userVo))
+                result = success()
+            else
+                result = failure('账号重复，请重新输入')
+        } catch (e) {
+            log.error('注册检查操作失败', e)
+            result = failure()
+        }
+        return result
+    }
 }
 
