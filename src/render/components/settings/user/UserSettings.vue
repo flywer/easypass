@@ -2,7 +2,7 @@
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {createVNode, onMounted, reactive, ref, watch} from "vue";
-import {cloneDeep, isEmpty, isEqual, random} from "lodash-es";
+import {cloneDeep, isEmpty, isEqual, isNull, isUndefined, random} from "lodash-es";
 import {
   cancellation,
   checkPassword,
@@ -24,7 +24,14 @@ import {
   UpOutlined
 } from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
-import {appRelaunch, setAppToken, setLoginMode} from "@render/api/app.api";
+import {
+  appRelaunch,
+  getCommonTextContent,
+  setAppToken,
+  setCommonAccount,
+  setCommonPassword,
+  setLoginMode
+} from "@render/api/app.api";
 import {Rule} from "ant-design-vue/es/form";
 import {sendEmail} from "@render/api/utils.api";
 import {randomValidCode} from "@render/utils/randomValidCode";
@@ -332,6 +339,98 @@ const onUpdatePassword = () => {
 
 //endregion
 
+//region 常用账号、密码
+
+const commonAccountRef = reactive({
+  isForm: false,
+  model: {
+    commonAccount: ''
+  },
+  rules: {
+    commonAccount: [{required: true, message: '账号不可为空'}, {max: 128, message: '最大长度为128'}]
+  },
+  isSubmit: false,
+  isSet: false
+})
+
+/*常用账号保存*/
+const onCommonAccountFormSubmit = () => {
+  commonAccountRef.isSubmit = true
+  setCommonAccount(commonAccountRef.model.commonAccount).then(res => {
+    if (res.data.success) {
+      message.success(res.data.message)
+      commonAccountRef.isSet = true
+    } else {
+      message.warn(res.data.message)
+    }
+  }).then(() => {
+    commonAccountRef.isSubmit = false
+    commonAccountRef.isForm = false
+  })
+}
+
+/*常用账号重置*/
+const onAccountReset = () => {
+  setCommonAccount(null).then(res => {
+    if (res.data.success) {
+      message.success('重置成功')
+      commonAccountRef.isSet = false
+    } else {
+      message.warn('重置失败')
+    }
+  })
+}
+
+const commonPasswordRef = reactive({
+  isForm: false,
+  model: {
+    commonPassword: ''
+  },
+  rules: {
+    commonPassword: [{required: true, message: '密码不可为空'}, {max: 128, message: '最大长度为128'}]
+  },
+  isSubmit: false,
+  isSet: false
+})
+
+/*常用密码保存*/
+const onCommonPasswordFormSubmit = () => {
+  commonPasswordRef.isSubmit = true
+  setCommonPassword(commonPasswordRef.model.commonPassword).then(res => {
+    if (res.data.success) {
+      message.success(res.data.message)
+      commonPasswordRef.isSet = true
+    } else {
+      message.warn(res.data.message)
+    }
+  }).then(() => {
+    commonPasswordRef.isSubmit = false
+    commonPasswordRef.isForm = false
+  })
+}
+
+/*常用密码重置*/
+const onPasswordReset = () => {
+  setCommonPassword(null).then(res => {
+    if (res.data.success) {
+      message.success('重置成功')
+      commonPasswordRef.isSet = false
+    } else {
+      message.warn('重置失败')
+    }
+  })
+}
+
+onMounted(async () => {
+  let commonText = (await getCommonTextContent()).data.result;
+  //常用账号设置
+  commonAccountRef.isSet = !(isUndefined(commonText.commonAccount) || isNull(commonText.commonAccount) || commonText.commonAccount.length == 0);
+  //常用密码设置
+  commonPasswordRef.isSet = !(isUndefined(commonText.commonPassword) || isNull(commonText.commonPassword) || commonText.commonPassword.length == 0);
+})
+
+//endregion
+
 </script>
 
 <template>
@@ -499,6 +598,90 @@ const onUpdatePassword = () => {
     </RowCard>
     <!--绑定邮箱-->
     <EmailBindCard/>
+    <a-divider class="setting-divider"/>
+    <!--常用账号-->
+    <RowCard>
+      <template #left>常用账号
+        <SecondaryText>
+          <template #text>点击左下角按钮复制使用</template>
+        </SecondaryText>
+      </template>
+      <template #right>
+        <a-button class="animate__animated animate__flipInX"
+                  v-show="!commonAccountRef.isForm && !commonAccountRef.isSet"
+                  @click="commonAccountRef.isForm = true">设置
+        </a-button>
+        <a-button class="animate__animated animate__flipInX"
+                  v-show="!commonAccountRef.isForm && commonAccountRef.isSet"
+                  @click="onAccountReset">重置
+        </a-button>
+        <a-form
+            class="animate__animated animate__flipInX"
+            v-show="commonAccountRef.isForm"
+            :model="commonAccountRef.model"
+            @finish="onCommonAccountFormSubmit"
+        >
+          <a-input-group compact>
+            <a-form-item name="commonAccount" style="width: 200px" :rules="commonAccountRef.rules.commonAccount">
+              <a-input v-model:value="commonAccountRef.model.commonAccount" placeholder="请输入常用账号" allow-clear/>
+            </a-form-item>
+            <a-form-item>
+              <a-button
+                  v-if="!isEmpty(commonAccountRef.model.commonAccount)"
+                  html-type="submit"
+                  :loading="commonAccountRef.isSubmit"
+              >保存
+              </a-button>
+              <a-button v-if="isEmpty(commonAccountRef.model.commonAccount)" @click="commonAccountRef.isForm = false">
+                取消
+              </a-button>
+            </a-form-item>
+          </a-input-group>
+        </a-form>
+      </template>
+    </RowCard>
+    <!--常用密码-->
+    <RowCard>
+      <template #left>常用密码
+        <SecondaryText>
+          <template #text>点击左下角按钮复制使用</template>
+        </SecondaryText>
+      </template>
+      <template #right>
+        <a-button class="animate__animated animate__flipInX"
+                  v-show="!commonPasswordRef.isForm && !commonPasswordRef.isSet"
+                  @click="commonPasswordRef.isForm = true">设置
+        </a-button>
+        <a-button class="animate__animated animate__flipInX"
+                  v-show="!commonPasswordRef.isForm && commonPasswordRef.isSet"
+                  @click="onPasswordReset">重置
+        </a-button>
+        <a-form
+            class="animate__animated animate__flipInX"
+            v-show="commonPasswordRef.isForm"
+            :model="commonPasswordRef.model"
+            @finish="onCommonPasswordFormSubmit"
+        >
+          <a-input-group compact>
+            <a-form-item name="commonPassword" style="width: 200px" :rules="commonPasswordRef.rules.commonPassword">
+              <a-input-password v-model:value="commonPasswordRef.model.commonPassword" placeholder="请输入常用密码" allow-clear/>
+            </a-form-item>
+            <a-form-item>
+              <a-button
+                  v-if="!isEmpty(commonPasswordRef.model.commonPassword)"
+                  html-type="submit"
+                  :loading="commonPasswordRef.isSubmit"
+              >保存
+              </a-button>
+              <a-button v-if="isEmpty(commonPasswordRef.model.commonPassword)"
+                        @click="commonPasswordRef.isForm = false">
+                取消
+              </a-button>
+            </a-form-item>
+          </a-input-group>
+        </a-form>
+      </template>
+    </RowCard>
   </a-layout-content>
 </template>
 
@@ -514,6 +697,10 @@ const onUpdatePassword = () => {
   :deep(.ant-form-item-explain-error) {
     font-size: 11px;
   }
+}
+
+:deep(.ant-form-item-explain-error) {
+  font-size: 11px;
 }
 
 </style>

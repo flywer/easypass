@@ -245,13 +245,36 @@ export function getAppDbStat() {
  * 切换数据源
  */
 export function changeDataSource(id: string) {
-    return ipcInstance.send<Result>(channel.app.changeDataSource,id)
+    return ipcInstance.send<Result>(channel.app.changeDataSource, id)
 }
 
 /**
  * 删除数据源
  * @param id
  */
-export function deleteDataSource(id:string){
-    return ipcInstance.send<Result>(channel.app.deleteDataSource,id)
+export function deleteDataSource(id: string) {
+    return ipcInstance.send<Result>(channel.app.deleteDataSource, id)
+}
+
+/**
+ * 设置常用账号
+ * @param account
+ */
+export function setCommonAccount(account: string) {
+    return ipcInstance.send<Result>(channel.app.setCommonAccount, account)
+}
+
+/**
+ * 设置常用密码
+ * @param password
+ */
+export function setCommonPassword(password: string) {
+    return ipcInstance.send<Result>(channel.app.setCommonPassword, password)
+}
+
+/**
+ * 获取常用文本
+ */
+export function getCommonTextContent() {
+    return ipcInstance.send<Result>(channel.app.getCommonTextContent)
 }

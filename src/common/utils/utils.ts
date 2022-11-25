@@ -192,4 +192,24 @@ export const getDataSourceSettings = async () => {
     else
         return parseJson(buffer.toString())
 }
+
+/**
+ * 获取常用文本文件内容
+ */
+export const getCommonTextContent = async () => {
+    const defaultContent = {
+        commonAccount: '',
+        commonPassword: ''
+    }
+
+    const commonTextContent = {
+        folderPath: path.join(getAppDataPath(), '/config'),
+        fileName: 'commonText.json'
+    }
+    const buffer = await readFsSync(path.join(commonTextContent.folderPath, commonTextContent.fileName))
+    if (buffer == null || isEmpty(buffer.toString()))
+        return defaultContent
+    else
+        return parseJson(buffer.toString())
+}
 //endregion

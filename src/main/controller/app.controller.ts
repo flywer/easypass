@@ -11,6 +11,7 @@ import {
     getAppSettings,
     getAppTempDataPath,
     getAppTokenSettings,
+    getCommonTextContent,
     getDataSourceSettings,
     getResourcePath
 } from "@common/utils/utils";
@@ -86,6 +87,15 @@ export class AppController {
         fileName: 'dbStat.json',
         getFullPath: () => {
             return path.join(this.appDSStatFile.folderPath, this.appDSStatFile.fileName)
+        }
+    }
+
+    /*常用文本文件*/
+    private readonly commonTextFile = {
+        folderPath: path.join(getAppDataPath(), '/config'),
+        fileName: 'commonText.json',
+        getFullPath: () => {
+            return path.join(this.commonTextFile.folderPath, this.commonTextFile.fileName)
         }
     }
 
@@ -853,6 +863,63 @@ export class AppController {
         } catch (e) {
             log.error(e)
             result = failure('数据源删除失败')
+        }
+        return result
+    }
+
+    /**
+     * 设置常用账号
+     * @param account
+     * @constructor
+     */
+    @IpcHandle(channel.app.setCommonAccount)
+    public async HandleSetCommonAccount(account) {
+        let result
+        try {
+            let res = (await getCommonTextContent())
+            res.commonAccount = account
+            jsonfileWrite(this.commonTextFile.getFullPath(), res, {spaces: 2})
+            result = success('常用账号设置成功')
+        } catch (e) {
+            log.error(e)
+            result = failure('常用账号设置失败')
+        }
+        return result
+    }
+
+    /**
+     * 设置常用密码
+     * @param password
+     * @constructor
+     */
+    @IpcHandle(channel.app.setCommonPassword)
+    public async HandleSetCommonPassword(password) {
+        let result
+        try {
+            let res = (await getCommonTextContent())
+            res.commonPassword = password
+            jsonfileWrite(this.commonTextFile.getFullPath(), res, {spaces: 2})
+            result = success('常用密码设置成功')
+        } catch (e) {
+            log.error(e)
+            result = failure('常用密码设置失败')
+        }
+        return result
+    }
+
+    /**
+     * 获取常用文本
+     * @constructor
+     */
+    @IpcHandle(channel.app.getCommonTextContent)
+    public async HandleGetCommonTextContent() {
+        let result
+        try {
+            result = success()
+            result.result = (await getCommonTextContent())
+        } catch (e) {
+            log.error(e)
+            result = failure('获取常用文本失败')
         }
         return result
     }

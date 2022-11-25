@@ -1,5 +1,5 @@
 <template>
-  <a-row type="flex" style="margin-bottom: 12px;">
+  <a-row type="flex" style="margin-bottom: 12px">
     <a-col flex="auto">
       <a-card class="card-view" :bordered="false" size="small">
         <a-layout-content>
@@ -39,6 +39,7 @@ const props = defineProps({
   0 5px 12px 4px rgb(0 0 0 / 9%);
   border-radius: 5px;
   height: 60px;
+  max-height: 56px;
   line-height: 36px;
   padding: 0 12px;
   text-align: center;

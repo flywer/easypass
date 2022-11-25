@@ -46,7 +46,10 @@ export const channel = reactive({
         addDataSource: 'app/addDataSource',
         getAppDbStat:'app/getAppDbStat',
         changeDataSource: 'app/changeDataSource',
-        deleteDataSource: 'app/deleteDataSource'
+        deleteDataSource: 'app/deleteDataSource',
+        setCommonAccount: 'app/setCommonAccount',
+        getCommonTextContent: 'app/getCommonTextContent',
+        setCommonPassword:  'app/setCommonPassword',
     },
     group: {
         getGroupListByUserInfo: 'group/getGroupListByUserInfo',

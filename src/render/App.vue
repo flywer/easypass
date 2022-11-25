@@ -123,6 +123,7 @@ const appTokenInit = async () => {
   //界面隐藏时
   ipcInstance.on(channel.app.showTokenPanel, () => store.showTokenPanel = true)
 }
+
 /*令牌剩余输入次数检测*/
 watch(() => store.tokenCheckRemainTimes, (value) => {
   if (value === 1) {
