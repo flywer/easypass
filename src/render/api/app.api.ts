@@ -228,9 +228,9 @@ export function getDataSourceList() {
 }
 
 /**
- * 添加数据源
+ * 添加或更新数据源
  */
-export function addDataSource(options) {
+export function saveOrUpdateDataSource(options) {
     return ipcInstance.send<Result>(channel.app.addDataSource, options)
 }
 

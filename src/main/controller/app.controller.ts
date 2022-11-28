@@ -776,7 +776,6 @@ export class AppController {
     public async HandleDataSourceTest(type: dataSourceType, options) {
         let result
         try {
-            console.log(options)
             let s = new Sequelize(options)
             await s.authenticate().then(() => {
                 result = success('连接成功')
@@ -795,7 +794,7 @@ export class AppController {
     }
 
     /**
-     * 新增数据源
+     * 添加或更新数据源
      * @constructor
      */
     @IpcHandle(channel.app.addDataSource)
@@ -803,12 +802,19 @@ export class AppController {
         let result
         try {
             let ds = (await getDataSourceSettings()) as any[]
-            ds.push(opt)
-            jsonfileWrite(this.appDSFile.getFullPath(), ds, {spaces: 2})
-            result = success('数据源添加成功')
+            if (opt.id == null) {
+                ds.push(opt)
+                jsonfileWrite(this.appDSFile.getFullPath(), ds, {spaces: 2})
+                result = success('数据源添加成功')
+            } else {
+                let ds2 = ds.filter(item => !isEqual(item.id, opt.id))
+                ds2.push(opt)
+                jsonfileWrite(this.appDSFile.getFullPath(), ds2, {spaces: 2})
+                result = success('数据源修改成功')
+            }
         } catch (e) {
             log.error(e)
-            result = failure('数据源添加失败')
+            result = failure('数据源操作失败')
         }
         return result
     }

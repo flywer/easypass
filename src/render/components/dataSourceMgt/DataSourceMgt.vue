@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons-vue'
 import {onMounted, reactive, ref, watch, createVNode} from "vue";
 import {
-  addDataSource,
+  saveOrUpdateDataSource,
   appRelaunch,
   changeDataSource,
   deleteDataSource,
@@ -24,9 +24,11 @@ import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {defaultOpenDialogOptions, showAppOpenDialog, showAppSaveDialog} from "@render/utils/fileDialog";
 import sqlite from '@render/assets/img/db/sqlite.png'
 import mysql from '@render/assets/img/db/mysql.png'
+import mariadb from '@render/assets/img/db/mariadb.png'
 import {dataSourceTest} from "@render/api/utils.api";
 import {uuid} from "vue3-uuid";
 
+// region 数据源列表
 //加载效果是否显示
 const spinning = ref(false)
 const dataSourceList = ref([])
@@ -39,39 +41,8 @@ const refreshSpinning = () => {
     refreshSpin.value = false
   }, 1000)
 }
-/*表单Ref*/
-const formRef = {
-  sqliteRef: ref<FormInstance>(),
-  mysqlRef: ref<FormInstance>(),
-}
-/*新增数据源Ref*/
-const newDataSourceRef = reactive({
-  modalVisible: false,
-  selectedDataSource: 1,
-  loading: false,
-  test: {
-    isTesting: false,
-    isSuccess: false,
-    result: {
-      showResult: false,
-      visible: false,
-      title: '',
-      content: ''
-    }
-  },
-  sqliteModel: {
-    name: '',
-    filePath: ''
-  },
-  mysqlModel: {
-    name: '',
-    hostname: '',
-    port: 3306,
-    username: '',
-    password: '',
-    database: ''
-  }
-})
+
+/*当前选择的数据源*/
 let currentDSId = ref()
 
 onMounted(async () => {
@@ -108,42 +79,8 @@ const onRefresh = async () => {
   dataSourceList.value.unshift(currentDS)
 }
 
-/*删除数据源*/
-const onDeleteDataSource = (id: string) => {
-  Modal.confirm({
-    title: '提示',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: '是否删除此数据源？',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      deleteDataSource(id).then(res => {
-        if (res.data.success) {
-          message.success(res.data.message)
-          onRefresh()
-        } else
-          message.warn(res.data.message)
-      })
-    }
-  })
-}
-
-/*数据源类型格式化*/
-const dialectFormat = (type) => {
-  if (isEqual(type, 1))
-    return 'SQLite'
-  else if (isEqual(type, 2))
-    return 'MySQL'
-}
-
-/*新增数据源框显示*/
-const onShowDataSourceModal = () => {
-  newDataSourceRef.modalVisible = true
-}
-
 /*切换数据源*/
 const onChangeDataSource = (id: string) => {
-  console.log(id)
   Modal.confirm({
     title: '提示',
     icon: createVNode(ExclamationCircleOutlined),
@@ -174,68 +111,245 @@ const onChangeDataSource = (id: string) => {
 }
 
 /*新增数据源*/
-const onAddDataSource = () => {
-  newDataSourceRef.loading = true
-  /*sqlite*/
-  if (newDataSourceRef.selectedDataSource == 1) {
-    formRef.sqliteRef.value.validate().then(() => {
-      const opt = {
-        id: uuid.v1(),
-        type: 1,
-        name: newDataSourceRef.sqliteModel.name,
-        dialect: 'sqlite',
-        storage: newDataSourceRef.sqliteModel.filePath,
-      }
-      addDataSource(opt).then(res => {
+const onSubmitDSForm = () => {
+  dataSourceEditModalRef.loading = true
+
+  switch (dataSourceEditModalRef.selectedDataSource) {
+      /*sqlite*/
+    case 1:
+      formRef.sqliteRef.value.validate().then(() => {
+        const opt = {
+          id: dataSourceEditModalRef.sqliteModel.id == null ? uuid.v1() : dataSourceEditModalRef.sqliteModel.id,
+          type: 1,
+          name: dataSourceEditModalRef.sqliteModel.name,
+          dialect: 'sqlite',
+          storage: dataSourceEditModalRef.sqliteModel.filePath,
+        }
+        saveOrUpdateDataSource(opt).then(res => {
+          if (res.data.success) {
+            message.success(res.data.message)
+            onRefresh()
+          } else {
+            message.error(res.data.message)
+          }
+        }).then(() => {
+          dataSourceEditModalRef.modalVisible = false
+          dataSourceEditModalRef.loading = false
+        })
+      }).catch(e => {
+        console.log(e)
+        dataSourceEditModalRef.loading = false
+      })
+      break
+      /*mysql*/
+    case 2:
+      formRef.mysqlRef.value.validate().then(() => {
+        let opt = cloneDeep(dataSourceEditModalRef.mysqlModel) as any
+        opt.id = dataSourceEditModalRef.mysqlModel.id == null ? uuid.v1() : dataSourceEditModalRef.mysqlModel.id
+        opt.type = 2
+        opt.dialect = 'mysql'
+        saveOrUpdateDataSource(opt).then(res => {
+          if (res.data.success) {
+            message.success(res.data.message)
+            onRefresh()
+          } else {
+            message.error(res.data.message)
+          }
+        }).then(() => {
+          dataSourceEditModalRef.modalVisible = false
+          dataSourceEditModalRef.loading = false
+        })
+      }).catch(e => {
+        console.log(e)
+        dataSourceEditModalRef.loading = false
+      })
+      break
+      /*mariadb*/
+    case 3:
+      formRef.mariaDbRef.value.validate().then(() => {
+        let opt = cloneDeep(dataSourceEditModalRef.mariaDbModel) as any
+        opt.id = dataSourceEditModalRef.mariaDbModel.id == null ? uuid.v1() : dataSourceEditModalRef.mariaDbModel.id
+        opt.type = 3
+        opt.dialect = 'mariadb'
+        saveOrUpdateDataSource(opt).then(res => {
+          if (res.data.success) {
+            message.success(res.data.message)
+            onRefresh()
+          } else {
+            message.error(res.data.message)
+          }
+        }).then(() => {
+          dataSourceEditModalRef.modalVisible = false
+          dataSourceEditModalRef.loading = false
+        })
+      }).catch(e => {
+        console.log(e)
+        dataSourceEditModalRef.loading = false
+      })
+      break
+  }
+}
+
+/*删除数据源*/
+const onDeleteDataSource = (id: string) => {
+  Modal.confirm({
+    title: '提示',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '是否删除此数据源？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      deleteDataSource(id).then(res => {
         if (res.data.success) {
           message.success(res.data.message)
           onRefresh()
-        } else {
-          message.error(res.data.message)
-        }
-      }).then(() => {
-        newDataSourceRef.modalVisible = false
-        newDataSourceRef.loading = false
+        } else
+          message.warn(res.data.message)
       })
-    }).catch(e => {
-      console.log(e)
-      newDataSourceRef.loading = false
-    })
+    }
+  })
+}
+
+/*数据源类型格式化*/
+const dialectFormat = (type) => {
+  if (isEqual(type, 1))
+    return 'SQLite'
+  else if (isEqual(type, 2))
+    return 'MySQL'
+  else if (isEqual(type, 3))
+    return 'MariaDB'
+}
+
+/*设置数据源图标*/
+const getDbIcon = (type: number) => {
+  if (type == 1)
+    return sqlite
+  else if (type == 2)
+    return mysql
+  else if (type == 3)
+    return mariadb
+}
+
+//endregion
+
+//region 新增数据源弹框
+
+/*表单Ref*/
+const formRef = {
+  sqliteRef: ref<FormInstance>(),
+  mysqlRef: ref<FormInstance>(),
+  mariaDbRef: ref<FormInstance>()
+}
+
+/*新增数据源Ref*/
+const dataSourceEditModalRef = reactive({
+  modalVisible: false,
+  selectedDataSource: 1,
+  loading: false,
+  test: {
+    isTesting: false,
+    isSuccess: false,
+    result: {
+      showResult: false,
+      visible: false,
+      title: '',
+      content: ''
+    }
+  },
+  sqliteModel: {
+    id: null,
+    name: '',
+    filePath: ''
+  },
+  mysqlModel: {
+    id: null,
+    name: '',
+    hostname: '',
+    port: 3306,
+    username: '',
+    password: '',
+    database: ''
+  },
+  mariaDbModel: {
+    id: null,
+    name: '',
+    hostname: '',
+    port: 3306,
+    username: '',
+    password: '',
+    database: ''
   }
-  /*mysql*/
-  if (newDataSourceRef.selectedDataSource == 2) {
-    formRef.mysqlRef.value.validate().then(() => {
-      let opt = cloneDeep(newDataSourceRef.mysqlModel) as any
-      opt.id = uuid.v1()
-      opt.type = 2
-      opt.dialect = 'mysql'
-      addDataSource(opt).then(res => {
-        if (res.data.success) {
-          message.success(res.data.message)
-          onRefresh()
-        } else {
-          message.error(res.data.message)
-        }
-      }).then(() => {
-        newDataSourceRef.modalVisible = false
-        newDataSourceRef.loading = false
-      })
-    }).catch(e => {
-      console.log(e)
-      newDataSourceRef.loading = false
-    })
+})
+
+/*显示更新弹出框*/
+const onEdit = (ds: any) => {
+  dataSourceEditModalRef.modalVisible = true
+  dataSourceEditModalRef.selectedDataSource = ds.type
+  switch (ds.type) {
+    case 1:
+      dataSourceEditModalRef.sqliteModel.id = ds.id
+      dataSourceEditModalRef.sqliteModel.name = ds.name
+      dataSourceEditModalRef.sqliteModel.filePath = ds.storage
+      break
+    case 2:
+      dataSourceEditModalRef.mysqlModel.id = ds.id
+      dataSourceEditModalRef.mysqlModel.name = ds.name
+      dataSourceEditModalRef.mysqlModel.hostname = ds.hostname
+      dataSourceEditModalRef.mysqlModel.port = ds.port
+      dataSourceEditModalRef.mysqlModel.username = ds.username
+      dataSourceEditModalRef.mysqlModel.password = ds.password
+      dataSourceEditModalRef.mysqlModel.database = ds.database
+      break
+    case 3:
+      dataSourceEditModalRef.mariaDbModel.id = ds.id
+      dataSourceEditModalRef.mariaDbModel.name = ds.name
+      dataSourceEditModalRef.mariaDbModel.hostname = ds.hostname
+      dataSourceEditModalRef.mariaDbModel.port = ds.port
+      dataSourceEditModalRef.mariaDbModel.username = ds.username
+      dataSourceEditModalRef.mariaDbModel.password = ds.password
+      dataSourceEditModalRef.mariaDbModel.database = ds.database
+      break
   }
+}
+
+/*新增数据源框显示*/
+const onShowDataSourceModal = () => {
+
+  dataSourceEditModalRef.sqliteModel = {
+    id: null,
+    name: '',
+    filePath: ''
+  }
+  dataSourceEditModalRef.mysqlModel = {
+    id: null,
+    name: '',
+    hostname: '',
+    port: 3306,
+    username: '',
+    password: '',
+    database: ''
+  }
+  dataSourceEditModalRef.mariaDbModel = {
+    id: null,
+    name: '',
+    hostname: '',
+    port: 3306,
+    username: '',
+    password: '',
+    database: ''
+  }
+  dataSourceEditModalRef.modalVisible = true
 }
 
 /*打开数据源文件*/
 const OnShowOpenDialog = async () => {
-  if (newDataSourceRef.selectedDataSource == 1) {
+  if (dataSourceEditModalRef.selectedDataSource == 1) {
     let opt = defaultOpenDialogOptions
     opt.title = '选择数据库'
     opt.filters = [{name: 'Sqlite File', extensions: ['sqlite']}]
     const res = await showAppOpenDialog(opt)
     if (res != null) {
-      newDataSourceRef.sqliteModel.filePath = res.at(0)
+      dataSourceEditModalRef.sqliteModel.filePath = res.at(0)
       await formRef.sqliteRef.value.validateFields('filePath')
     }
   }
@@ -243,7 +357,7 @@ const OnShowOpenDialog = async () => {
 
 /*新建数据源文件*/
 const OnShowSaveDialog = async () => {
-  if (newDataSourceRef.selectedDataSource == 1) {
+  if (dataSourceEditModalRef.selectedDataSource == 1) {
     let opt = defaultOpenDialogOptions
     opt.title = '新建数据库'
     opt.defaultPath = 'easy_pass'
@@ -251,7 +365,7 @@ const OnShowSaveDialog = async () => {
     opt.properties.openDirectory = true
     const res = await showAppSaveDialog(opt)
     if (res != null) {
-      newDataSourceRef.sqliteModel.filePath = res
+      dataSourceEditModalRef.sqliteModel.filePath = res
       await formRef.sqliteRef.value.validateFields('filePath')
     }
 
@@ -260,58 +374,71 @@ const OnShowSaveDialog = async () => {
 
 /*测试连接*/
 const onDataSourceTest = async () => {
-  newDataSourceRef.test.isTesting = true
+  dataSourceEditModalRef.test.isTesting = true
   let result = null
-  if (newDataSourceRef.selectedDataSource == 1) {
+  if (dataSourceEditModalRef.selectedDataSource == 1) {
     await formRef.sqliteRef.value.validate().then(async () => {
       result = await dataSourceTest(
-          newDataSourceRef.selectedDataSource,
-          {dialect: 'sqlite', storage: newDataSourceRef.sqliteModel.filePath})
+          dataSourceEditModalRef.selectedDataSource,
+          {dialect: 'sqlite', storage: dataSourceEditModalRef.sqliteModel.filePath})
     }).catch((e) => {
-      newDataSourceRef.test.isTesting = false
+      dataSourceEditModalRef.test.isTesting = false
       return null
     })
-  } else if (newDataSourceRef.selectedDataSource == 2) {
+  } else if (dataSourceEditModalRef.selectedDataSource == 2) {
     await formRef.mysqlRef.value.validate().then(async () => {
       result = await dataSourceTest(
-          newDataSourceRef.selectedDataSource,
+          dataSourceEditModalRef.selectedDataSource,
           {
-            database: newDataSourceRef.mysqlModel.database,
-            username: newDataSourceRef.mysqlModel.username,
-            password: newDataSourceRef.mysqlModel.password,
-            host: newDataSourceRef.mysqlModel.hostname,
-            port: newDataSourceRef.mysqlModel.port,
+            database: dataSourceEditModalRef.mysqlModel.database,
+            username: dataSourceEditModalRef.mysqlModel.username,
+            password: dataSourceEditModalRef.mysqlModel.password,
+            host: dataSourceEditModalRef.mysqlModel.hostname,
+            port: dataSourceEditModalRef.mysqlModel.port,
             dialect: 'mysql'
           })
     }).catch((e) => {
-      newDataSourceRef.test.isTesting = false
+      dataSourceEditModalRef.test.isTesting = false
+      return null
+    })
+  } else if (dataSourceEditModalRef.selectedDataSource == 3) {
+    await formRef.mariaDbRef.value.validate().then(async () => {
+      result = await dataSourceTest(
+          dataSourceEditModalRef.selectedDataSource,
+          {
+            database: dataSourceEditModalRef.mariaDbModel.database,
+            username: dataSourceEditModalRef.mariaDbModel.username,
+            password: dataSourceEditModalRef.mariaDbModel.password,
+            host: dataSourceEditModalRef.mariaDbModel.hostname,
+            port: dataSourceEditModalRef.mariaDbModel.port,
+            dialect: 'mariadb'
+          })
+    }).catch((e) => {
+      dataSourceEditModalRef.test.isTesting = false
       return null
     })
   }
 
-  newDataSourceRef.test.isTesting = false
+  dataSourceEditModalRef.test.isTesting = false
   /*结果处理*/
   if (result != null) {
     if (result.data.success) {
-      newDataSourceRef.test.isSuccess = true
-      newDataSourceRef.test.result.title = result.data.message
+      dataSourceEditModalRef.test.isSuccess = true
+      dataSourceEditModalRef.test.result.title = result.data.message
     } else {
-      newDataSourceRef.test.isSuccess = false
-      newDataSourceRef.test.result.title = result.data.message
-      newDataSourceRef.test.result.content = result.data.result.message
+      dataSourceEditModalRef.test.isSuccess = false
+      dataSourceEditModalRef.test.result.title = result.data.message
+      dataSourceEditModalRef.test.result.content = result.data.result.message
     }
-    newDataSourceRef.test.result.showResult = true
-    newDataSourceRef.test.result.visible = true
+    dataSourceEditModalRef.test.result.showResult = true
+    dataSourceEditModalRef.test.result.visible = true
   }
-
 }
 
-/*关闭时清空表单*/
-watch(() => newDataSourceRef.modalVisible, (value) => {
+/*关闭时重置测试功能*/
+watch(() => dataSourceEditModalRef.modalVisible, (value) => {
   if (!value) {
-    formRef.sqliteRef.value?.resetFields()
-    formRef.mysqlRef.value?.resetFields()
-    newDataSourceRef.test = {
+    dataSourceEditModalRef.test = {
       isTesting: false,
       isSuccess: false,
       result: {
@@ -324,17 +451,8 @@ watch(() => newDataSourceRef.modalVisible, (value) => {
   }
 })
 
-const getDbIcon = (type: number) => {
-  if (type == 1)
-    return sqlite
-  else if (type == 2)
-    return mysql
-}
+//endregion
 
-const activeKey = ref([]);
-const customStyle =
-    'background: #f7f7f7;border-radius: 4px;margin-top: 12px;border: 0;overflow: hidden';
-const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
 </script>
 
 <template>
@@ -383,37 +501,34 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                   style=""
           >
             <a-row :gutter="20">
-              <a-col>
-                <a-image
-                    :width="80"
-                    :height="80"
-
-                    :preview="false"
-                    :src="getDbIcon(ds.type)"
-                    fallback="data:image/png;base64,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"
-                />
-              </a-col>
-              <a-col :span="20">
+              <a-col :span="24">
                 <a-row :gutter="12">
+                  <a-col>
+                    <a-avatar :src="getDbIcon(ds.type)" shape="square"></a-avatar>
+                  </a-col>
                   <a-col>
                     <a-typography-title :level="4"> {{ ds.name }}</a-typography-title>
                   </a-col>
                   <a-col v-if="isEqual(currentDSId,ds.id)">
+                    <a-divider type="vertical"/>
                     <a-tag color="#2db7f5" style="margin-top: 0.3em;">当前数据源</a-tag>
                   </a-col>
-                  <a-col v-else>
-                    <a-button color="#2db7f5" size="small" style="margin-top: 0.3em;"
-                              @click="onChangeDataSource(ds.id)">
-                      切换至此数据源
-                    </a-button>
-                  </a-col>
                 </a-row>
-                <a-row style="margin-top: 17px">
-                  <a-col>
-                    <a-typography style="line-height: 32px;">数据库类型：{{ dialectFormat(ds.type) }}</a-typography>
-                  </a-col>
-                  <a-col :offset="15">
-                    <a-button type="link">编辑</a-button>
+                <a-row style="margin-top: 2px">
+                  <a-col :span="24">
+                    <SecondaryText style="line-height: 2.5em">
+                      <template #text>数据库类型：{{ dialectFormat(ds.type) }}</template>
+                    </SecondaryText>
+                    <div style="float: right;">
+                      <template v-if="!isEqual(currentDSId,ds.id)">
+                        <a-button type="link" @click="onChangeDataSource(ds.id)">
+                          切换至此数据源
+                        </a-button>
+                        <a-divider type="vertical" style="margin: 0"/>
+                      </template>
+                      <a-button type="link" @click="onEdit(ds)">编辑</a-button>
+                    </div>
+
                   </a-col>
                 </a-row>
               </a-col>
@@ -424,84 +539,77 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                 v-show="ds.isHover && !isEqual(currentDSId,ds.id)"
                 @click="onDeleteDataSource(ds.id)"
                 class="close-btn"
-                style="" title="删除"/>
-            <!--            <div style="background-color: rgb(0, 120, 255);
-                height: 32px;
-                width: 120px;
-                position: absolute;
-                right: 2%;
-                bottom: 3%;">
-                        </div>-->
-            <a-collapse v-model:activeKey="activeKey" ghost :expand-icon-position="expandIconPosition">
-              <a-collapse-panel :key="ds.id" header="详情" :style="customStyle">
-                <div v-if="isEqual(ds.type,1)" style="margin:0 0  0 24px;">
-                  <a-row>
-                    <a-col>
-                      <SecondaryText>
-                        <template #text>存储位置：</template>
-                      </SecondaryText>
-                    </a-col>
-                    <a-col>
-                      <SecondaryText>
-                        <template #text>{{ ds.storage }}</template>
-                      </SecondaryText>
-                    </a-col>
-                  </a-row>
-                  <a-row>
-                    <a-col>
-                      <SecondaryText>
-                        <template #text>存储空间：</template>
-                      </SecondaryText>
-                    </a-col>
-                    <a-col>
-                      <SecondaryText>
-                        <template #text>1GB</template>
-                      </SecondaryText>
-                    </a-col>
-                  </a-row>
-                </div>
-                <div v-if="isEqual(ds.type,2)" style="margin:0 0  0 24px;">
-                  <!--              <a-row>
-                                  <a-col>
-                                    <SecondaryText>
-                                      <template #text>存储位置：</template>
-                                    </SecondaryText>
-                                  </a-col>
-                                  <a-col>
-                                    <SecondaryText>
-                                      <template #text>{{ ds.storage }}</template>
-                                    </SecondaryText>
-                                  </a-col>
-                                </a-row>
-                                <a-row>
-                                  <a-col>
-                                    <SecondaryText>
-                                      <template #text>存储空间：</template>
-                                    </SecondaryText>
-                                  </a-col>
-                                  <a-col>
-                                    <SecondaryText>
-                                      <template #text>1GB</template>
-                                    </SecondaryText>
-                                  </a-col>
-                                </a-row>-->
-                </div>
-              </a-collapse-panel>
-            </a-collapse>
+                title="删除"/>
+            <!--折叠栏-->
+            <!--            <a-collapse v-model:activeKey="activeKey" ghost :expand-icon-position="expandIconPosition">
+                          <a-collapse-panel :key="ds.id" header="详情" :style="customStyle">
+                            <div v-if="isEqual(ds.type,1)" style="margin:0 0  0 24px;">
+                              <a-row>
+                                <a-col>
+                                  <SecondaryText>
+                                    <template #text>存储位置：</template>
+                                  </SecondaryText>
+                                </a-col>
+                                <a-col>
+                                  <SecondaryText>
+                                    <template #text>{{ ds.storage }}</template>
+                                  </SecondaryText>
+                                </a-col>
+                              </a-row>
+                              <a-row>
+                                <a-col>
+                                  <SecondaryText>
+                                    <template #text>存储空间：</template>
+                                  </SecondaryText>
+                                </a-col>
+                                <a-col>
+                                  <SecondaryText>
+                                    <template #text>1GB</template>
+                                  </SecondaryText>
+                                </a-col>
+                              </a-row>
+                            </div>
+                            <div v-if="isEqual(ds.type,2)" style="margin:0 0  0 24px;">
+                              &lt;!&ndash;              <a-row>
+                                              <a-col>
+                                                <SecondaryText>
+                                                  <template #text>存储位置：</template>
+                                                </SecondaryText>
+                                              </a-col>
+                                              <a-col>
+                                                <SecondaryText>
+                                                  <template #text>{{ ds.storage }}</template>
+                                                </SecondaryText>
+                                              </a-col>
+                                            </a-row>
+                                            <a-row>
+                                              <a-col>
+                                                <SecondaryText>
+                                                  <template #text>存储空间：</template>
+                                                </SecondaryText>
+                                              </a-col>
+                                              <a-col>
+                                                <SecondaryText>
+                                                  <template #text>1GB</template>
+                                                </SecondaryText>
+                                              </a-col>
+                                            </a-row>&ndash;&gt;
+                            </div>
+                          </a-collapse-panel>
+                        </a-collapse>-->
           </a-card>
         </a-col>
       </a-row>
     </a-spin>
   </a-layout-content>
 
-  <!--新增弹出框-->
+  <!--新增或更新弹出框-->
   <a-modal
-      v-model:visible=" newDataSourceRef.modalVisible"
+      v-model:visible="dataSourceEditModalRef.modalVisible"
       :closable="true"
       :mask-closable="false"
       title="新增数据源"
       width="62%"
-      @ok="onAddDataSource"
       class="add-modal"
   >
     <div style="max-height: 280px;overflow-y: auto">
@@ -510,21 +618,22 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
           <span>数据源类型：</span>
           <a-select
               ref="select"
-              v-model:value="newDataSourceRef.selectedDataSource"
+              v-model:value="dataSourceEditModalRef.selectedDataSource"
               style="width: 180px"
               @focus="focus"
           >
             <a-select-option :value="1">SQLite</a-select-option>
             <a-select-option :value="2">MySQL</a-select-option>
-            <a-select-option :value="4">MariaDB</a-select-option>
-            <a-select-option :value="5">Microsoft SQL Server</a-select-option>
-            <a-select-option :value="3">Postgres</a-select-option>
+            <a-select-option :value="3">MariaDB</a-select-option>
+            <a-select-option :value="4">Microsoft SQL Server</a-select-option>
+            <a-select-option :value="5">Postgres</a-select-option>
           </a-select>
         </a-space>
       </a-row>
       <a-divider style="margin-top: 12px;"/>
       <div style="margin-left: 14px;">
-        <a-row v-if="isEqual(newDataSourceRef.selectedDataSource,1)">
+        <!--sqlite-->
+        <a-row v-if="isEqual(dataSourceEditModalRef.selectedDataSource,1)">
           <a-row :gutter="50">
             <a-col>驱动程序:
               <a-typography-text code>SQLite3 v5.1.2</a-typography-text>
@@ -537,20 +646,20 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
             <a-col>
               <a-form
                   :ref="formRef.sqliteRef"
-                  :model="newDataSourceRef.sqliteModel"
+                  :model="dataSourceEditModalRef.sqliteModel"
                   :label-col="{span:3}"
                   labelAlign="left"
                   style="width: 470px"
               >
                 <a-form-item label="名称" name="name"
                              :rules="[{ required: true, message: '名称不可为空' },{max:24,message: '最大长度为24'}]">
-                  <a-input v-model:value="newDataSourceRef.sqliteModel.name" allowClear
-                           :title="newDataSourceRef.sqliteModel.name"/>
+                  <a-input v-model:value="dataSourceEditModalRef.sqliteModel.name" allowClear
+                           :title="dataSourceEditModalRef.sqliteModel.name"/>
                 </a-form-item>
                 <a-form-item label="文件" name="filePath" :rules="[{ required: true, message: '路径不可为空' }]">
                   <a-input-group compact>
-                    <a-input style="width: 80%;" v-model:value="newDataSourceRef.sqliteModel.filePath" allowClear
-                             :title="newDataSourceRef.sqliteModel.filePath"/>
+                    <a-input style="width: 80%;" v-model:value="dataSourceEditModalRef.sqliteModel.filePath" allowClear
+                             :title="dataSourceEditModalRef.sqliteModel.filePath"/>
                     <a-button style="width: 10%;" title="打开">
                       <ellipsis-outlined @click="OnShowOpenDialog"/>
                     </a-button>
@@ -563,7 +672,8 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
             </a-col>
           </a-row>
         </a-row>
-        <a-row v-if="isEqual(newDataSourceRef.selectedDataSource,2)">
+        <!--mysql-->
+        <a-row v-if="isEqual(dataSourceEditModalRef.selectedDataSource,2)">
           <a-row :gutter="50">
             <a-col>驱动程序:
               <a-typography-text code>MySql2 v2.3.3</a-typography-text>
@@ -573,7 +683,7 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
             <a-col>
               <a-form
                   :ref="formRef.mysqlRef"
-                  :model="newDataSourceRef.mysqlModel"
+                  :model="dataSourceEditModalRef.mysqlModel"
                   labelAlign="left"
                   style="width: 470px"
               >
@@ -582,8 +692,8 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                     <a-form-item label="名称" name="name" :label-col="{span:4}" :wrapper-col="{span:20}"
                                  :rules="[{ required: true, message: '名称不可为空' },{max:24,message: '最大长度为24'}]">
                       <a-input
-                          v-model:value="newDataSourceRef.mysqlModel.name"
-                          :title="newDataSourceRef.mysqlModel.name"
+                          v-model:value="dataSourceEditModalRef.mysqlModel.name"
+                          :title="dataSourceEditModalRef.mysqlModel.name"
                           allowClear/>
                     </a-form-item>
                   </a-col>
@@ -593,8 +703,8 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                     <a-form-item label="主机名" name="hostname" :label-col="{span:5}" :wrapper-col="{span:16,offset:1}"
                                  :rules="[{ required: true, message: '主机名不可为空' }]">
                       <a-input
-                          v-model:value="newDataSourceRef.mysqlModel.hostname"
-                          :title="newDataSourceRef.mysqlModel.hostname"
+                          v-model:value="dataSourceEditModalRef.mysqlModel.hostname"
+                          :title="dataSourceEditModalRef.mysqlModel.hostname"
                           allowClear
                       />
                     </a-form-item>
@@ -602,7 +712,7 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                   <a-col :span="8">
                     <a-form-item label="端口" name="port" :wrapper-col="{offset:2}"
                                  :rules="[{ required: true, message: '端口号不可为空' }]">
-                      <a-input-number v-model:value="newDataSourceRef.mysqlModel.port" :min="0"/>
+                      <a-input-number v-model:value="dataSourceEditModalRef.mysqlModel.port" :min="0"/>
                     </a-form-item>
                   </a-col>
                 </a-row>
@@ -611,8 +721,8 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                     <a-form-item label="用户名" name="username" :label-col="{span:4}" :wrapper-col="{span:20}"
                                  :rules="[{ required: true, message: '用户名不可为空' }]">
                       <a-input
-                          v-model:value="newDataSourceRef.mysqlModel.username"
-                          :title="newDataSourceRef.mysqlModel.username"
+                          v-model:value="dataSourceEditModalRef.mysqlModel.username"
+                          :title="dataSourceEditModalRef.mysqlModel.username"
                           allowClear
                       />
                     </a-form-item>
@@ -623,8 +733,8 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                     <a-form-item label="密码" name="password" :label-col="{span:4}" :wrapper-col="{span:20}"
                                  :rules="[{ required: true, message: '密码不可为空' }]">
                       <a-input-password
-                          v-model:value="newDataSourceRef.mysqlModel.password"
-                          :title="newDataSourceRef.mysqlModel.password"
+                          v-model:value="dataSourceEditModalRef.mysqlModel.password"
+                          :title="dataSourceEditModalRef.mysqlModel.password"
                           allowClear
                       />
                     </a-form-item>
@@ -635,8 +745,92 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
                     <a-form-item label="数据库" name="database" :label-col="{span:4}" :wrapper-col="{span:20}"
                                  :rules="[{ required: true, message: '数据库名不可为空' }]">
                       <a-input
-                          v-model:value="newDataSourceRef.mysqlModel.database"
-                          :title="newDataSourceRef.mysqlModel.database"
+                          v-model:value="dataSourceEditModalRef.mysqlModel.database"
+                          :title="dataSourceEditModalRef.mysqlModel.database"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </a-form>
+            </a-col>
+          </a-row>
+        </a-row>
+        <!--mariadb-->
+        <a-row v-if="isEqual(dataSourceEditModalRef.selectedDataSource,3)">
+          <a-row :gutter="50">
+            <a-col>驱动程序:
+              <a-typography-text code>MariaDB v3.0.2</a-typography-text>
+            </a-col>
+          </a-row>
+          <a-row style="margin-top: 20px">
+            <a-col>
+              <a-form
+                  :ref="formRef.mariaDbRef"
+                  :model="dataSourceEditModalRef.mariaDbModel"
+                  labelAlign="left"
+                  style="width: 470px"
+              >
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="名称" name="name" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '名称不可为空' },{max:24,message: '最大长度为24'}]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mariaDbModel.name"
+                          :title="dataSourceEditModalRef.mariaDbModel.name"
+                          allowClear/>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row :gutter="2">
+                  <a-col :span="16">
+                    <a-form-item label="主机名" name="hostname" :label-col="{span:5}" :wrapper-col="{span:16,offset:1}"
+                                 :rules="[{ required: true, message: '主机名不可为空' }]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mariaDbModel.hostname"
+                          :title="dataSourceEditModalRef.mariaDbModel.hostname"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                  <a-col :span="8">
+                    <a-form-item label="端口" name="port" :wrapper-col="{offset:2}"
+                                 :rules="[{ required: true, message: '端口号不可为空' }]">
+                      <a-input-number v-model:value="dataSourceEditModalRef.mariaDbModel.port" :min="0"/>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="用户名" name="username" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '用户名不可为空' }]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mariaDbModel.username"
+                          :title="dataSourceEditModalRef.mariaDbModel.username"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="密码" name="password" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '密码不可为空' }]">
+                      <a-input-password
+                          v-model:value="dataSourceEditModalRef.mariaDbModel.password"
+                          :title="dataSourceEditModalRef.mariaDbModel.password"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="数据库" name="database" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '数据库名不可为空' }]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mariaDbModel.database"
+                          :title="dataSourceEditModalRef.mariaDbModel.database"
                           allowClear
                       />
                     </a-form-item>
@@ -652,24 +846,27 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
     <template #footer>
       <a-space style="float: left">
         <a-button type="link" @click="onDataSourceTest">测试连接</a-button>
-        <loading-outlined v-if="newDataSourceRef.test.isTesting"/>
+        <loading-outlined v-if="dataSourceEditModalRef.test.isTesting"/>
         <check-outlined class="success-icon"
-                        v-if="!isEmpty( newDataSourceRef.test.result.title) && newDataSourceRef.test.isSuccess"/>
+                        v-if="!isEmpty( dataSourceEditModalRef.test.result.title) && dataSourceEditModalRef.test.isSuccess"/>
         <exclamation-circle-outlined class="warn-icon"
-                                     v-if="!isEmpty( newDataSourceRef.test.result.title) && !newDataSourceRef.test.isSuccess"/>
-        <a-popover v-if="newDataSourceRef.test.result.showResult" :visible="newDataSourceRef.test.result.visible">
-          <template #content v-if="!isEmpty(newDataSourceRef.test.result.content)">
+                                     v-if="!isEmpty( dataSourceEditModalRef.test.result.title) && !dataSourceEditModalRef.test.isSuccess"/>
+        <a-popover v-if="dataSourceEditModalRef.test.result.showResult"
+                   :visible="dataSourceEditModalRef.test.result.visible">
+          <template #content v-if="!isEmpty(dataSourceEditModalRef.test.result.content)">
             <a-space>
-              {{ newDataSourceRef.test.result.content }}
-              <close-outlined @click="newDataSourceRef.test.result.visible=false"/>
+              {{ dataSourceEditModalRef.test.result.content }}
+              <close-outlined @click="dataSourceEditModalRef.test.result.visible=false"/>
             </a-space>
 
           </template>
-          <span @click="newDataSourceRef.test.result.visible=true">{{ newDataSourceRef.test.result.title }}</span>
+          <span @click="dataSourceEditModalRef.test.result.visible=true">{{
+              dataSourceEditModalRef.test.result.title
+            }}</span>
         </a-popover>
       </a-space>
-      <a-button @click="newDataSourceRef.modalVisible = false">取消</a-button>
-      <a-button type="primary" @click="onAddDataSource" :loading="newDataSourceRef.loading">确定</a-button>
+      <a-button @click="dataSourceEditModalRef.modalVisible = false">取消</a-button>
+      <a-button type="primary" @click="onSubmitDSForm" :loading="dataSourceEditModalRef.loading">确定</a-button>
     </template>
   </a-modal>
 </template>
@@ -698,7 +895,7 @@ const expandIconPosition = ref<CollapseProps['expandIconPosition']>('right');
   .close-btn {
     position: absolute;
     right: 1%;
-    top: 3%;
+    top: 5%;
     font-size: 15px;
   }
 }
