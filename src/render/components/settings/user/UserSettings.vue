@@ -12,7 +12,7 @@ import {
   registerCheck,
   updateUserInfoByUserId
 } from "@render/api/user.api";
-import {Form, message, Modal} from "ant-design-vue";
+import {Form, FormInstance, message, Modal} from "ant-design-vue";
 import {store} from "@render/store";
 import {
   CheckOutlined,
@@ -352,6 +352,7 @@ const commonAccountRef = reactive({
   isSubmit: false,
   isSet: false
 })
+const commonAccountFormRef = ref<FormInstance>()
 
 /*常用账号保存*/
 const onCommonAccountFormSubmit = () => {
@@ -381,6 +382,12 @@ const onAccountReset = () => {
   })
 }
 
+/*表单关闭*/
+const onHideCommonAccountForm = () => {
+  commonAccountRef.isForm = false
+  commonAccountFormRef.value.resetFields()
+}
+
 const commonPasswordRef = reactive({
   isForm: false,
   model: {
@@ -392,6 +399,7 @@ const commonPasswordRef = reactive({
   isSubmit: false,
   isSet: false
 })
+const commonPasswordFormRef = ref<FormInstance>()
 
 /*常用密码保存*/
 const onCommonPasswordFormSubmit = () => {
@@ -419,6 +427,12 @@ const onPasswordReset = () => {
       message.warn('重置失败')
     }
   })
+}
+
+/*表单关闭*/
+const onHideCommonPasswordForm = () => {
+  commonPasswordRef.isForm = false
+  commonPasswordFormRef.value.resetFields()
 }
 
 onMounted(async () => {
@@ -616,10 +630,11 @@ onMounted(async () => {
                   @click="onAccountReset">重置
         </a-button>
         <a-form
-            class="animate__animated animate__flipInX"
+            class="animate__animated animate__flipInX row-card-form"
             v-show="commonAccountRef.isForm"
             :model="commonAccountRef.model"
             @finish="onCommonAccountFormSubmit"
+            ref="commonAccountFormRef"
         >
           <a-input-group compact>
             <a-form-item name="commonAccount" style="width: 200px" :rules="commonAccountRef.rules.commonAccount">
@@ -632,7 +647,7 @@ onMounted(async () => {
                   :loading="commonAccountRef.isSubmit"
               >保存
               </a-button>
-              <a-button v-if="isEmpty(commonAccountRef.model.commonAccount)" @click="commonAccountRef.isForm = false">
+              <a-button v-if="isEmpty(commonAccountRef.model.commonAccount)" @click="onHideCommonAccountForm">
                 取消
               </a-button>
             </a-form-item>
@@ -657,14 +672,16 @@ onMounted(async () => {
                   @click="onPasswordReset">重置
         </a-button>
         <a-form
-            class="animate__animated animate__flipInX"
+            class="animate__animated animate__flipInX row-card-form"
             v-show="commonPasswordRef.isForm"
             :model="commonPasswordRef.model"
             @finish="onCommonPasswordFormSubmit"
+            ref="commonPasswordFormRef"
         >
           <a-input-group compact>
             <a-form-item name="commonPassword" style="width: 200px" :rules="commonPasswordRef.rules.commonPassword">
-              <a-input-password v-model:value="commonPasswordRef.model.commonPassword" placeholder="请输入常用密码" allow-clear/>
+              <a-input-password v-model:value="commonPasswordRef.model.commonPassword" placeholder="请输入常用密码"
+                                allow-clear/>
             </a-form-item>
             <a-form-item>
               <a-button
@@ -674,7 +691,7 @@ onMounted(async () => {
               >保存
               </a-button>
               <a-button v-if="isEmpty(commonPasswordRef.model.commonPassword)"
-                        @click="commonPasswordRef.isForm = false">
+                        @click="onHideCommonPasswordForm">
                 取消
               </a-button>
             </a-form-item>
@@ -702,5 +719,4 @@ onMounted(async () => {
 :deep(.ant-form-item-explain-error) {
   font-size: 11px;
 }
-
 </style>

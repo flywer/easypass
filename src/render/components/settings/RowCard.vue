@@ -66,3 +66,9 @@ const props = defineProps({
 }
 
 </style>
+
+<style lang="less">
+.row-card-form{
+  max-height: 32px;
+}
+</style>

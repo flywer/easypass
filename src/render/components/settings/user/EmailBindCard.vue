@@ -264,7 +264,7 @@ const onNewEmailValidFormSubmit = () => {
       </a-space>
       <!--邮箱绑定表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailBindRef.isEmailForm"
           :model="emailBindRef.emailModel"
           @finish="onEmailFormSubmit"
@@ -286,7 +286,7 @@ const onNewEmailValidFormSubmit = () => {
       </a-form>
       <!--邮箱验证表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailBindRef.isValidCodeForm"
           :model="emailBindRef.validCodeModel"
           @finish="onValidCodeFormSubmit"
@@ -301,7 +301,7 @@ const onNewEmailValidFormSubmit = () => {
 
       <!--邮箱解绑表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailUnbindRef.isEmailUnbindForm"
           :model="emailUnbindRef.emailModel"
           @finish="onEmailUnbindSubmit"
@@ -323,7 +323,7 @@ const onNewEmailValidFormSubmit = () => {
       </a-form>
       <!--邮箱解绑验证表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailUnbindRef.isValidCodeForm"
           :model="emailUnbindRef.validCodeModel"
           @finish="onEmailUnbindValidFormSubmit"
@@ -338,7 +338,7 @@ const onNewEmailValidFormSubmit = () => {
 
       <!--邮箱换绑表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailChangeRef.isEmailChangeForm"
           :model="emailChangeRef.emailModel"
           @finish="onEmailChangeFormSubmit"
@@ -360,7 +360,7 @@ const onNewEmailValidFormSubmit = () => {
       </a-form>
       <!--邮箱换绑验证表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailChangeRef.isValidCodeForm"
           :model="emailChangeRef.validCodeModel"
           @finish="onEmailChangeValidFormSubmit"
@@ -372,9 +372,10 @@ const onNewEmailValidFormSubmit = () => {
           <a-button html-type="submit">确认</a-button>
         </a-input-group>
       </a-form>
+
       <!--新邮箱绑定表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailChangeRef.isNewEmailForm"
           :model="emailChangeRef.emailModel"
           @finish="onNewEmailFormSubmit"
@@ -396,7 +397,7 @@ const onNewEmailValidFormSubmit = () => {
       </a-form>
       <!--新邮箱验证表单-->
       <a-form
-          class="animate__animated animate__flipInX"
+          class="animate__animated animate__flipInX row-card-form"
           v-show="emailChangeRef.isNewEmailValidCodeForm"
           :model="emailChangeRef.newEmailValidCodeModel"
           @finish="onNewEmailValidFormSubmit"

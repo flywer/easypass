@@ -392,7 +392,7 @@ onMounted(() => {
         </div>
         <!--设置令牌-->
         <a-form
-            class="animate__animated animate__flipInX"
+            class="animate__animated animate__flipInX row-card-form"
             v-show="appTokenRef.isShowTokenForm"
             :model="appTokenRef.model"
             @finish="onAppTokenSubmit"
@@ -580,5 +580,9 @@ onMounted(() => {
 
 .tool-btn:hover {
   background-color: @primary-1;
+}
+
+:deep(.ant-form-item-explain-error) {
+  font-size: 11px;
 }
 </style>
