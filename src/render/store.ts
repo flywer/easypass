@@ -11,7 +11,6 @@ export const store = reactive({
     isLogin: false,
     selectedMenuKeys: ['100'],
     user: <typeof User>{},
-    loginMode: '02',
     hasUpdates: false,/*发现可更新版本*/
     emailValidCode: '',
     haveToken: false,/*是否使用了应用令牌*/

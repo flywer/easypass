@@ -164,20 +164,6 @@ export class AppController {
     }
 
     /**
-     * 设置登录模式
-     * @param setup
-     * @constructor
-     */
-    @IpcHandle(channel.app.setLoginMode)
-    public async HandleSetLoginMode(setup) {
-        //获取本地设置文件
-        const appSettings = await getAppSettings()
-        /*登录模式*/
-        appSettings.loginMode = setup
-        jsonfileWrite(this.appSettingsFile.getFullPath(), appSettings, {spaces: 2})
-    }
-
-    /**
      * 获取应用设置
      * @constructor
      */

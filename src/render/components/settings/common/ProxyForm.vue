@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {createVNode, onMounted, reactive, ref} from "vue";
 import {cloneDeep, isEqual} from 'lodash-es'
-import {appRelaunch, getAppProxySettings, setLoginMode, setProxy} from "@render/api/app.api";
+import {appRelaunch, getAppProxySettings, setProxy} from "@render/api/app.api";
 import {Form, message, Modal} from "ant-design-vue";
 import {Rule} from "ant-design-vue/es/form";
 import {ExclamationCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons-vue";

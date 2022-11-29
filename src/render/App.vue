@@ -8,7 +8,7 @@ import {
   downloadUpdate,
   getAppSettings,
   getAppTheme, getTokenSettings,
-  quitAndInstall, setLoginMode
+  quitAndInstall
 } from "@render/api/app.api";
 import {store} from "@render/store";
 import {ipcInstance} from "@render/plugins";
@@ -95,13 +95,6 @@ onMounted(async () => {
     }
   })
 
-  const appSettings = (await getAppSettings()).data.result
-  if (typeof (appSettings.loginMode) == "undefined") { //默认跨平台模式
-    await setLoginMode('02')
-    store.loginMode = '02'
-  } else {
-    store.loginMode = appSettings.loginMode
-  }
   await autoThemeConfig()
   updateDownloadedListener()
   autoCheckUpdates()

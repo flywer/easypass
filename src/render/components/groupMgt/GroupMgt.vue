@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {useRoute} from 'vue-router'
-import {computed, createVNode, h, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
+import {computed, createVNode, h, onMounted, reactive, ref, watch} from 'vue'
 import {
   MoreOutlined,
   PlusOutlined,
@@ -25,10 +24,8 @@ import {
 } from "@render/api/group.api";
 import {useRouter} from "vue-router";
 import {store} from "@render/store";
-import SaveGroupModal from "@render/components/groupMgt/SaveGroupModal.vue";
-import {Button, message, Modal, notification} from "ant-design-vue";
+import {message, Modal} from "ant-design-vue";
 import empty from '@render/assets/img/empty.png'
-import LoginModal from "@render/components/common/LoginModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {cloneDeep, isEqual, isNull} from "lodash-es";
 import {isEmpty} from "lodash";
@@ -36,14 +33,8 @@ import {randomColor} from "@render/utils/randomColor";
 import {routeName} from "@render/router";
 
 //路由
-const route = useRoute()
 const router = useRouter()
-// 菜单key
-const menuKey = ref<string>('100')
 
-watch(() => route.params.key, (newValue) => {
-  menuKey.value = (newValue as string) // 断言推断，类型选择
-})
 //是否显示新增弹窗
 const saveModalVisible = ref<boolean>(false)
 //是否显示更新弹窗
@@ -259,6 +250,7 @@ const onAddGroup = () => {
     message.warn('尚未登录')
 }
 
+/*导出ref*/
 const exportGroupRef = reactive({
   modalVisible: false,
   checkedGroupList: [],
@@ -267,19 +259,22 @@ const exportGroupRef = reactive({
   loading:false
 })
 
+/*显示导出弹窗*/
 const onShowExportModal = async () => {
   exportGroupRef.modalVisible = true
   exportGroupRef.groupList = (await getGroupListByUserInfo({id: store.user.id})).data.result
   exportGroupRef.checkedGroupList = [] /*初始化*/
 }
+/*全选检测*/
 watch(() => exportGroupRef.checkedGroupList, (value) => {
   exportGroupRef.isCheckedAll = isEqual(value.length, exportGroupRef.groupList.length);/*是否全选*/
 })
 
+/*全选*/
 const onCheckedAll = () => {
   exportGroupRef.checkedGroupList = cloneDeep(exportGroupRef.groupList.map(item => item.id))
 }
-
+/*全不选*/
 const onUncheckedAll = () => {
   exportGroupRef.checkedGroupList = []
 }
@@ -410,8 +405,6 @@ const onExport = () => {
            :closable="true"
            ok-text="导出至"
            cancel-text="取消"
-           @ok=""
-           @cancel=""
   >
     <div style="max-height: 245px;overflow-y: auto;">
       <a-checkbox-group v-model:value="exportGroupRef.checkedGroupList">

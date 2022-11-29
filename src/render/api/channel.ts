@@ -19,7 +19,6 @@ export const channel = reactive({
         getAppInfo: 'app/getAppInfo',
         getAppSettings: 'app/getAppSettings',
         setAppSettings: 'app/setAppSettings',
-        setLoginMode: 'app/setLoginMode',
         relaunch: 'app/relaunch',
         setProxy: 'app/setProxy',
         getAppProxySettings: 'app/getAppProxySettings',

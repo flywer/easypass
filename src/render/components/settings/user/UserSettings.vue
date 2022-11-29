@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
-import {createVNode, onMounted, reactive, ref, watch} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import {cloneDeep, isEmpty, isEqual, isNull, isUndefined, random} from "lodash-es";
 import {
   cancellation,
@@ -27,44 +27,11 @@ import {copyText} from "@render/utils/clipboard";
 import {
   appRelaunch,
   getCommonTextContent,
-  setAppToken,
   setCommonAccount,
-  setCommonPassword,
-  setLoginMode
+  setCommonPassword
 } from "@render/api/app.api";
 import {Rule} from "ant-design-vue/es/form";
-import {sendEmail} from "@render/api/utils.api";
-import {randomValidCode} from "@render/utils/randomValidCode";
 import EmailBindCard from "@render/components/settings/user/EmailBindCard.vue";
-
-//region 账号模式
-//登录模式切换
-const loginMode = ref()
-onMounted(() => {
-  loginMode.value = store.loginMode
-})
-
-/*切换账号模式*/
-const onLoginModeChange = () => {
-  Modal.confirm({
-    title: '切换数据源',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: '此操作需要重启应用，是否继续？',
-    okText: '确认',
-    cancelText: '取消',
-    async onOk() {
-      store.loginMode = loginMode.value
-      await setLoginMode(store.loginMode)
-      await onLogout()
-      await appRelaunch()
-    },
-    onCancel() {
-      loginMode.value = store.loginMode
-    }
-  });
-}
-
-//endregion
 
 //region 用户登录、注册
 const loginCardRef = reactive({
@@ -449,27 +416,6 @@ onMounted(async () => {
 
 <template>
   <a-layout-content class="setting-content">
-    <!--账号模式-->
-    <!--    <RowCard>
-          <template #left>账号模式
-          </template>
-          <template #right>
-            <a-radio-group v-model:value="loginMode" button-style="solid" @change="onLoginModeChange">
-              <a-radio-button value="01">
-                <a-tooltip>
-                  <template #title>本地存储</template>
-                  本地
-                </a-tooltip>
-              </a-radio-button>
-              <a-radio-button value="02">
-                <a-tooltip>
-                  <template #title>账号可在其他设备登录</template>
-                  跨平台
-                </a-tooltip>
-              </a-radio-button>
-            </a-radio-group>
-          </template>
-        </RowCard>-->
     <!--用户登录-->
     <RowCard v-if="!store.isLogin" class="user-login-card">
       <template #left>用户{{ loginCardRef.titleText }}</template>
