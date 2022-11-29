@@ -1,10 +1,26 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {nextTick, onMounted, ref, watch} from "vue";
 import UISettings from "@render/components/settings/ui/UISettings.vue";
 import CommonSettings from "@render/components/settings/common/CommonSettings.vue";
 import UserSettings from "@render/components/settings/user/UserSettings.vue";
+import {useRoute} from "vue-router";
+import {isNull} from "lodash-es";
 
 const tabActiveKey = ref('1')
+const route = useRoute()
+
+onMounted(()=>{
+    if (!isNull(route.params.tabActiveKey)) {
+      tabActiveKey.value = route.params.tabActiveKey as string
+    }
+})
+
+watch(() => route.params.tabActiveKey, (value) => {
+  if (!isNull(value)) {
+    tabActiveKey.value = value as string
+  }
+})
+
 </script>
 
 <template>

@@ -8,8 +8,17 @@ const GroupItemTableForm = () => import('@render/components/groupItemMgt/SaveOrU
 const CommonAccount = () => import('@render/components/groupItemMgt/CommonAccount.vue')
 const DataSourceMgt = () => import('@render/components/dataSourceMgt/DataSourceMgt.vue')
 
+export const routeName = {
+    GROUP_MGT: 'groupMgt',
+    COMMON_ACCOUNT: 'commonAccount',
+    SETTINGS: 'settings',
+    GROUP_ITEM: 'groupItems',
+    GROUP_ITEM_TABLE_FORM: 'groupItemTableForm',
+    DATA_SOURCE: 'dataSource'
+}
+
+
 // 定义一些路由
-// 每个路由都需要映射到一个组件。
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -17,29 +26,29 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/group/:key',
-        name: 'groupMgt',
+        name: routeName.GROUP_MGT,
         component: GroupMgt,
     },
     {
         path: '/commonAccount',
-        name: 'commonAccount',
+        name: routeName.COMMON_ACCOUNT,
         component: CommonAccount
     },
     {
-        path: '/settings',
-        name: 'settings',
+        path: '/settings/:tabActiveKey',
+        name: routeName.SETTINGS,
         component: Settings,
     }, {
         path: '/items',
-        name: 'groupItems',
+        name: routeName.GROUP_ITEM,
         component: GroupItems,
     }, {
         path: '/save_item',
-        name: 'groupItemTableForm',
+        name: routeName.GROUP_ITEM_TABLE_FORM,
         component: GroupItemTableForm,
     }, {
         path: '/dataSource',
-        name: 'dataSource',
+        name: routeName.DATA_SOURCE,
         component: DataSourceMgt,
     }
 ]

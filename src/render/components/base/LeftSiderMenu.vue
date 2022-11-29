@@ -3,6 +3,26 @@
 import {DatabaseOutlined, DesktopOutlined, LockOutlined, SettingOutlined, UploadOutlined,} from '@ant-design/icons-vue'
 import {store} from "@render/store";
 import AppBottomTool from "@render/components/base/AppBottomTool.vue";
+import {useRouter} from "vue-router";
+import {MenuProps} from "ant-design-vue";
+import {routeName} from "@render/router";
+
+const router = useRouter()
+
+const handleClick: MenuProps['onClick'] = menuInfo => {
+  store.selectedMenuKeys = [menuInfo.key as string]
+  const value = menuInfo.key as string
+  if (value === '100') {
+    router.push({name: routeName.GROUP_MGT, params: {key: value}})
+  } else if (value === '200') {
+    router.push({name: routeName.COMMON_ACCOUNT})
+  } else if (value === '400') {
+    router.push({name: routeName.DATA_SOURCE})
+  } else if (value === '500') {
+    router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}})
+  }
+}
+
 </script>
 
 <template>
@@ -16,6 +36,7 @@ import AppBottomTool from "@render/components/base/AppBottomTool.vue";
         mode="inline"
         style="height: 472px;
         user-select: none;"
+        @click="handleClick"
     >
       <a-menu-item key="100">
         <LockOutlined/>

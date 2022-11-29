@@ -20,6 +20,7 @@ import {cloneDeep, isNull, isUndefined} from "lodash-es";
 import {Model} from "sequelize";
 import {useRouter} from "vue-router";
 import AppTokenValid from "@render/components/base/AppTokenValid.vue";
+import {routeName} from "@render/router";
 
 const router = useRouter()
 
@@ -72,7 +73,7 @@ const openUnLoginNotification = () => {
               size: 'small',
               onClick: () => {
                 store.selectedMenuKeys = ['500']
-                router.push({name: 'settings'})
+                router.push({name: routeName.SETTINGS})
                 notification.close(notificationKey)
               },
             },

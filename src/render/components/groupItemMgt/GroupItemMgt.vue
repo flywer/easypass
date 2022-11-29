@@ -19,6 +19,7 @@ import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {isEmpty, isEqual} from "lodash-es";
 import GroupItemCard from "@render/components/groupItemMgt/GroupItemCard.vue";
+import {routeName} from "@render/router";
 
 const router = useRouter()
 //从后端传过来的分组数据
@@ -71,7 +72,7 @@ onMounted(async () => {
 // click:显示添加账号项
 const showAddItemModal = () => {
   router.push({
-    name: 'groupItemTableForm',
+    name: routeName.GROUP_ITEM_TABLE_FORM,
     query: {
       groupId: store.currentGroupId
     }

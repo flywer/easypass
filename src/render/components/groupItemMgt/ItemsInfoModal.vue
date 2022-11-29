@@ -57,7 +57,7 @@ const itemId = computed(() => {
 const editItems = () => {
   router.push(
       {
-        name: 'groupItemTableForm',
+        name: routeName.GROUP_ITEM_TABLE_FORM,
         query: {itemId: itemId.value}
       }
   )

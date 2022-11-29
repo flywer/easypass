@@ -41,6 +41,7 @@ import {isNull} from "lodash-es";
 import {h} from "vue";
 import {useRouter} from "vue-router";
 import {uuid} from "vue3-uuid";
+import {routeName} from "@render/router";
 
 const router = useRouter()
 
@@ -55,7 +56,7 @@ const onLockApp = () => {
         h('a', {
           onClick: () => {
             store.selectedMenuKeys = ['500']
-            router.push({name: 'settings'}).then(() => {
+            router.push({name: routeName.SETTINGS, params: {tabActiveKey: '3'}}).then(() => {
               message.destroy()
             })
           }
@@ -76,7 +77,7 @@ const onCopyCommonAccount = () => {
           h('a', {
             onClick: () => {
               store.selectedMenuKeys = ['500']
-              router.push({name: 'settings'}).then(() => {
+              router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}}).then(() => {
                 message.destroy()
               })
             }
@@ -98,7 +99,7 @@ const onCopyCommonPassword = () => {
           h('a', {
             onClick: () => {
               store.selectedMenuKeys = ['500']
-              router.push({name: 'settings'}).then(() => {
+              router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}}).then(() => {
                 message.destroy()
               })
             }

@@ -33,6 +33,7 @@ import SearchInput from "@render/components/common/SearchInput.vue";
 import {cloneDeep, isEqual, isNull} from "lodash-es";
 import {isEmpty} from "lodash";
 import {randomColor} from "@render/utils/randomColor";
+import {routeName} from "@render/router";
 
 //路由
 const route = useRoute()
@@ -140,7 +141,7 @@ const showGroupItem = (id: string, name: string, isEdit: boolean) => {
   if (!isEdit) {
     store.currentGroupId = id
     store.currentGroupName = name
-    router.push({name: 'groupItems'})
+    router.push({name: routeName.GROUP_ITEM})
   }
 }
 

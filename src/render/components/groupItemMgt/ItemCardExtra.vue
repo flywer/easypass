@@ -22,6 +22,7 @@ import {
 } from '@ant-design/icons-vue'
 import {getGroupListByUserInfo} from "@render/api/group.api";
 import {store} from "@render/store";
+import {routeName} from "@render/router";
 
 const router = useRouter()
 
@@ -62,7 +63,7 @@ const showAccountItems = async (itemId: string) => {
 const showUpdateModal = (itemId: string) => {
   router.push(
       {
-        name: 'groupItemTableForm',
+        name: routeName.GROUP_ITEM_TABLE_FORM,
         query: {
           itemId: itemId,
           groupId: props.item.groupId
