@@ -40,26 +40,53 @@ import {copyText} from "@render/utils/clipboard";
 import {isNull} from "lodash-es";
 import {h} from "vue";
 import {useRouter} from "vue-router";
+import {uuid} from "vue3-uuid";
 
 const router = useRouter()
+
+const lockAppKey = uuid.v1();
 const onLockApp = () => {
   if (store.haveToken)
     lockApp()
-  else
-    message.info('未设置应用令牌')
+  else {
+    message.info({
+      content: [
+        h('span', {}, '未设置应用令牌，'),
+        h('a', {
+          onClick: () => {
+            store.selectedMenuKeys = ['500']
+            router.push({name: 'settings'}).then(() => {
+              message.destroy()
+            })
+          }
+        }, '前往设置')], key: lockAppKey
+    })
+  }
 }
 
+const commonAccountKey = uuid.v1();
 const onCopyCommonAccount = () => {
   getCommonTextContent().then(res => {
     if (res.data.success) {
       if (!isNull(res.data.result.commonAccount))
         copyText(res.data.result.commonAccount, true);
-      else message.info('未设置常用账户')
+      else message.info({
+        content: [
+          h('span', {}, '未设置常用账户，'),
+          h('a', {
+            onClick: () => {
+              store.selectedMenuKeys = ['500']
+              router.push({name: 'settings'}).then(() => {
+                message.destroy()
+              })
+            }
+          }, '前往设置')], key: commonAccountKey
+      })
     }
   })
 }
 
-const Key1 = `open${Date.now()}`;
+const commonPasswordKey = uuid.v1();
 const onCopyCommonPassword = () => {
   getCommonTextContent().then(res => {
     if (res.data.success) {
@@ -71,11 +98,11 @@ const onCopyCommonPassword = () => {
           h('a', {
             onClick: () => {
               store.selectedMenuKeys = ['500']
-              router.push({name: 'settings'})
-              notification.close(Key1)
+              router.push({name: 'settings'}).then(() => {
+                message.destroy()
+              })
             }
-          }, '前往设置')]
-        , key: Key1
+          }, '前往设置')], key: commonPasswordKey
       })
     }
   })

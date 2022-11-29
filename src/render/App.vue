@@ -71,7 +71,6 @@ const openUnLoginNotification = () => {
               type: 'primary',
               size: 'small',
               onClick: () => {
-                //settings.value.click()
                 store.selectedMenuKeys = ['500']
                 router.push({name: 'settings'})
                 notification.close(notificationKey)
@@ -106,6 +105,7 @@ onMounted(async () => {
   updateDownloadedListener()
   autoCheckUpdates()
   await appTokenInit()
+  antMessageInit()
 })
 
 /*应用令牌初始化*/
@@ -170,6 +170,14 @@ const autoCheckUpdates = () => {
   })
 }
 
+/*全局消息弹窗全局设置*/
+const antMessageInit = () => {
+  message.config({
+    top: '32px',
+    maxCount: 4,
+    duration:2
+  })
+}
 </script>
 
 <template>
