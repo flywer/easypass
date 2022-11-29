@@ -256,7 +256,7 @@ const exportGroupRef = reactive({
   checkedGroupList: [],
   groupList: [],/*待选列表*/
   isCheckedAll: false,
-  loading:false
+  loading: false
 })
 
 /*显示导出弹窗*/
@@ -290,7 +290,7 @@ const onExport = () => {
       message.error(res.data.message)
       exportGroupRef.modalVisible = false
     }
-  }).then(()=>{
+  }).then(() => {
     exportGroupRef.loading = false
   })
 }
@@ -427,7 +427,9 @@ const onExport = () => {
       <a-button v-if="!exportGroupRef.isCheckedAll" style="float: left" @click="onCheckedAll">全选</a-button>
       <a-button v-if="exportGroupRef.isCheckedAll" style="float: left" @click="onUncheckedAll">取消全选</a-button>
       <a-button @click="exportGroupRef.modalVisible = false">取消</a-button>
-      <a-button type="primary" :disabled="isNull(exportGroupRef.checkedGroupList)" @click="onExport" :loading="exportGroupRef.loading">导出至</a-button>
+      <a-button type="primary" :disabled="isNull(exportGroupRef.checkedGroupList)" @click="onExport"
+                :loading="exportGroupRef.loading">导出至
+      </a-button>
     </template>
   </a-modal>
 </template>

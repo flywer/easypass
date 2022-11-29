@@ -60,7 +60,7 @@ export class GroupItemController {
             let count: number
             if (groupItemVo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList,false)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList, false)
                 rows = data.rows
                 count = data.count
             } else {
@@ -112,7 +112,7 @@ export class GroupItemController {
             let count: number
             if (groupItemVo.value != null) {
                 //模糊搜索
-                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList,true)
+                let data = await this.groupItemService.getAllItemsTitleListByPage(groupItemVo, groupIdList, true)
                 rows = data.rows
                 count = data.count
             } else {

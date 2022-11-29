@@ -8,7 +8,7 @@ import {trayInit} from "@main/app/app.tray";
 import {GroupItemController} from "@main/controller/groupItem.controller";
 import installExtension from 'electron-devtools-installer'
 import {UserController} from "@main/controller/user.controller";
-import {getAppDbStat, getAppProxySettings, getAppSettings} from "@common/utils/utils";
+import {getAppDataPath, getAppDbStat, getAppPath, getAppProxySettings, getAppSettings} from "@common/utils/utils";
 import log from 'electron-log'
 import {groupInit} from "@main/model/group";
 import {GroupItemInit} from "@main/model/groupItem";
@@ -17,6 +17,8 @@ import {databaseInit} from "@main/mapper/databaseInit";
 import {isEqual, isNull} from "lodash";
 import {appLogInit} from "@main/app/app.log";
 import {QueryTypes} from "sequelize";
+import fs from "fs";
+import path, {join} from "path";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -93,6 +95,8 @@ async function bootstrap() {
     try {
         appLogInit()
 
+        appDataFolderInit()
+
         await electronAppInit()
 
         await createEinf({
@@ -146,4 +150,13 @@ async function installVueDevtools() {
     } catch (e) {
         log.error('Vue Devtools failed to install:', e)
     }
+}
+
+/**
+ * 创建config文件夹，防止不存在报错
+ */
+function appDataFolderInit() {
+    fs.mkdir(join(getAppDataPath(), 'config'), {recursive: true}, (error) => {
+        if (error) log.error(error)
+    })
 }
