@@ -1,29 +1,19 @@
 <!-- 中心内容组件载体 -->
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue'
+import {watch} from 'vue'
 import {useRouter} from 'vue-router'
-import {getNetworkInterfaces} from "@render/api/app.api";
-
-const props = defineProps({
-  menuKey: {
-    type: String,
-    default: '',
-  },
-})
+import {store} from "@render/store";
 
 const router = useRouter()
 
-const menuKeyValue = ref('')
-
-watch(() => props.menuKey, () => {
-  menuKeyValue.value = props.menuKey
-  if (props.menuKey === '100') {
-    router.push({name: 'groupMgt', params: {key: props.menuKey}})
-  } else if (props.menuKey === '200') {
+watch(() => store.selectedMenuKeys.at(0), (value) => {
+  if (value === '100') {
+    router.push({name: 'groupMgt', params: {key: value}})
+  } else if (value === '200') {
     router.push({name: 'commonAccount'})
-  } else if (props.menuKey === '400') {
+  } else if (value === '400') {
     router.push({name: 'dataSource'})
-  } else if (props.menuKey === '500') {
+  } else if (value === '500') {
     router.push({name: 'settings'})
   }
 })

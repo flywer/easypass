@@ -21,13 +21,7 @@ import {Model} from "sequelize";
 import {useRouter} from "vue-router";
 import AppTokenValid from "@render/components/base/AppTokenValid.vue";
 
-const manuKey = ref('')
 const router = useRouter()
-
-// 接收子组件传过来的值，此为响应函数
-const getMenuKey = (value) => {
-  manuKey.value = value
-}
 
 //配置动态主题
 const autoThemeConfig = async () => {
@@ -184,9 +178,9 @@ const autoCheckUpdates = () => {
     <a-layout has-sider style="min-height: 100vh;">
       <AppTokenValid v-show="store.haveToken && store.showTokenPanel"/>
       <!-- 左菜单 -->
-      <LeftSiderMenu v-show="!store.showTokenPanel" @getKey="getMenuKey"/>
+      <LeftSiderMenu v-show="!store.showTokenPanel"/>
       <!-- 中心内容组件载体 -->
-      <CenterContent v-show="!store.showTokenPanel" :menu-key="manuKey"/>
+      <CenterContent v-show="!store.showTokenPanel"/>
     </a-layout>
   </a-config-provider>
 </template>

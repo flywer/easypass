@@ -35,9 +35,13 @@
 import {LockOutlined} from "@ant-design/icons-vue";
 import {store} from "@render/store";
 import {getCommonTextContent, lockApp} from "@render/api/app.api";
-import {message} from "ant-design-vue";
+import {message, notification} from "ant-design-vue";
 import {copyText} from "@render/utils/clipboard";
+import {isNull} from "lodash-es";
+import {h} from "vue";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 const onLockApp = () => {
   if (store.haveToken)
     lockApp()
@@ -48,15 +52,31 @@ const onLockApp = () => {
 const onCopyCommonAccount = () => {
   getCommonTextContent().then(res => {
     if (res.data.success) {
-      copyText(res.data.result.commonAccount, true);
+      if (!isNull(res.data.result.commonAccount))
+        copyText(res.data.result.commonAccount, true);
+      else message.info('未设置常用账户')
     }
   })
 }
 
+const Key1 = `open${Date.now()}`;
 const onCopyCommonPassword = () => {
   getCommonTextContent().then(res => {
     if (res.data.success) {
-      copyText(res.data.result.commonPassword, true);
+      if (!isNull(res.data.result.commonPassword))
+        copyText(res.data.result.commonPassword, true);
+      else message.info({
+        content: [
+          h('span', {}, '未设置常用密码，'),
+          h('a', {
+            onClick: () => {
+              store.selectedMenuKeys = ['500']
+              router.push({name: 'settings'})
+              notification.close(Key1)
+            }
+          }, '前往设置')]
+        , key: Key1
+      })
     }
   })
 }

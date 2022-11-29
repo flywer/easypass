@@ -3,15 +3,6 @@
 import {DatabaseOutlined, DesktopOutlined, LockOutlined, SettingOutlined, UploadOutlined,} from '@ant-design/icons-vue'
 import {store} from "@render/store";
 import AppBottomTool from "@render/components/base/AppBottomTool.vue";
-
-// 使用defineEmits注册一个自定义事件
-const emit = defineEmits(['getKey'])
-
-// 菜单点击事件，每次点击，通过getKey事件发送selectedKeys的值
-const menuClick = (item) => {
-  emit('getKey', item.key)
-}
-
 </script>
 
 <template>
@@ -23,7 +14,6 @@ const menuClick = (item) => {
         v-model:selectedKeys="store.selectedMenuKeys"
         theme="light"
         mode="inline"
-        @click="menuClick"
         style="height: 472px;
         user-select: none;"
     >
@@ -48,7 +38,6 @@ const menuClick = (item) => {
         <span>设置</span>
       </a-menu-item>
     </a-menu>
-
     <AppBottomTool/>
   </a-layout-sider>
 </template>
