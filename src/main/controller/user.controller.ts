@@ -268,7 +268,7 @@ export class UserController {
             if (await this.userService.registerCheck(userVo))
                 result = success()
             else
-                result = failure('账号重复，请重新输入')
+                result = failure('账号已存在，请重新输入')
         } catch (e) {
             log.error('注册检查操作失败', e)
             result = failure()
