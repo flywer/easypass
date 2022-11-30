@@ -1,11 +1,10 @@
 import {Controller, IpcHandle} from "einf";
 import {GroupItemService} from "@main/service/groupItem.service";
 import {channel} from "@render/api/channel";
-import {failure, Result, success} from "@main/vo/resultVo";
+import {failure, success} from "@main/vo/resultVo";
 import log, {error} from 'electron-log'
 import {GroupService} from "@main/service/group.service";
 import {IGroupItemVo, itemTypeEnum} from "@main/model/groupItem";
-import {updateGroupIdByItemId} from "@render/api/groupItem.api";
 
 @Controller()
 export class GroupItemController {

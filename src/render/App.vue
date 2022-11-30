@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {createVNode, h, onMounted, reactive, ref, watch} from 'vue'
+import {createVNode, h, onMounted, watch} from 'vue'
 import WindowBtn from '@render/components/base/WindowBtn.vue'
 import LeftSiderMenu from '@render/components/base/LeftSiderMenu.vue'
 import CenterContent from '@render/components/base/CenterContent.vue'
@@ -16,8 +16,7 @@ import {channel} from "@render/api/channel";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import config from "@common/config/appConfig.json"
 import {checkLogin} from "@render/api/user.api";
-import {cloneDeep, isNull, isUndefined} from "lodash-es";
-import {Model} from "sequelize";
+import {cloneDeep} from "lodash-es";
 import {useRouter} from "vue-router";
 import AppTokenValid from "@render/components/base/AppTokenValid.vue";
 import {routeName} from "@render/router";
@@ -74,7 +73,7 @@ const openUnLoginNotification = () => {
               onClick: () => {
                 store.selectedMenuKeys = ['500']
                 router.push({name: routeName.SETTINGS})
-                notification.close(notificationKey)
+                notification.destroy()
               },
             },
             {default: () => '登录'},
@@ -169,7 +168,7 @@ const antMessageInit = () => {
   message.config({
     top: '32px',
     maxCount: 4,
-    duration:2
+    duration: 2
   })
 }
 </script>

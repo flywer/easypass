@@ -10,5 +10,6 @@ export interface IpcResponse<T> {
 export enum dataSourceType {
     none,
     sqlite,
-    mysql
+    mysql,
+    mariadb
 }
