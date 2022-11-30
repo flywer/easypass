@@ -130,7 +130,15 @@ async function bootstrap() {
         });
     } catch (error) {
         log.error(error)
-        app.quit()
+        dialog.showMessageBox({
+            type: 'error',
+            title: '程序初始化失败',
+            message: error.toString(),
+            buttons: ['ok']
+        }).then(() => {
+            app.quit()
+        })
+
     }
 }
 
