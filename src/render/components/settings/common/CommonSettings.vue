@@ -28,7 +28,7 @@ import {
 } from '@ant-design/icons-vue'
 import ProxyForm from "@render/components/settings/common/ProxyForm.vue";
 import {Rule} from "ant-design-vue/es/form";
-import {cloneDeep, isEmpty, isEqual} from "lodash-es";
+import {isEmpty} from "lodash-es";
 import {byteConvert} from "@render/utils/byteConvert";
 import {copyText} from "@render/utils/clipboard";
 
