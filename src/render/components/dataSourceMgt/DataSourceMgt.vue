@@ -22,9 +22,10 @@ import {CollapseProps, FormInstance, message, Modal} from "ant-design-vue";
 import {cloneDeep, isEmpty, isEqual} from "lodash-es";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {defaultOpenDialogOptions, showAppOpenDialog, showAppSaveDialog} from "@render/utils/fileDialog";
-import sqlite from '@render/assets/img/db/sqlite.png'
-import mysql from '@render/assets/img/db/mysql.png'
-import mariadb from '@render/assets/img/db/mariadb.png'
+import sqliteIcon from '@render/assets/img/db/sqlite.png'
+import mysqlIcon from '@render/assets/img/db/mysql.png'
+import mariadbIcon from '@render/assets/img/db/mariadb.png'
+import mssqlIcon from '@render/assets/img/db/sql_server.png'
 import {dataSourceTest} from "@render/api/utils.api";
 import {uuid} from "vue3-uuid";
 
@@ -115,8 +116,8 @@ const onSubmitDSForm = () => {
   dataSourceEditModalRef.loading = true
 
   switch (dataSourceEditModalRef.selectedDataSource) {
-      /*sqlite*/
     case 1:
+      /*sqlite*/
       formRef.sqliteRef.value.validate().then(() => {
         const opt = {
           id: dataSourceEditModalRef.sqliteModel.id == null ? uuid.v1() : dataSourceEditModalRef.sqliteModel.id,
@@ -141,8 +142,8 @@ const onSubmitDSForm = () => {
         dataSourceEditModalRef.loading = false
       })
       break
-      /*mysql*/
     case 2:
+      /*mysql*/
       formRef.mysqlRef.value.validate().then(() => {
         let opt = cloneDeep(dataSourceEditModalRef.mysqlModel) as any
         opt.id = dataSourceEditModalRef.mysqlModel.id == null ? uuid.v1() : dataSourceEditModalRef.mysqlModel.id
@@ -164,13 +165,36 @@ const onSubmitDSForm = () => {
         dataSourceEditModalRef.loading = false
       })
       break
-      /*mariadb*/
     case 3:
+      /*mariadb*/
       formRef.mariaDbRef.value.validate().then(() => {
         let opt = cloneDeep(dataSourceEditModalRef.mariaDbModel) as any
         opt.id = dataSourceEditModalRef.mariaDbModel.id == null ? uuid.v1() : dataSourceEditModalRef.mariaDbModel.id
         opt.type = 3
         opt.dialect = 'mariadb'
+        saveOrUpdateDataSource(opt).then(res => {
+          if (res.data.success) {
+            message.success(res.data.message)
+            onRefresh()
+          } else {
+            message.error(res.data.message)
+          }
+        }).then(() => {
+          dataSourceEditModalRef.modalVisible = false
+          dataSourceEditModalRef.loading = false
+        })
+      }).catch(e => {
+        console.log(e)
+        dataSourceEditModalRef.loading = false
+      })
+      break
+    case 4:
+      /*mssql*/
+      formRef.mssqlRef.value.validate().then(() => {
+        let opt = cloneDeep(dataSourceEditModalRef.mssqlModel) as any
+        opt.id = dataSourceEditModalRef.mssqlModel.id == null ? uuid.v1() : dataSourceEditModalRef.mssqlModel.id
+        opt.type = 4
+        opt.dialect = 'mssql'
         saveOrUpdateDataSource(opt).then(res => {
           if (res.data.success) {
             message.success(res.data.message)
@@ -218,16 +242,20 @@ const dialectFormat = (type) => {
     return 'MySQL'
   else if (isEqual(type, 3))
     return 'MariaDB'
+  else if (isEqual(type, 4))
+    return 'SQL Server'
 }
 
 /*设置数据源图标*/
 const getDbIcon = (type: number) => {
   if (type == 1)
-    return sqlite
+    return sqliteIcon
   else if (type == 2)
-    return mysql
+    return mysqlIcon
   else if (type == 3)
-    return mariadb
+    return mariadbIcon
+  else if (type == 4)
+    return mssqlIcon
 }
 
 //endregion
@@ -238,7 +266,8 @@ const getDbIcon = (type: number) => {
 const formRef = {
   sqliteRef: ref<FormInstance>(),
   mysqlRef: ref<FormInstance>(),
-  mariaDbRef: ref<FormInstance>()
+  mariaDbRef: ref<FormInstance>(),
+  mssqlRef: ref<FormInstance>(),
 }
 
 /*新增数据源Ref*/
@@ -278,6 +307,15 @@ const dataSourceEditModalRef = reactive({
     username: '',
     password: '',
     database: ''
+  },
+  mssqlModel: {
+    id: null,
+    name: '',
+    hostname: '',
+    port: 1433,
+    username: '',
+    password: '',
+    database: ''
   }
 })
 
@@ -309,6 +347,15 @@ const onEdit = (ds: any) => {
       dataSourceEditModalRef.mariaDbModel.password = ds.password
       dataSourceEditModalRef.mariaDbModel.database = ds.database
       break
+    case 4:
+      dataSourceEditModalRef.mssqlModel.id = ds.id
+      dataSourceEditModalRef.mssqlModel.name = ds.name
+      dataSourceEditModalRef.mssqlModel.hostname = ds.hostname
+      dataSourceEditModalRef.mssqlModel.port = ds.port
+      dataSourceEditModalRef.mssqlModel.username = ds.username
+      dataSourceEditModalRef.mssqlModel.password = ds.password
+      dataSourceEditModalRef.mssqlModel.database = ds.database
+      break
   }
 }
 
@@ -334,6 +381,15 @@ const onShowDataSourceModal = () => {
     name: '',
     hostname: '',
     port: 3306,
+    username: '',
+    password: '',
+    database: ''
+  }
+  dataSourceEditModalRef.mssqlModel = {
+    id: null,
+    name: '',
+    hostname: '',
+    port: 1433,
     username: '',
     password: '',
     database: ''
@@ -368,57 +424,90 @@ const OnShowSaveDialog = async () => {
       dataSourceEditModalRef.sqliteModel.filePath = res
       await formRef.sqliteRef.value.validateFields('filePath')
     }
-
   }
 }
 
 /*测试连接*/
 const onDataSourceTest = async () => {
   dataSourceEditModalRef.test.isTesting = true
-  let result = null
-  if (dataSourceEditModalRef.selectedDataSource == 1) {
-    await formRef.sqliteRef.value.validate().then(async () => {
-      result = await dataSourceTest(
-          dataSourceEditModalRef.selectedDataSource,
-          {dialect: 'sqlite', storage: dataSourceEditModalRef.sqliteModel.filePath})
-    }).catch((e) => {
-      dataSourceEditModalRef.test.isTesting = false
-      return null
-    })
-  } else if (dataSourceEditModalRef.selectedDataSource == 2) {
-    await formRef.mysqlRef.value.validate().then(async () => {
-      result = await dataSourceTest(
-          dataSourceEditModalRef.selectedDataSource,
-          {
-            database: dataSourceEditModalRef.mysqlModel.database,
-            username: dataSourceEditModalRef.mysqlModel.username,
-            password: dataSourceEditModalRef.mysqlModel.password,
-            host: dataSourceEditModalRef.mysqlModel.hostname,
-            port: dataSourceEditModalRef.mysqlModel.port,
-            dialect: 'mysql'
-          })
-    }).catch((e) => {
-      dataSourceEditModalRef.test.isTesting = false
-      return null
-    })
-  } else if (dataSourceEditModalRef.selectedDataSource == 3) {
-    await formRef.mariaDbRef.value.validate().then(async () => {
-      result = await dataSourceTest(
-          dataSourceEditModalRef.selectedDataSource,
-          {
-            database: dataSourceEditModalRef.mariaDbModel.database,
-            username: dataSourceEditModalRef.mariaDbModel.username,
-            password: dataSourceEditModalRef.mariaDbModel.password,
-            host: dataSourceEditModalRef.mariaDbModel.hostname,
-            port: dataSourceEditModalRef.mariaDbModel.port,
-            dialect: 'mariadb'
-          })
-    }).catch((e) => {
-      dataSourceEditModalRef.test.isTesting = false
-      return null
-    })
+  /*结果初始化*/
+  dataSourceEditModalRef.test.result = {
+    showResult: false,
+    visible: false,
+    title: '',
+    content: ''
   }
 
+  let result = null
+
+  switch (dataSourceEditModalRef.selectedDataSource) {
+
+    case 1:
+      /*sqlite*/
+      await formRef.sqliteRef.value.validate().then(async () => {
+        result = await dataSourceTest(
+            dataSourceEditModalRef.selectedDataSource,
+            {dialect: 'sqlite', storage: dataSourceEditModalRef.sqliteModel.filePath})
+      }).catch((e) => {
+        dataSourceEditModalRef.test.isTesting = false
+        return null
+      })
+      break
+    case 2:
+      /*mysql*/
+      await formRef.mysqlRef.value.validate().then(async () => {
+        result = await dataSourceTest(
+            dataSourceEditModalRef.selectedDataSource,
+            {
+              database: dataSourceEditModalRef.mysqlModel.database,
+              username: dataSourceEditModalRef.mysqlModel.username,
+              password: dataSourceEditModalRef.mysqlModel.password,
+              host: dataSourceEditModalRef.mysqlModel.hostname,
+              port: dataSourceEditModalRef.mysqlModel.port,
+              dialect: 'mysql'
+            })
+      }).catch((e) => {
+        dataSourceEditModalRef.test.isTesting = false
+        return null
+      })
+      break
+    case 3:
+      /*mariadb*/
+      await formRef.mariaDbRef.value.validate().then(async () => {
+        result = await dataSourceTest(
+            dataSourceEditModalRef.selectedDataSource,
+            {
+              database: dataSourceEditModalRef.mariaDbModel.database,
+              username: dataSourceEditModalRef.mariaDbModel.username,
+              password: dataSourceEditModalRef.mariaDbModel.password,
+              host: dataSourceEditModalRef.mariaDbModel.hostname,
+              port: dataSourceEditModalRef.mariaDbModel.port,
+              dialect: 'mariadb'
+            })
+      }).catch((e) => {
+        dataSourceEditModalRef.test.isTesting = false
+        return null
+      })
+      break
+    case 4:
+      /*mssql*/
+      await formRef.mssqlRef.value.validate().then(async () => {
+        result = await dataSourceTest(
+            dataSourceEditModalRef.selectedDataSource,
+            {
+              database: dataSourceEditModalRef.mssqlModel.database,
+              username: dataSourceEditModalRef.mssqlModel.username,
+              password: dataSourceEditModalRef.mssqlModel.password,
+              host: dataSourceEditModalRef.mssqlModel.hostname,
+              port: dataSourceEditModalRef.mssqlModel.port,
+              dialect: 'mssql'
+            })
+      }).catch((e) => {
+        dataSourceEditModalRef.test.isTesting = false
+        return null
+      })
+      break
+  }
   dataSourceEditModalRef.test.isTesting = false
   /*结果处理*/
   if (result != null) {
@@ -540,63 +629,6 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
                 @click="onDeleteDataSource(ds.id)"
                 class="close-btn"
                 title="删除"/>
-            <!--折叠栏-->
-            <!--            <a-collapse v-model:activeKey="activeKey" ghost :expand-icon-position="expandIconPosition">
-                          <a-collapse-panel :key="ds.id" header="详情" :style="customStyle">
-                            <div v-if="isEqual(ds.type,1)" style="margin:0 0  0 24px;">
-                              <a-row>
-                                <a-col>
-                                  <SecondaryText>
-                                    <template #text>存储位置：</template>
-                                  </SecondaryText>
-                                </a-col>
-                                <a-col>
-                                  <SecondaryText>
-                                    <template #text>{{ ds.storage }}</template>
-                                  </SecondaryText>
-                                </a-col>
-                              </a-row>
-                              <a-row>
-                                <a-col>
-                                  <SecondaryText>
-                                    <template #text>存储空间：</template>
-                                  </SecondaryText>
-                                </a-col>
-                                <a-col>
-                                  <SecondaryText>
-                                    <template #text>1GB</template>
-                                  </SecondaryText>
-                                </a-col>
-                              </a-row>
-                            </div>
-                            <div v-if="isEqual(ds.type,2)" style="margin:0 0  0 24px;">
-                              &lt;!&ndash;              <a-row>
-                                              <a-col>
-                                                <SecondaryText>
-                                                  <template #text>存储位置：</template>
-                                                </SecondaryText>
-                                              </a-col>
-                                              <a-col>
-                                                <SecondaryText>
-                                                  <template #text>{{ ds.storage }}</template>
-                                                </SecondaryText>
-                                              </a-col>
-                                            </a-row>
-                                            <a-row>
-                                              <a-col>
-                                                <SecondaryText>
-                                                  <template #text>存储空间：</template>
-                                                </SecondaryText>
-                                              </a-col>
-                                              <a-col>
-                                                <SecondaryText>
-                                                  <template #text>1GB</template>
-                                                </SecondaryText>
-                                              </a-col>
-                                            </a-row>&ndash;&gt;
-                            </div>
-                          </a-collapse-panel>
-                        </a-collapse>-->
           </a-card>
         </a-col>
       </a-row>
@@ -625,8 +657,7 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
             <a-select-option :value="1">SQLite</a-select-option>
             <a-select-option :value="2">MySQL</a-select-option>
             <a-select-option :value="3">MariaDB</a-select-option>
-            <a-select-option :value="4">Microsoft SQL Server</a-select-option>
-            <a-select-option :value="5">Postgres</a-select-option>
+            <a-select-option :value="4">SQL Server</a-select-option>
           </a-select>
         </a-space>
       </a-row>
@@ -734,7 +765,6 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
                                  :rules="[{ required: true, message: '密码不可为空' }]">
                       <a-input-password
                           v-model:value="dataSourceEditModalRef.mysqlModel.password"
-                          :title="dataSourceEditModalRef.mysqlModel.password"
                           allowClear
                       />
                     </a-form-item>
@@ -818,7 +848,6 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
                                  :rules="[{ required: true, message: '密码不可为空' }]">
                       <a-input-password
                           v-model:value="dataSourceEditModalRef.mariaDbModel.password"
-                          :title="dataSourceEditModalRef.mariaDbModel.password"
                           allowClear
                       />
                     </a-form-item>
@@ -831,6 +860,89 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
                       <a-input
                           v-model:value="dataSourceEditModalRef.mariaDbModel.database"
                           :title="dataSourceEditModalRef.mariaDbModel.database"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </a-form>
+            </a-col>
+          </a-row>
+        </a-row>
+        <!--mssql-->
+        <a-row v-if="isEqual(dataSourceEditModalRef.selectedDataSource,4)">
+          <a-row :gutter="50">
+            <a-col>驱动程序:
+              <a-typography-text code>Tedious v15.1.2</a-typography-text>
+            </a-col>
+          </a-row>
+          <a-row style="margin-top: 20px">
+            <a-col>
+              <a-form
+                  :ref="formRef.mssqlRef"
+                  :model="dataSourceEditModalRef.mssqlModel"
+                  labelAlign="left"
+                  style="width: 470px"
+              >
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="名称" name="name" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '名称不可为空' },{max:24,message: '最大长度为24'}]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mssqlModel.name"
+                          :title="dataSourceEditModalRef.mssqlModel.name"
+                          allowClear/>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row :gutter="2">
+                  <a-col :span="16">
+                    <a-form-item label="主机名" name="hostname" :label-col="{span:5}" :wrapper-col="{span:16,offset:1}"
+                                 :rules="[{ required: true, message: '主机名不可为空' }]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mssqlModel.hostname"
+                          :title="dataSourceEditModalRef.mssqlModel.hostname"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                  <a-col :span="8">
+                    <a-form-item label="端口" name="port" :wrapper-col="{offset:2}"
+                                 :rules="[{ required: true, message: '端口号不可为空' }]">
+                      <a-input-number v-model:value="dataSourceEditModalRef.mssqlModel.port" :min="0"/>
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="用户名" name="username" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '用户名不可为空' }]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mssqlModel.username"
+                          :title="dataSourceEditModalRef.mssqlModel.username"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="密码" name="password" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '密码不可为空' }]">
+                      <a-input-password
+                          v-model:value="dataSourceEditModalRef.mssqlModel.password"
+                          allowClear
+                      />
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item label="数据库" name="database" :label-col="{span:4}" :wrapper-col="{span:20}"
+                                 :rules="[{ required: true, message: '数据库名不可为空' }]">
+                      <a-input
+                          v-model:value="dataSourceEditModalRef.mssqlModel.database"
+                          :title="dataSourceEditModalRef.mssqlModel.database"
                           allowClear
                       />
                     </a-form-item>
@@ -882,6 +994,7 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
 
 #content-view {
   overflow-x: hidden;
+  padding-top: 16px;
 
   :deep(.ant-card-body) {
     padding: 12px;

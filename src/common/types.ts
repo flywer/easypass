@@ -11,5 +11,6 @@ export enum dataSourceType {
     none,
     sqlite,
     mysql,
-    mariadb
+    mariadb,
+    mssql
 }

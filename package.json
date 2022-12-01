@@ -33,6 +33,7 @@
     "pg-hstore": "^2.3.4",
     "sqlite3": "^5.1.2",
     "superagent": "^8.0.3",
+    "tedious": "^15.1.2",
     "vue": "^3.2.38",
     "vue-clipboard3": "^2.0.0",
     "vue3-uuid": "^1.0.0",
