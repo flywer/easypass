@@ -7,7 +7,7 @@
   >
     <template #title>
       <a-space>
-        <a-avatar v-if="item.iconUrl.length>0" shape="square" :src="item.iconUrl"/>
+        <a-avatar v-if="!isNull(item.iconUrl) && item.iconUrl.length>0" shape="square" :src="item.iconUrl"/>
         <a-avatar v-else shape="square">{{ item.title.slice(0, 1) }}</a-avatar>
         {{ item.title }}
         <a-space v-for="(showItem) in item.showItems">
