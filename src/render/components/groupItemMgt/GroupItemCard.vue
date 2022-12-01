@@ -7,7 +7,7 @@
   >
     <template #title>
       <a-space>
-        <a-avatar v-if="item.iconUrl!=null" shape="square" :src="item.iconUrl"/>
+        <a-avatar v-if="item.iconUrl.length>0" shape="square" :src="item.iconUrl"/>
         <a-avatar v-else shape="square">{{ item.title.slice(0, 1) }}</a-avatar>
         {{ item.title }}
         <a-space v-for="(showItem) in item.showItems">
@@ -31,11 +31,13 @@
 import ItemCardExtra from "@render/components/groupItemMgt/ItemCardExtra.vue";
 import {copyText} from "@render/utils/clipboard";
 import {CopyOutlined} from '@ant-design/icons-vue'
+import {isNull} from "lodash-es";
 
 const props = defineProps({
   item: {},
   groupItemsList: null
 })
+
 
 // 定义事件
 const emit = defineEmits(['showItemInfo', 'updateList'])
