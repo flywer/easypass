@@ -273,6 +273,7 @@ const formRef = {
 /*新增数据源Ref*/
 const dataSourceEditModalRef = reactive({
   modalVisible: false,
+  isUpdate: false,
   selectedDataSource: 1,
   loading: false,
   test: {
@@ -319,10 +320,11 @@ const dataSourceEditModalRef = reactive({
   }
 })
 
-/*显示更新弹出框*/
+/*更新数据源弹出框显示*/
 const onEdit = (ds: any) => {
   dataSourceEditModalRef.modalVisible = true
   dataSourceEditModalRef.selectedDataSource = ds.type
+  dataSourceEditModalRef.isUpdate = true
   switch (ds.type) {
     case 1:
       dataSourceEditModalRef.sqliteModel.id = ds.id
@@ -361,7 +363,6 @@ const onEdit = (ds: any) => {
 
 /*新增数据源框显示*/
 const onShowDataSourceModal = () => {
-
   dataSourceEditModalRef.sqliteModel = {
     id: null,
     name: '',
@@ -395,6 +396,7 @@ const onShowDataSourceModal = () => {
     database: ''
   }
   dataSourceEditModalRef.modalVisible = true
+  dataSourceEditModalRef.isUpdate = false
 }
 
 /*打开数据源文件*/
@@ -640,7 +642,7 @@ watch(() => dataSourceEditModalRef.modalVisible, (value) => {
       v-model:visible="dataSourceEditModalRef.modalVisible"
       :closable="true"
       :mask-closable="false"
-      title="新增数据源"
+      :title="dataSourceEditModalRef.isUpdate?'编辑数据源':'新增数据源'"
       width="62%"
       class="add-modal"
   >
