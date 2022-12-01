@@ -23,12 +23,14 @@ import {
   DownOutlined,
   ExclamationCircleOutlined,
   UpOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  CopyOutlined
 } from '@ant-design/icons-vue'
 import ProxyForm from "@render/components/settings/common/ProxyForm.vue";
 import {Rule} from "ant-design-vue/es/form";
 import {cloneDeep, isEmpty, isEqual} from "lodash-es";
 import {byteConvert} from "@render/utils/byteConvert";
+import {copyText} from "@render/utils/clipboard";
 
 /*开机自启动*/
 const openAtLoginChecked = ref<boolean>(false);
@@ -564,6 +566,15 @@ onMounted(() => {
             <a-button @click="onOpenAppTempDataFolder">打开Temp文件夹</a-button>
           </a-col>
         </a-row>
+      </template>
+    </RowCard>
+    <a-divider class="setting-divider"/>
+    <!--BUG反馈-->
+    <RowCard>
+      <template #left>BUG反馈</template>
+      <template #right>
+        邮箱：<a href="mailto:1781998918@qq.com">1781998918@qq.com</a>
+        <copy-outlined style="margin-left: 8px" @click="copyText('1781998918@qq.com',true)"/>
       </template>
     </RowCard>
   </a-layout-content>
