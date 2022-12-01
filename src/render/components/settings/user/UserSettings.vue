@@ -2,7 +2,7 @@
 import RowCard from "@render/components/settings/RowCard.vue";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {onMounted, reactive, ref, watch} from "vue";
-import {cloneDeep, isEmpty, isEqual, isNull, isUndefined, random} from "lodash-es";
+import {cloneDeep, isEmpty, isNull, isUndefined, random} from "lodash-es";
 import {
   cancellation,
   checkPassword,
@@ -12,7 +12,7 @@ import {
   registerCheck,
   updateUserInfoByUserId
 } from "@render/api/user.api";
-import {Form, FormInstance, message, Modal} from "ant-design-vue";
+import {Form, FormInstance, message} from "ant-design-vue";
 import {store} from "@render/store";
 import {
   CheckOutlined,

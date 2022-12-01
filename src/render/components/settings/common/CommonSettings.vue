@@ -9,7 +9,6 @@ import {
   openAppDataFolder,
   openAppFolder,
   openAppTempDataFolder,
-  openPath,
   setAppMinSizeLock,
   setAppSettings,
   setAppToken,

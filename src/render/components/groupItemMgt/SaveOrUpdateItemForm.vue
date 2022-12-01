@@ -278,14 +278,19 @@ const onchangeIcon = (icon) => {
     <a-space>
       <a-space>
         <!--返回-->
-        <a-button class="tool-btn"  type="text" size="large" @click="handleBack" title="返回">
-          <template #icon><arrow-left-outlined/></template>
+        <a-button class="tool-btn" type="text" size="large" @click="handleBack" title="返回">
+          <template #icon>
+            <arrow-left-outlined/>
+          </template>
           返回
         </a-button>
       </a-space>
       <!--新增-->
       <a-button @click="handleAddItem" title="新增">
-        <template #icon><PlusOutlined/></template>新增
+        <template #icon>
+          <PlusOutlined/>
+        </template>
+        新增
       </a-button>
     </a-space>
     <!--右侧-->
@@ -334,7 +339,8 @@ const onchangeIcon = (icon) => {
               <a-input placeholder="名称"
                        :bordered="false"
                        v-model:value.trim="element.name"
-                       :readonly="isEqual(element.type,itemType.account) || isEqual(element.type,itemType.title)" style="width: 120px;"/>
+                       :readonly="isEqual(element.type,itemType.account) || isEqual(element.type,itemType.title)"
+                       style="width: 120px;"/>
               <a-divider class="my-form-divider"/>
             </a-form-item>
             <!--内容-->
@@ -354,7 +360,10 @@ const onchangeIcon = (icon) => {
               <a-divider type="vertical" class="my-form-divider-vertical"/>
               <a-radio-group v-model:value="iconChecked" name="radioGroup">
                 <a-radio value="1">
-                  <a-avatar size="large" shape="square" style="margin: 0 0 14px 20px;">{{ element.value.slice(0,1) }}</a-avatar>
+                  <a-avatar size="large" shape="square" style="margin: 0 0 14px 20px;">{{
+                      element.value.slice(0, 1)
+                    }}
+                  </a-avatar>
                 </a-radio>
                 <a-radio value="2">
                   <!--图标选择弹框-->

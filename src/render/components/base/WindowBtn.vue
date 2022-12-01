@@ -1,6 +1,6 @@
 <!-- 窗口的右上角三个操作按钮 -->
 <script setup lang="ts">
-import {BorderOutlined, CloseOutlined, MinusOutlined} from '@ant-design/icons-vue'
+import {CloseOutlined, MinusOutlined} from '@ant-design/icons-vue'
 import {getAppVersion, setWindow} from '@render/api/app.api'
 import {onMounted, ref} from 'vue'
 

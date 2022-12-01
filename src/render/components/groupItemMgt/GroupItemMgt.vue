@@ -7,14 +7,13 @@ import {
   MoreOutlined,
   PlusOutlined,
   ReloadOutlined,
-  ArrowLeftOutlined,
-  CopyOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons-vue'
 import {
   getGroupItemsListByPage, getItemTypeEnum,
 } from "@render/api/groupItem.api";
 import empty from '@render/assets/img/empty.png'
-import {message, Modal} from "ant-design-vue";
+import {message} from "ant-design-vue";
 import ItemsInfoModal from "@render/components/groupItemMgt/ItemsInfoModal.vue";
 import SearchInput from "@render/components/common/SearchInput.vue";
 import {isEmpty, isEqual} from "lodash-es";

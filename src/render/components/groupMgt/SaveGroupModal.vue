@@ -1,6 +1,6 @@
 <!-- 添加分组弹窗 -->
 <script setup lang="ts">
-import {onMounted, reactive, ref, watch} from 'vue'
+import {reactive, ref, watch} from 'vue'
 import {Form, message} from 'ant-design-vue'
 import {saveGroup} from "@render/api/group.api";
 import {store} from "@render/store";

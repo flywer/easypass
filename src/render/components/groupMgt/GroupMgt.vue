@@ -7,11 +7,9 @@ import {
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
-  SettingOutlined,
   CheckOutlined,
   LoadingOutlined,
   MenuOutlined,
-  DragOutlined,
   DownloadOutlined,
   FolderOutlined
 } from '@ant-design/icons-vue'
@@ -19,7 +17,6 @@ import {
   deleteGroupById, exportByGroupIds, getGroupListByUserInfo,
   getGroupListByUserInfoByPage,
   saveGroup,
-  saveOrUpdateGroup,
   updateGroup
 } from "@render/api/group.api";
 import {useRouter} from "vue-router";

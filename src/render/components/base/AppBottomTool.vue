@@ -35,7 +35,7 @@
 import {LockOutlined} from "@ant-design/icons-vue";
 import {store} from "@render/store";
 import {getCommonTextContent, lockApp} from "@render/api/app.api";
-import {message, notification} from "ant-design-vue";
+import {message} from "ant-design-vue";
 import {copyText} from "@render/utils/clipboard";
 import {isNull} from "lodash-es";
 import {h} from "vue";

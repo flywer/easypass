@@ -1,6 +1,6 @@
 <!-- 左侧菜单 -->
 <script setup lang="ts">
-import {DatabaseOutlined, DesktopOutlined, LockOutlined, SettingOutlined, UploadOutlined,} from '@ant-design/icons-vue'
+import {DatabaseOutlined, DesktopOutlined, LockOutlined, SettingOutlined, UploadOutlined} from '@ant-design/icons-vue'
 import {store} from "@render/store";
 import AppBottomTool from "@render/components/base/AppBottomTool.vue";
 import {useRouter} from "vue-router";

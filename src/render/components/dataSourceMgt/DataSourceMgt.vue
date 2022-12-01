@@ -18,7 +18,7 @@ import {
   getAppDbStat,
   getDataSourceList
 } from "@render/api/app.api";
-import {CollapseProps, FormInstance, message, Modal} from "ant-design-vue";
+import {FormInstance, message, Modal} from "ant-design-vue";
 import {cloneDeep, isEmpty, isEqual} from "lodash-es";
 import SecondaryText from "@render/components/settings/SecondaryText.vue";
 import {defaultOpenDialogOptions, showAppOpenDialog, showAppSaveDialog} from "@render/utils/fileDialog";
