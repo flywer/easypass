@@ -5,7 +5,6 @@ import {getAppSettings, getAppTokenSettings, getResourcePath} from "@common/util
 import {tray} from "@main/app/app.tray";
 import {autoUpdater} from "electron-updater";
 import {channel} from "@render/api/channel";
-import log from "electron-log";
 
 const isDev = !app.isPackaged
 let isAutoCheckUpdate = false

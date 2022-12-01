@@ -3,7 +3,6 @@ import path from "path";
 import log from 'electron-log'
 import {promisify} from "util";
 import jsonfile from 'jsonfile'
-import {isEqual} from "lodash";
 
 /**
  * 异步写入本地文件，没有则创建

@@ -6,8 +6,6 @@ import {isEmpty} from "lodash";
 import config from "@common/config/appConfig.json";
 import parseJson from 'parse-json'
 import log from "electron-log";
-import fs from "fs";
-import {promisify} from 'util'
 import {app} from "electron";
 
 //region 字符串

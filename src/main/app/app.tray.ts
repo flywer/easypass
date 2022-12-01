@@ -1,6 +1,6 @@
 import {BrowserWindow, Menu, nativeImage, Tray, MenuItem, dialog, app} from "electron";
 import {getResourcePath} from "@common/utils/utils";
-import path, {join} from "path";
+import path from "path";
 
 export let tray = null
 

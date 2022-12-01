@@ -1,4 +1,4 @@
-import {app, BrowserWindow, dialog} from 'electron'
+import {app, dialog} from 'electron'
 import {createEinf} from 'einf'
 import {AppController} from './controller/app.controller'
 import {createWindow} from './main.window'
@@ -12,13 +12,12 @@ import {getAppDataPath, getAppDbStat, getAppPath, getAppProxySettings, getAppSet
 import log from 'electron-log'
 import {groupInit} from "@main/model/group";
 import {GroupItemInit} from "@main/model/groupItem";
-import {User, UserInit} from "@main/model/user";
+import {UserInit} from "@main/model/user";
 import {databaseInit} from "@main/mapper/databaseInit";
 import {isEqual, isNull} from "lodash";
 import {appLogInit} from "@main/app/app.log";
-import {QueryTypes} from "sequelize";
 import fs from "fs";
-import path, {join} from "path";
+import {join} from "path";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
