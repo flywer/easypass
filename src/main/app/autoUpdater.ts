@@ -19,7 +19,7 @@ export const handleUpdate = (window) => {
         let result = success()
         result.message = '正在检测更新...'
         result.tag = 1
-        window.webContents.send(channel.app.sendUpdateInfo, result)
+        window.webContents.send(channel.app.updater.sendUpdateInfo, result)
     });
 
     //当没有可用更新的时候触发
@@ -28,7 +28,7 @@ export const handleUpdate = (window) => {
         let result = success()
         result.message = '当前为最新版本，无需更新~'
         result.tag = 2
-        window.webContents.send(channel.app.sendUpdateInfo, result)
+        window.webContents.send(channel.app.updater.sendUpdateInfo, result)
     });
 
     //当发现一个可用更新的时候触发
@@ -37,7 +37,7 @@ export const handleUpdate = (window) => {
         let result = success()
         result.result = info
         result.tag = 3
-        window.webContents.send(channel.app.sendUpdateInfo, result)
+        window.webContents.send(channel.app.updater.sendUpdateInfo, result)
     });
 
     // 更新下载进度事件
@@ -46,7 +46,7 @@ export const handleUpdate = (window) => {
         result.message = '下载中'
         result.result = progressObj
         result.tag = 4
-        window.webContents.send(channel.app.sendDownloadProgress, result)
+        window.webContents.send(channel.app.updater.sendDownloadProgress, result)
     })
 
     //安装包下载完成
@@ -54,7 +54,7 @@ export const handleUpdate = (window) => {
         let result = success()
         result.message = '下载完成，是否退出更新？'
         result.tag = 5
-        window.webContents.send(channel.app.sendUpdateDownloaded, result)
+        window.webContents.send(channel.app.updater.sendUpdateDownloaded, result)
     });
 
     autoUpdater.on('error', function (error) {
@@ -62,7 +62,7 @@ export const handleUpdate = (window) => {
         let result = failure()
         result.message = error.message
         result.tag = 6
-        window.webContents.send(channel.app.sendUpdateInfo, result)
+        window.webContents.send(channel.app.updater.sendUpdateInfo, result)
     });
 }
 

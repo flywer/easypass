@@ -7,6 +7,7 @@ import config from "@common/config/appConfig.json";
 import parseJson from 'parse-json'
 import log from "electron-log";
 import {app} from "electron";
+import {appProxyFile, appSettingsFile} from "@common/utils/appFilePath";
 
 //region 字符串
 
@@ -106,11 +107,8 @@ export const getNetworkInfo = () => {
  */
 export const getAppSettings = async () => {
     const defaultSettings = config.defaultSettings
-    const appSettingsFile = {
-        folderPath: path.join(getAppDataPath(), '/config'),
-        fileName: 'settings.json'
-    }
-    const buffer = await readFsSync(path.join(appSettingsFile.folderPath, appSettingsFile.fileName))
+
+    const buffer = await readFsSync(appSettingsFile.getFullPath())
     if (buffer == null || isEmpty(buffer.toString()))
         return defaultSettings
     else
@@ -122,12 +120,8 @@ export const getAppSettings = async () => {
  */
 export const getAppProxySettings = async () => {
     const defaultSettings = config.defaultProxySettings
-    const appSettingsFile = {
-        folderPath: path.join(getAppDataPath(), '/config'),
-        fileName: 'proxy.json'
-    }
 
-    const buffer = await readFsSync(path.join(appSettingsFile.folderPath, appSettingsFile.fileName))
+    const buffer = await readFsSync(appProxyFile.getFullPath())
     if (buffer == null || isEmpty(buffer.toString()))
         return defaultSettings
     else

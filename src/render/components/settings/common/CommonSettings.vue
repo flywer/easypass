@@ -97,7 +97,7 @@ watch(() => store.isDownloaded, () => {
 onMounted(async () => {
   appVersion.value = (await getAppVersion()).data.result
   //接收下载信息
-  ipcInstance.on(channel.app.sendDownloadProgress, (res) => {
+  ipcInstance.on(channel.app.updater.sendDownloadProgress, (res) => {
     progressInfo.value = res.result
   })
 })

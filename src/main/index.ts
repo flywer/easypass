@@ -18,6 +18,10 @@ import {isEqual, isNull} from "lodash";
 import {appLogInit} from "@main/app/app.log";
 import fs from "fs";
 import {join} from "path";
+import {AppSettingsController} from "@main/controller/app.settings.controller";
+import {AppWindowController} from "@main/controller/app.window.controller";
+import {AppUpdaterController} from "@main/controller/app.updater.controller";
+import {AppDataSourceController} from "@main/controller/app.dataSource.controller";
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -100,7 +104,16 @@ async function bootstrap() {
 
         await createEinf({
             window: createWindow,
-            controllers: [AppController, GroupController, GroupItemController, UserController],
+            controllers: [
+                AppController,
+                AppSettingsController,
+                AppWindowController,
+                AppUpdaterController,
+                AppDataSourceController,
+                GroupController,
+                GroupItemController,
+                UserController
+            ],
             injects: [{
                 name: 'IS_DEV',
                 inject: !app.isPackaged,

@@ -41,7 +41,7 @@ const autoThemeConfig = async () => {
 
 /*监听应用更新下载完毕回调*/
 const updateDownloadedListener = () => {
-  ipcInstance.on(channel.app.sendUpdateDownloaded, res => {
+  ipcInstance.on(channel.app.updater.sendUpdateDownloaded, res => {
     store.isDownloaded = true
     Modal.confirm({
       title: '提示',
@@ -126,7 +126,7 @@ watch(() => store.tokenCheckRemainTimes, (value) => {
 
 const autoCheckUpdates = () => {
   const updateKey = 'updateKey'
-  ipcInstance.on(channel.app.sendUpdateInfo, (res) => {
+  ipcInstance.on(channel.app.updater.sendUpdateInfo, (res) => {
     switch (res.tag) {
         //检测更新时
       case 1:

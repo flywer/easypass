@@ -17,7 +17,6 @@ export const routeName = {
     DATA_SOURCE: 'dataSource'
 }
 
-
 // 定义一些路由
 const routes: Array<RouteRecordRaw> = [
     {
@@ -38,15 +37,18 @@ const routes: Array<RouteRecordRaw> = [
         path: '/settings/:tabActiveKey',
         name: routeName.SETTINGS,
         component: Settings,
-    }, {
+    },
+    {
         path: '/items',
         name: routeName.GROUP_ITEM,
         component: GroupItems,
-    }, {
+    },
+    {
         path: '/save_item',
         name: routeName.GROUP_ITEM_TABLE_FORM,
         component: GroupItemTableForm,
-    }, {
+    },
+    {
         path: '/dataSource',
         name: routeName.DATA_SOURCE,
         component: DataSourceMgt,

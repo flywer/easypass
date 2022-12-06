@@ -32,5 +32,5 @@ export function showSaveDialog(options) {
 }
 
 export function dataSourceTest(type: number, options) {
-    return ipcInstance.send<Result>(channel.app.dataSourceTest, type, options)
+    return ipcInstance.send<Result>(channel.app.dataSource.dataSourceTest, type, options)
 }

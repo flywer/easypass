@@ -1,21 +1,20 @@
 import {ipcInstance} from '@render/plugins'
 import {channel} from "@render/api/channel";
 import {Result} from "@main/vo/resultVo";
-import {getAppDataPath} from "@common/utils/utils";
 
 /**
  * 设置主窗体 最大化、最小化、关闭
  * @param setup
  */
 export function setWindow(setup: string) {
-    return ipcInstance.send<string>(channel.app.setWindow, setup)
+    return ipcInstance.send<string>(channel.app.window.setWindow, setup)
 }
 
 /**
  * 获取应用主题
  */
 export function getAppTheme() {
-    return ipcInstance.send<Result>(channel.app.getAppTheme)
+    return ipcInstance.send<Result>(channel.app.settings.getAppTheme)
 }
 
 /**
@@ -23,35 +22,35 @@ export function getAppTheme() {
  * @param data
  */
 export function setAppTheme(data) {
-    return ipcInstance.send<Result>(channel.app.setAppTheme, data)
+    return ipcInstance.send<Result>(channel.app.settings.setAppTheme, data)
 }
 
 /**
  * 获取应用版本号
  */
 export function getAppVersion() {
-    return ipcInstance.send<Result>(channel.app.getAppVersion)
+    return ipcInstance.send<Result>(channel.app.updater.getAppVersion)
 }
 
 /**
  * 检查应用是否需要更新
  */
 export function checkForUpdate() {
-    return ipcInstance.send<Result>(channel.app.checkForUpdate)
+    return ipcInstance.send<Result>(channel.app.updater.checkForUpdate)
 }
 
 /**
  * 下载更新
  */
 export function downloadUpdate() {
-    return ipcInstance.send<Result>(channel.app.downloadUpdate)
+    return ipcInstance.send<Result>(channel.app.updater.downloadUpdate)
 }
 
 /**
  * 退出应用并安装
  */
 export function quitAndInstall() {
-    return ipcInstance.send<Result>(channel.app.quitAndInstall)
+    return ipcInstance.send<Result>(channel.app.updater.quitAndInstall)
 }
 
 /**
@@ -72,7 +71,7 @@ export function getAppInfo() {
  * 获取应用设置
  */
 export function getAppSettings() {
-    return ipcInstance.send<Result>(channel.app.getAppSettings)
+    return ipcInstance.send<Result>(channel.app.settings.getAppSettings)
 }
 
 /**
@@ -80,7 +79,7 @@ export function getAppSettings() {
  * @param setup
  */
 export function setAppSettings(setup) {
-    return ipcInstance.send<Result>(channel.app.setAppSettings, setup)
+    return ipcInstance.send<Result>(channel.app.settings.setAppSettings, setup)
 }
 
 /**
@@ -94,14 +93,14 @@ export function appRelaunch() {
  * 应用网络代理设置
  */
 export function setProxy(setup) {
-    return ipcInstance.send<Result>(channel.app.setProxy, setup)
+    return ipcInstance.send<Result>(channel.app.settings.setProxySettings, setup)
 }
 
 /**
  * 获取网络代理设置
  */
 export function getAppProxySettings() {
-    return ipcInstance.send<Result>(channel.app.getAppProxySettings)
+    return ipcInstance.send<Result>(channel.app.settings.getAppProxySettings)
 }
 
 /**
@@ -216,28 +215,28 @@ export function lockApp() {
  * 获取数据源
  */
 export function getDataSourceList() {
-    return ipcInstance.send<Result>(channel.app.getDataSourceList)
+    return ipcInstance.send<Result>(channel.app.dataSource.getDataSourceList)
 }
 
 /**
  * 添加或更新数据源
  */
 export function saveOrUpdateDataSource(options) {
-    return ipcInstance.send<Result>(channel.app.addDataSource, options)
+    return ipcInstance.send<Result>(channel.app.dataSource.addDataSource, options)
 }
 
 /**
  * 获取应用数据库目前需要进行的操作配置
  */
 export function getAppDbStat() {
-    return ipcInstance.send<Result>(channel.app.getAppDbStat)
+    return ipcInstance.send<Result>(channel.app.dataSource.getAppDbStat)
 }
 
 /**
  * 切换数据源
  */
 export function changeDataSource(id: string) {
-    return ipcInstance.send<Result>(channel.app.changeDataSource, id)
+    return ipcInstance.send<Result>(channel.app.dataSource.changeDataSource, id)
 }
 
 /**
@@ -245,7 +244,7 @@ export function changeDataSource(id: string) {
  * @param id
  */
 export function deleteDataSource(id: string) {
-    return ipcInstance.send<Result>(channel.app.deleteDataSource, id)
+    return ipcInstance.send<Result>(channel.app.dataSource.deleteDataSource, id)
 }
 
 /**
