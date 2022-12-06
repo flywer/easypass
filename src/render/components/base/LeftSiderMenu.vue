@@ -12,14 +12,22 @@ const router = useRouter()
 const handleClick: MenuProps['onClick'] = menuInfo => {
   store.selectedMenuKeys = [menuInfo.key as string]
   const value = menuInfo.key as string
-  if (value === '100') {
-    router.push({name: routeName.GROUP_MGT, params: {key: value}})
-  } else if (value === '200') {
-    router.push({name: routeName.COMMON_ACCOUNT})
-  } else if (value === '400') {
-    router.push({name: routeName.DATA_SOURCE})
-  } else if (value === '500') {
-    router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}})
+
+  switch (value) {
+    case routeName.GROUP_MGT:
+      router.push({name: value})
+      break
+    case routeName.COMMON_ACCOUNT:
+      router.push({name: value})
+      break
+    case routeName.DATA_SOURCE:
+      router.push({name: value})
+      break
+    case routeName.SETTINGS:
+      router.push({name: value, params: {tabActiveKey: '1'}})
+      break
+    default:
+      break
   }
 }
 
@@ -38,23 +46,23 @@ const handleClick: MenuProps['onClick'] = menuInfo => {
         user-select: none;"
         @click="handleClick"
     >
-      <a-menu-item key="100">
+      <a-menu-item :key=routeName.GROUP_MGT>
         <LockOutlined/>
         <span>账号管理</span>
       </a-menu-item>
-      <a-menu-item key="200">
+      <a-menu-item :key=routeName.COMMON_ACCOUNT>
         <DesktopOutlined/>
         <span>常用账号</span>
       </a-menu-item>
-      <a-menu-item key="300">
-        <UploadOutlined/>
-        <span>批量导入</span>
-      </a-menu-item>
-      <a-menu-item key="400">
+      <!--      <a-menu-item key="300">
+              <UploadOutlined/>
+              <span>批量导入</span>
+            </a-menu-item>-->
+      <a-menu-item :key=routeName.DATA_SOURCE>
         <DatabaseOutlined/>
         <span>数据源</span>
       </a-menu-item>
-      <a-menu-item key="500">
+      <a-menu-item :key=routeName.SETTINGS>
         <SettingOutlined/>
         <span>设置</span>
       </a-menu-item>

@@ -47,7 +47,7 @@ const onLockApp = () => {
         h('span', {}, '未设置应用令牌，'),
         h('a', {
           onClick: () => {
-            store.selectedMenuKeys = ['500']
+            store.selectedMenuKeys = [routeName.SETTINGS]
             router.push({name: routeName.SETTINGS, params: {tabActiveKey: '3'}}).then(() => {
               message.destroy()
             })
@@ -68,7 +68,7 @@ const onCopyCommonAccount = () => {
           h('span', {}, '未设置常用账户，'),
           h('a', {
             onClick: () => {
-              store.selectedMenuKeys = ['500']
+              store.selectedMenuKeys = [routeName.SETTINGS]
               router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}}).then(() => {
                 message.destroy()
               })
@@ -90,7 +90,7 @@ const onCopyCommonPassword = () => {
           h('span', {}, '未设置常用密码，'),
           h('a', {
             onClick: () => {
-              store.selectedMenuKeys = ['500']
+              store.selectedMenuKeys = [routeName.SETTINGS]
               router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}}).then(() => {
                 message.destroy()
               })

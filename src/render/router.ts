@@ -21,10 +21,10 @@ export const routeName = {
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        redirect: '/group/100',
+        redirect: '/group',
     },
     {
-        path: '/group/:key',
+        path: '/group',
         name: routeName.GROUP_MGT,
         component: GroupMgt,
     },

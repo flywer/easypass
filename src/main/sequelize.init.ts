@@ -11,7 +11,7 @@ export const sequelizeInit = async () => {
     const dsId = (await getAppDbStat()).currentDSId
     let curDS = dataSourceSettings.filter(item => isEqual(item.id, dsId)).at(0)
     if (isEqual(curDS.type, dataSourceType.sqlite)) {
-        sequelize = new Sequelize({dialect: 'sqlite', storage: curDS.storage})
+        sequelize = new Sequelize({dialect: curDS.dialect, storage: curDS.storage})
     } else if (isEqual(curDS.type, dataSourceType.mysql) || isEqual(curDS.type, dataSourceType.mariadb) || isEqual(curDS.type, dataSourceType.mssql)) {
         sequelize = new Sequelize(curDS.database, curDS.username, curDS.password, {
             host: curDS.hostname,

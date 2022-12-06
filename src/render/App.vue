@@ -6,8 +6,8 @@ import CenterContent from '@render/components/base/CenterContent.vue'
 import {Button, ConfigProvider, message, Modal, notification} from 'ant-design-vue';
 import {
   downloadUpdate,
-  getAppSettings,
-  getAppTheme, getTokenSettings,
+  getAppTheme,
+  getTokenSettings,
   quitAndInstall
 } from "@render/api/app.api";
 import {store} from "@render/store";
@@ -71,8 +71,8 @@ const openUnLoginNotification = () => {
               type: 'primary',
               size: 'small',
               onClick: () => {
-                store.selectedMenuKeys = ['500']
-                router.push({name: routeName.SETTINGS})
+                store.selectedMenuKeys = [routeName.SETTINGS]
+                router.push({name: routeName.SETTINGS, params: {tabActiveKey: '1'}})
                 notification.destroy()
               },
             },
@@ -171,6 +171,7 @@ const antMessageInit = () => {
     duration: 2
   })
 }
+
 </script>
 
 <template>
