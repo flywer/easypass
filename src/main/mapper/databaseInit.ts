@@ -6,9 +6,9 @@ import log from 'electron-log'
 import {dialog} from "electron";
 
 /**
- * 数据库初始化  false,false如果表不存在,则创建该表(如果已经存在,则不执行任何操作)
- * @param alter 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
- * @param force  将创建表,如果表已经存在,则将其首先删除
+ * 数据库初始化  alter=false,force=false 如果表不存在,则创建该表(如果已经存在,则不执行任何操作)
+ * @param alter alter=true 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
+ * @param force  force=true 将创建表,如果表已经存在,则将其首先删除
  */
 export const databaseInit = async (alter?: boolean, force?: boolean) => {
     if (typeof (alter) === 'undefined') alter = false

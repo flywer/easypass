@@ -415,7 +415,7 @@ onMounted(() => {
         </a-form>
         <!--解除令牌验证表单-->
         <a-form
-            class="animate__animated animate__flipInX"
+            class="animate__animated animate__flipInX row-card-form"
             v-show="appTokenCancelRef.isShowValidTokenForm"
             :model="appTokenCancelRef.validModel"
             @finish="onTokenCancelValidToken"
@@ -434,7 +434,7 @@ onMounted(() => {
         </a-form>
         <!--修改令牌验证表单-->
         <a-form
-            class="animate__animated animate__flipInX"
+            class="animate__animated animate__flipInX row-card-form"
             v-show="appTokenUpdateRef.isShowValidTokenForm"
             :model="appTokenUpdateRef.validModel"
             @finish="onTokenUpdateValidToken"

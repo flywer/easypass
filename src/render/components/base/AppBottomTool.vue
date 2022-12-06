@@ -10,22 +10,14 @@
     <a-col>
       <a-button type="text" class="sider-tool-btn" title="常用账号" @click="onCopyCommonAccount">
         <template #icon>
-          <span class="icon" style="position: absolute;
-    bottom: 9px;
-    left: 26%;
-    font-size: 13px;
-    font-weight: bold;">账</span>
+          <span class="icon acc-icon">账</span>
         </template>
       </a-button>
     </a-col>
     <a-col>
       <a-button type="text" class="sider-tool-btn" title="常用密码" @click="onCopyCommonPassword">
         <template #icon>
-          <span class="icon" style="position: absolute;
-    bottom: 8px;
-    left: 26%;
-    font-size: 13px;
-    font-weight: bold;">密</span>
+          <span class="icon pwd-icon">密</span>
         </template>
       </a-button>
     </a-col>
@@ -126,6 +118,22 @@ const onCopyCommonPassword = () => {
 
   .icon {
     color: @primary-6;
+  }
+
+  .acc-icon{
+    position: absolute;
+    bottom: 9px;
+    left: 26%;
+    font-size: 13px;
+    font-weight: bold;
+  }
+
+  .pwd-icon{
+    position: absolute;
+    bottom: 8px;
+    left: 26%;
+    font-size: 13px;
+    font-weight: bold;
   }
 }
 
