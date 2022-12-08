@@ -3,6 +3,7 @@ import {AppService} from "@main/service/app.service";
 import {BrowserWindow} from "electron";
 import {channel} from "@render/api/channel";
 import {getAppSettings} from "@common/utils/utils";
+import {isEqual} from "lodash";
 
 /**
  * 应用窗口Controller
@@ -23,7 +24,6 @@ export class AppWindowController {
     @IpcHandle(channel.app.window.setWindow)
     public async HandleSetWindow(setup: string) {
         if (setup === 'window-min') {
-
             this.mainWindow.minimize()
         } else if (setup === 'window-max') {
             if (this.mainWindow.isMaximized())
@@ -35,6 +35,10 @@ export class AppWindowController {
             if (appSettings.closeAsHidden) {
                 this.mainWindow.hide()
             } else this.mainWindow.close()
+        } else if (isEqual(setup, 'window-top')) {
+            this.mainWindow.setAlwaysOnTop(true)
+        } else if (isEqual(setup, 'window-un-top')) {
+            this.mainWindow.setAlwaysOnTop(false)
         }
     }
 }
