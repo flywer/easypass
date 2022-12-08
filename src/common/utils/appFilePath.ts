@@ -1,53 +1,54 @@
 import path from "path";
 import os from "os";
 
-/*似乎utils文件加载在此文件之后，出现了无法使用其方法的问题，这里再写一遍*/
-const getAppDataPath = () => {
-    return path.join(os.homedir(), '/AppData/Local/EasyPass')
-}
+/*应用配置文件夹路径*/
+export const appSettingsFolderPath = path.join(os.homedir(), '/AppData/Local/EasyPass/config')
 
 /*应用设置文件*/
 export const appSettingsFile = {
-    folderPath: path.join(getAppDataPath(), '/config'),
     fileName: 'settings.json',
     getFullPath: () => {
-        return path.join(appSettingsFile.folderPath, appSettingsFile.fileName)
+        return path.join(appSettingsFolderPath, appSettingsFile.fileName)
     }
 }
 
 /*应用主题文件*/
 export const appThemeFile = {
-    folderPath: path.join(getAppDataPath(), '/config'),
     fileName: 'theme.json',
     getFullPath: () => {
-        return path.join(appThemeFile.folderPath, appThemeFile.fileName)
+        return path.join(appSettingsFolderPath, appThemeFile.fileName)
     }
 }
 
 /*网络代理配置文件*/
 export const appProxyFile = {
-    folderPath: path.join(getAppDataPath(), '/config'),
     fileName: 'proxy.json',
     getFullPath: () => {
-        return path.join(appProxyFile.folderPath, appProxyFile.fileName)
+        return path.join(appSettingsFolderPath, appProxyFile.fileName)
     }
 }
 
 /*数据源文件*/
 export const appDSFile = {
-    folderPath: path.join(getAppDataPath(), '/config'),
     fileName: 'ds.json',
     getFullPath: () => {
-        return path.join(appDSFile.folderPath, appDSFile.fileName)
+        return path.join(appSettingsFolderPath, appDSFile.fileName)
     }
 }
 
 /*数据库操作文件*/
 export const appDSStatFile = {
-    folderPath: path.join(getAppDataPath(), '/config'),
     fileName: 'dbStat.json',
     getFullPath: () => {
-        return path.join(appDSStatFile.folderPath, appDSStatFile.fileName)
+        return path.join(appSettingsFolderPath, appDSStatFile.fileName)
+    }
+}
+
+/*用户本地信息文件*/
+export const userConfigFile = {
+    fileName: 'userConfig.json',
+    getFullPath: () => {
+        return path.join(appSettingsFolderPath, userConfigFile.fileName)
     }
 }
 

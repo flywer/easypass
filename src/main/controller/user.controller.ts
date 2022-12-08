@@ -12,6 +12,7 @@ import {GroupItemService} from "@main/service/groupItem.service";
 import log from 'electron-log'
 import {IUserVo} from "@main/model/user";
 import {sendEmail} from "@common/utils/mailer";
+import {appSettingsFolderPath, userConfigFile} from "@common/utils/appFilePath";
 
 @Controller()
 export class UserController {
@@ -21,15 +22,6 @@ export class UserController {
         private groupItemService: GroupItemService,
         @Window() private readonly mainWindow: BrowserWindow // 主窗口实例
     ) {
-    }
-
-    /*用户本地信息文件*/
-    private readonly userConfigFile = {
-        folderPath: path.join(getAppDataPath(), '/config'),
-        fileName: 'userConfig.json',
-        getFullPath: () => {
-            return path.join(this.userConfigFile.folderPath, this.userConfigFile.fileName)
-        }
     }
 
     /**
@@ -100,7 +92,7 @@ export class UserController {
             } else {
                 const data = result.result
                 data.lastLoginTime = getDateString()
-                jsonfileWrite(this.userConfigFile.getFullPath(), data, {spaces: 2})
+                jsonfileWrite(userConfigFile.getFullPath(), data, {spaces: 2})
                 result.tag = 2
                 result.message = '登录成功！'
             }
@@ -120,7 +112,7 @@ export class UserController {
         let result
         try {
             result = success()
-            let buffer = await readFsSync(this.userConfigFile.getFullPath())
+            let buffer = await readFsSync(userConfigFile.getFullPath())
             if (buffer != null) {
                 let userInfo = parseJson(buffer.toString())
                 let res = await this.userService.login(userInfo, true)
@@ -130,7 +122,7 @@ export class UserController {
                 } else {
                     res.lastLoginTime = getDateString()
                     result.result = res
-                    jsonfileWrite(this.userConfigFile.getFullPath(), res, {spaces: 2})
+                    jsonfileWrite(userConfigFile.getFullPath(), res, {spaces: 2})
                 }
             } else {
                 //不存在本地记录
@@ -153,7 +145,7 @@ export class UserController {
         try {
             result = success()
             //删除本地账号记录
-            deleteFileFs(this.userConfigFile.getFullPath())
+            deleteFileFs(userConfigFile.getFullPath())
         } catch (e) {
             log.error(e)
             result = failure()
@@ -172,7 +164,7 @@ export class UserController {
         let result
         try {
             //删除本地账号记录
-            deleteFileFs(this.userConfigFile.getFullPath())
+            deleteFileFs(userConfigFile.getFullPath())
             //查询组信息
             const groupIdList = await this.groupService.getGroupIdByUserId(user.id)
             //删除账号组项
@@ -205,7 +197,7 @@ export class UserController {
                 await this.userService.updateUserInfoByUserId(user)
                 let userData = await this.userService.getUserById(user.id)
                 //更新本地文件
-                jsonfileWrite(this.userConfigFile.getFullPath(), userData, {spaces: 2})
+                jsonfileWrite(userConfigFile.getFullPath(), userData, {spaces: 2})
                 result = success("更新成功！")
             }
         } catch (error) {
