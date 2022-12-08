@@ -56,6 +56,16 @@ const props = defineProps({
     bottom: 7%;
     margin-left: 12px
   }
+
+  .card-image-left {
+    background-color: #0078ff;
+    width: 20px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
 }
 
 .bottom-card {
@@ -68,7 +78,7 @@ const props = defineProps({
 </style>
 
 <style lang="less">
-.row-card-form{
+.row-card-form {
   max-height: 32px;
 }
 </style>
