@@ -7,7 +7,6 @@ import {autoUpdater} from "electron-updater";
 import {channel} from "@render/api/channel";
 
 const isDev = !app.isPackaged
-let isAutoCheckUpdate = false
 export let mainWindow
 
 export async function createWindow() {

@@ -36,8 +36,8 @@ const config = {
       provider: 'github', // 打包上传到github
       owner: 'flywer', // 仓库所有者
       repo: 'easy-pass-updater', // 仓库名称
-      private: true, // 若是私有仓库，则将私有设置为true，同时添加token，反之不需要设置
-      token: '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', // github的私有token
+      /*      private: true, // 若是私有仓库，则将私有设置为true，同时添加token，反之不需要设置
+                  token: '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', // github的私有token */
       releaseType: 'release', // 上传到github的版本类型（draft:草稿，prerelease:提前发行版，release:发行版）
     },
   ],
