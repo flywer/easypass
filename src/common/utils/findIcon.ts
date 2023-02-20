@@ -1,6 +1,5 @@
 import superagent from 'superagent'
 import cheerio from 'cheerio'
-import log from "electron-log";
 import {isEmpty, isEqual} from "lodash";
 
 const baseUrl = 'https://cn.bing.com/images/search?'
@@ -9,7 +8,6 @@ const option = '&qs=n&form=QBIR&qft=%20filterui%3Aimagesize-custom_128_128%20fil
 export const findIcon = async (q: string, number: number) => {
     if (!isEmpty(q)) {
         const url = baseUrl + 'q=' + encodeURI(q) + option
-        log.info('图片搜素URL', url)
         const html = await superagent.get(url)
         return getIcon(html.text, number)
     }
