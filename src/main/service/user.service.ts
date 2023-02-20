@@ -25,11 +25,11 @@ export class UserService {
     public async login(userVo: IUserVo, isAuto: boolean) {
         if (!isAuto)//加密
             userVo.password = accountEncrypt(userVo.password)
-        return (await this.userMapper.getUserByAccountLogin(userVo))?.dataValues
+        return (await this.userMapper.getUserByAccountLogin(userVo))[0]?.dataValues
     }
 
     public async getUserById(userId: string) {
-        return (await this.userMapper.getUserById(userId))?.dataValues
+        return (await this.userMapper.getUserById(userId))[0]?.dataValues
     }
 
     public async updateUserInfoByUserId(user: IUserVo) {

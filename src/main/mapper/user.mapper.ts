@@ -24,7 +24,7 @@ export class UserMapper {
     }
 
     public async getUserByAccountLogin(user: IUserVo) {
-        return await User.findOne({
+        return await User.findAll({
             where: {
                 account: user.account,
                 password: user.password
@@ -57,7 +57,7 @@ export class UserMapper {
     }
 
     public async getUserById(userId: string) {
-        return await User.findOne({
+        return await User.findAll({
             where: {
                 id: userId
             }
