@@ -4,8 +4,9 @@ import {computed, onMounted, ref, watch} from "vue";
 import {CopyOutlined} from '@ant-design/icons-vue'
 import {copyText} from "@render/utils/clipboard";
 import {useRouter} from "vue-router";
-import {isEmpty, isEqual, isNull} from "lodash-es";
+import {isEmpty, isEqual} from "lodash-es";
 import {getItemTypeEnum} from "@render/api/groupItem.api";
+import {routeName} from "@render/router";
 
 const router = useRouter()
 
